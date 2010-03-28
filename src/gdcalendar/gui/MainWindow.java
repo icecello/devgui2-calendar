@@ -17,9 +17,14 @@ public class MainWindow extends JFrame {
     public MainWindow() {
         setLayout(new BorderLayout());
         CollapsiblePanel collapsiblePanel = new CollapsiblePanel(CollapsiblePanel.EAST);
-        Container leftContainer = collapsiblePanel.getContentPane();
-        JPanel leftPanel = new JPanel(new GridLayout());
-        leftPanel.add(new JLabel("hej hej hej"));
+        Container leftContainer = collapsiblePanel.getContentPanel();
+
+
+        JPanel leftPanel = new JPanel(new GridLayout(0, 1));
+        leftPanel.add(new JLabel("Item 1"));
+        leftPanel.add(new JLabel("Item 2"));
+        leftPanel.add(new JLabel("Item 3"));
+        leftPanel.add(new JLabel("Item 4"));
 
         leftContainer.add(leftPanel);
 
