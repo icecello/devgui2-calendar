@@ -2,7 +2,7 @@ package gdcalendar.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Container;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -27,14 +27,14 @@ public class CollapsiblePanel extends JPanel implements MouseListener {
      * the very left of the panel.
      */
     public static final int NORTH = 1, WEST = 2, SOUTH = 3, EAST = 4;
-    private JPanel contentPanel;                //Content panel, available to the user
-    private JPanel north, south, west, east;    //Panels containing exp/min button
+    private JPanel contentPanel;                //Content panel, area available to the user
+    private JPanel north, south, west, east;    //Panels containing expand/collapse button
     private boolean expanded = true;            //Indicate if panel expanded
     private JButton collapseButton;             //Button making panel expand/collapse
     private int orientation;                    //The current orientation of the panel
-                                                //can attain the values NORTH,WEST,SOUTH or EAST
+    //can attain the values NORTH,WEST,SOUTH or EAST
     private int buttonSize = 5;                 //The default collapsButton size
-    private int arrowSize;                      //The size of the arrow, displayed in the 
+    private int arrowSize;                      //The size of the arrow, displayed in the
     private Polygon downArrow, leftArrow, upArrow, rightArrow;
 
     /**
@@ -77,11 +77,12 @@ public class CollapsiblePanel extends JPanel implements MouseListener {
                         super.paintComponent(g);
                         g.setColor(Color.GRAY);
                         if (expanded) {
-                            g.translate(getSize().width / 2, 0);
-                            g.fillPolygon(upArrow);
-                        } else {
                             g.translate(getSize().width / 2, getSize().height);
                             g.fillPolygon(downArrow);
+
+                        } else {
+                            g.translate(getSize().width / 2, 0);
+                            g.fillPolygon(upArrow);
                         }
                         g.dispose();
                     }
@@ -91,7 +92,7 @@ public class CollapsiblePanel extends JPanel implements MouseListener {
                 north.add(collapseButton, BorderLayout.CENTER);
                 north.setPreferredSize(new Dimension(0, buttonSize));
                 north.setCursor(Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR));
-                add(north, BorderLayout.PAGE_START);
+                super.add(north, BorderLayout.PAGE_START);
                 break;
 
             case EAST:
@@ -115,7 +116,7 @@ public class CollapsiblePanel extends JPanel implements MouseListener {
                 east.add(collapseButton, BorderLayout.CENTER);
                 east.setPreferredSize(new Dimension(buttonSize, 0));
                 east.setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
-                add(east, BorderLayout.LINE_END);
+                super.add(east, BorderLayout.LINE_END);
                 break;
 
             case SOUTH:
@@ -126,11 +127,11 @@ public class CollapsiblePanel extends JPanel implements MouseListener {
                         super.paintComponent(g);
                         g.setColor(Color.GRAY);
                         if (expanded) {
-                            g.translate(getSize().width / 2, getSize().height);
-                            g.fillPolygon(downArrow);
-                        } else {
                             g.translate(getSize().width / 2, 0);
                             g.fillPolygon(upArrow);
+                        } else {
+                            g.translate(getSize().width / 2, getSize().height);
+                            g.fillPolygon(downArrow);
                         }
                         g.dispose();
                     }
@@ -139,7 +140,7 @@ public class CollapsiblePanel extends JPanel implements MouseListener {
                 south.add(collapseButton, BorderLayout.CENTER);
                 south.setPreferredSize(new Dimension(0, buttonSize));
                 south.setCursor(Cursor.getPredefinedCursor(Cursor.S_RESIZE_CURSOR));
-                add(south, BorderLayout.PAGE_END);
+                super.add(south, BorderLayout.PAGE_END);
                 break;
 
             case WEST:
@@ -163,7 +164,7 @@ public class CollapsiblePanel extends JPanel implements MouseListener {
                 west.add(collapseButton, BorderLayout.CENTER);
                 west.setPreferredSize(new Dimension(buttonSize, 0));
                 west.setCursor(Cursor.getPredefinedCursor(Cursor.W_RESIZE_CURSOR));
-                add(west, BorderLayout.LINE_START);
+                super.add(west, BorderLayout.LINE_START);
                 break;
         }
         //Remove all mouseListners from the button, so that it will not change
@@ -171,7 +172,33 @@ public class CollapsiblePanel extends JPanel implements MouseListener {
         collapseButton.removeMouseListener(collapseButton.getMouseListeners()[0]);
 
         collapseButton.addMouseListener(this);
-        add(contentPanel, BorderLayout.CENTER);
+        super.add(contentPanel, BorderLayout.CENTER);
+    }
+
+    /**
+     * Collapse the panel, making all except the expand/collapse button invisible
+     */
+    public void collapse() {
+        if (!expanded) {
+            return;
+        } else {
+            contentPanel.setVisible(false);
+        }
+        expanded = !expanded;
+        repaint();
+    }
+
+    /**
+     * Expand the panel, making the complete panel visible
+     */
+    public void expand() {
+        if (expanded) {
+            return;
+        } else {
+            contentPanel.setVisible(true);
+        }
+        expanded = !expanded;
+        repaint();
     }
 
     //Create a arrow pointing downwards
@@ -203,36 +230,24 @@ public class CollapsiblePanel extends JPanel implements MouseListener {
     }
 
     /**
-     * Get the panel which is supposed to contain the content of the collapsiblePanel
-     * @return The container holding the content of the collapsiblePanel
-     */
-    public Container getContentPanel() {
-        return contentPanel;
-    }
-
-    /**
      * Set the size of the collapsible panel button
-     * @param size The new size of the button in pixels (0>=)
+     * @param size The new size of the button in pixels (size>=0)
      */
     public void setCollapsButtonSize(int size) {
         buttonSize = size;
         //Redefine the collapseButton, and add it to the collapsiblePanel
         switch (orientation) {
             case NORTH:
-                collapseButton.setPreferredSize(new Dimension(0, buttonSize));
-                north.add(collapseButton,BorderLayout.PAGE_START);
+                north.setPreferredSize(new Dimension(0, buttonSize));
                 break;
             case WEST:
-                collapseButton.setPreferredSize(new Dimension(buttonSize,0));
-                west.add(collapseButton,BorderLayout.LINE_START);
+                west.setPreferredSize(new Dimension(buttonSize, 0));
                 break;
             case SOUTH:
-                collapseButton.setPreferredSize(new Dimension(0, buttonSize));
-                south.add(collapseButton,BorderLayout.PAGE_END);
+                south.setPreferredSize(new Dimension(0, buttonSize));
                 break;
             case EAST:
-                collapseButton.setPreferredSize(new Dimension(buttonSize,0));
-                east.add(collapseButton,BorderLayout.LINE_END);
+                east.setPreferredSize(new Dimension(buttonSize, 0));
                 break;
         }
         //Make sure the arrow is large enough
@@ -248,6 +263,33 @@ public class CollapsiblePanel extends JPanel implements MouseListener {
         arrowLeft(arrowSize);
     }
 
+    /**
+     * Add a component to the content pane of the collapsible panel
+     * @param comp The component to be added
+     * @return The component added
+     */
+    @Override
+    public Component add(Component comp) {
+        return contentPanel.add(comp);
+    }
+
+    /**
+     * Add a component to the collapsible panel,with layout defined by the
+     * constraints
+     * @param comp The component to be added
+     * @param constraints An object expressing layout contraints for this component
+     * @deprecated To add a component to the collapsible panel, use {@link #add(Component)}
+     */
+    @Deprecated
+    @Override
+    public void add(Component comp, Object constraints) {
+        //Don't do anything
+    }
+
+    /**
+     * Collapse/Expand the collapsible panel on mouse clicks
+     * @param e The mouseEvent fired
+     */
     public void mouseClicked(MouseEvent e) {
         if (expanded) {
             contentPanel.setVisible(false);
