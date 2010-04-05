@@ -59,6 +59,7 @@ public class CalendarContainer extends JPanel {
         // Create a calendar for current day
         Calendar cal = GregorianCalendar.getInstance();
         // Debug calendar to manually set the date
+        // Confusing! Set as (Year, Month(0-11), Day(1-*))
         // Calendar cal = new GregorianCalendar(2010, 4, 5);
         //The days contained in the dayTitle
         String[] days = {"Måndag", "Tisdag", "Onsdag", "Torsdag", "Fredag", "Lördag", "Söndag"};
