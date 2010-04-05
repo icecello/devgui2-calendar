@@ -5,6 +5,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Locale;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -51,11 +55,16 @@ public class CalendarContainer extends JPanel {
 
         setLayout(new BorderLayout());
         topPanel = new JPanel(new BorderLayout());
+
+        // Create a calendar for current day
+        Calendar cal = GregorianCalendar.getInstance();
+        // Debug calendar to manually set the date
+        // Calendar cal = new GregorianCalendar(2010, 4, 5);
         //The days contained in the dayTitle
         String[] days = {"Måndag", "Tisdag", "Onsdag", "Torsdag", "Fredag", "Lördag", "Söndag"};
 
         monthTitle = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        monthTitle.add(new JLabel("This month"));
+        monthTitle.add(new JLabel(cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH)));
         monthTitle.setBackground(new Color(220, 220, 220));
         monthTitle.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
@@ -70,10 +79,21 @@ public class CalendarContainer extends JPanel {
         topPanel.add(dayTitle, BorderLayout.CENTER);
 
 
-        monthView = new JPanel(new GridLayout(5, 7));
-        for (int i = 0; i < 35; i++) {
+        monthView = new JPanel(new GridLayout(6, 7));
+
+        // The number of days in the current month.
+        int numDays = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+        // The start day of the month in integer form, so we know where to
+        // start placing numbers in the grid.
+        int startDay = cal.get(Calendar.DAY_OF_WEEK);
+
+        for (int i = 0; i < 42; i++) {
             JPanel day = new JPanel();
-            day.add(new JLabel("" + (i + 1))); //Add date to every panel
+            // Add date label for days in the current month. No label for
+            // days not in the month.
+            if (i > startDay && i < (startDay + numDays + 1)) {
+                day.add(new JLabel("" + (i - startDay)));
+            }
             day.setBorder(BorderFactory.createLineBorder(Color.lightGray));
             day.setMinimumSize(new Dimension(100, 100));
             day.setForeground(Color.lightGray);
