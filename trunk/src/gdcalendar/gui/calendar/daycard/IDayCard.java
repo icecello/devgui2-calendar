@@ -9,6 +9,10 @@ import javax.swing.JPanel;
 /**
  * a proposition of an dayCard interface...
  * Please comment on this.
+ * 
+ * Update from Håkan: have a look at IDayCard2, this is a combination of IDayCard from SVN
+ * and the one I had done in parallel
+ * 
  * @author Tomas
  */
 public interface IDayCard {
