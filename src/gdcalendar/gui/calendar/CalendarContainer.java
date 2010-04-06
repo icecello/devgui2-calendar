@@ -1,9 +1,10 @@
 package gdcalendar.gui.calendar;
 
-import gdcalendar.gui.calendar.daycard.MockUpDayCard;
+import gdcalendar.gui.calendar.daycard.MonthDayCard;
+import gdcalendar.logic.Event;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.util.Calendar;
@@ -16,7 +17,7 @@ import javax.swing.JPanel;
 
 /**
  * Container for the calendar.
- * @author Tomas, HÃ¥kan, James
+ * @author Tomas, Håkan, James
  */
 public class CalendarContainer extends JPanel {
 
@@ -63,7 +64,7 @@ public class CalendarContainer extends JPanel {
         // Confusing! Set as (Year, Month(0-11), Day(1-*))
         // Calendar cal = new GregorianCalendar(2010, 4, 5);
         //The days contained in the dayTitle
-        String[] days = {"MÃ¥ndag", "Tisdag", "Onsdag", "Torsdag", "Fredag", "LÃ¶rdag", "SÃ¶ndag"};
+        String[] days = {"Måndag", "Tisdag", "Onsdag", "Torsdag", "Fredag", "Lördag", "Söndag"};
 
         monthTitle = new JPanel(new FlowLayout(FlowLayout.CENTER));
         monthTitle.add(new JLabel(cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH)));
@@ -90,7 +91,8 @@ public class CalendarContainer extends JPanel {
         int startDay = cal.get(Calendar.DAY_OF_WEEK);
 
         for (int i = 0; i < 42; i++) {
-            JPanel day = new JPanel();
+            /*
+             * JPanel day = new JPanel();
             // Add date label for days in the current month. No label for
             // days not in the month.
             if (i > startDay && i < (startDay + numDays + 1)) {
@@ -100,9 +102,39 @@ public class CalendarContainer extends JPanel {
             day.setMinimumSize(new Dimension(100, 100));
             day.setForeground(Color.lightGray);
             monthView.add(day);
+            */
+        	
+        	/*
+        	 * This is pretty much the same code as above, I made a small
+        	 * change to the test against day, since the previous version
+        	 * seemed to be one day off.
+        	 * 
+        	 * This uses the current implementation of day cards, which can
+        	 * be seen in MonthDayCard. The interface is a combination of
+        	 * the proposal Tomas had and the version that I had built in
+        	 * parallel.
+        	 */
+            if (i > (startDay - 1) && i < (startDay + numDays)) {
+                /*
+                 * we may want to change this date creation line
+                 * since this constructor is deprecated
+                 */
+	            Date date = new Date(2010, 04, i - startDay + 1);
+	        	MonthDayCard daycard = new MonthDayCard(date, MonthDayCard.CardView.SIMPLE);
+	        	daycard.setBorder(BorderFactory.createLineBorder(Color.lightGray));
+	        	//temporary code to make every other day card show the
+	        	//event indicator
+	        	if (i % 2 == 1)
+	        		daycard.addEvent(new Event());
+	        	monthView.add(daycard);
+	        	
+            } else
+            	monthView.add(new MonthDayCard());
         }
 
         add(topPanel, BorderLayout.PAGE_START);
         add(monthView, BorderLayout.CENTER);
     }
 }
+
+
