@@ -1,7 +1,6 @@
 package gdcalendar.gui.calendar;
 
 import gdcalendar.gui.calendar.daycard.MonthDayCard;
-import gdcalendar.logic.Event;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -115,12 +114,15 @@ public class CalendarContainer extends JPanel {
         	 * parallel.
         	 */
             if (i > (startDay - 1) && i < (startDay + numDays)) {
-                /*
-                 * we may want to change this date creation line
-                 * since this constructor is deprecated
-                 */
-                //Date date = new Date(2010, 04, i - startDay + 1);
-                    Calendar date = new GregorianCalendar(2010, 4, i - startDay + 1);
+				/*
+				 * Good call, let's use Calendar's instead.
+				 * 
+				 * Note: this still shows dates incorrectly for me. 
+				 * For instance, 1st of April shows up on a Tuesday, while
+				 * it should be a Thursday.
+				 */
+                
+            	Calendar date = new GregorianCalendar(2010, 4, i - startDay + 1);
 	        	MonthDayCard daycard = new MonthDayCard(date, MonthDayCard.CardView.SIMPLE);
 	        	daycard.setBorder(BorderFactory.createLineBorder(Color.lightGray));
 	        	//temporary code to make every other day card show the

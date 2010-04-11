@@ -1,6 +1,7 @@
 package gdcalendar.gui.calendar.daycard;
 
-import gdcalendar.logic.Event;
+import gdcalendar.gui.calendar.Event;
+
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.Image;
