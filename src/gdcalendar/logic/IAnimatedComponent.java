@@ -4,6 +4,10 @@ package gdcalendar.logic;
  * Suggestion of interface for animated components, need a review!
  * Interface for animated components. Class instances implementing this interface
  * can be loaded into an <code>AnimtionDriver</code>
+ * 
+ * Comment (Håkan): This is a great start :) I imagined something similar, but hadn't even begun
+ * on any implementation of the ideas. Now we need to write something up to hand in by tomorrow.
+ * 
  * @author Tomas
  */
 public interface IAnimatedComponent {

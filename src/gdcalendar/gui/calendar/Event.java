@@ -1,4 +1,4 @@
-package gdcalendar.logic;
+package gdcalendar.gui.calendar;
 
 /**
  *

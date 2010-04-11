@@ -4,7 +4,7 @@
 package gdcalendar.gui.calendar.daycard;
 
 
-import gdcalendar.logic.Event;
+import gdcalendar.gui.calendar.Event;
 
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -47,7 +47,6 @@ public class MonthDayCard extends JPanel implements IDayCard2 {
 	/*
 	 * member variables
 	 */
-	private Date date;
 	private Calendar calendar;
 	private CardView view = CardView.SIMPLE; 
 	private Collection<Event> dayEvents;
@@ -102,8 +101,8 @@ public class MonthDayCard extends JPanel implements IDayCard2 {
 	 * @see gdcalendar.gui.calendar.daycard.IDayCard2#getDate()
 	 */
 	@Override
-	public Date getDate() {
-		return date;
+	public Calendar getDate() {
+		return calendar;
 	}
 
 	/**
@@ -111,8 +110,8 @@ public class MonthDayCard extends JPanel implements IDayCard2 {
 	 * @see gdcalendar.gui.calendar.daycard.IDayCard2#setDate()
 	 */
 	@Override
-	public void setDate(Date date) {
-		this.date = date;
+	public void setDate(Calendar date) {
+		this.calendar = date;
 	}
 
 	/**
@@ -132,28 +131,6 @@ public class MonthDayCard extends JPanel implements IDayCard2 {
 	public CardView getCardView() {
 		return view;
 	}
-	
-	/**
-	 * Add a new event to display in this day card
-	 * 
-	 * @param newEvent		a new event
-	 */
-	public boolean addEvent(Event newEvent) {
-        return dayEvents.add(newEvent);
-    }
-
-	/**
-	 * Remove specified event from this day
-	 * 
-	 * @param event		which event to remove
-	 */
-    public boolean removeEvent(Event event) {
-        return dayEvents.remove(event);
-    }
-
-    public Collection<Event> getEvents() {
-        return dayEvents;
-    }
 
     public void setImage(Image image) {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -228,7 +205,8 @@ public class MonthDayCard extends JPanel implements IDayCard2 {
 			
 			//draw string showing how many events are available for this day
 			//very crude, needs refinement
-			String str = Integer.toString(dayEvents.size());
+			//probably easier to switch to a label for this...
+			String str = "Events: " + Integer.toString(dayEvents.size());
 			int stringY = Math.max(getHeight() - g2.getFontMetrics().getHeight(), getHeight() - 10);
 			g2.drawString(str, 10, stringY);
 		}
@@ -243,4 +221,17 @@ public class MonthDayCard extends JPanel implements IDayCard2 {
 	private void paintDetailed(Graphics g) {
 		
 	}
+	
+	/**
+	 * Add a new event to display in this day card.
+	 * This method is temporary and should probably be removed in favor of
+	 * using a CalendarModel to provide event data.
+	 * 
+	 * @param newEvent		a new event
+	 * @return true if the event was added successfully
+	 */
+	@Deprecated
+	public boolean addEvent(Event newEvent) {
+        return dayEvents.add(newEvent);
+    }
 }

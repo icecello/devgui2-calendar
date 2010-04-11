@@ -1,6 +1,7 @@
 package gdcalendar.gui.calendar.daycard;
 
-import gdcalendar.logic.Event;
+import gdcalendar.gui.calendar.Event;
+
 import java.awt.Image;
 import java.util.Collection;
 import java.util.Date;
@@ -10,7 +11,7 @@ import javax.swing.JPanel;
  * a proposition of an dayCard interface...
  * Please comment on this.
  * 
- * Update from Håkan: have a look at IDayCard2, this is a combination of IDayCard from SVN
+ * Update from Hï¿½kan: have a look at IDayCard2, this is a combination of IDayCard from SVN
  * and the one I had done in parallel
  * 
  * @author Tomas
