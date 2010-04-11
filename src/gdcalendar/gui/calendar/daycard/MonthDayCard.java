@@ -27,7 +27,7 @@ import javax.swing.JPanel;
 import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MaximizeAction;
 
 /**
- * @author Håkan
+ * @author Hï¿½kan
  *
  * This is the implementation of a day card that can be used in the standard
  * calendar if we omit the week view for now. It's quite simple to change if 
@@ -74,12 +74,18 @@ public class MonthDayCard extends JPanel implements IDayCard2 {
 	 * @param day		the day of month to display in this day card
 	 * @param view	which layout to use for the drawing of the component
 	 */
-	public MonthDayCard(Date date, CardView view) {
-		this.date = date;
+	public MonthDayCard(Calendar calendar, CardView view) {
+		/*
+                 * Replaced Date argument with a Calendar argument, same
+                 * parameters and functionality.
+                 */
+            
+                // this.date = date;
+                this.calendar = calendar;
 		this.view = view;
 		
-		calendar = Calendar.getInstance();
-		calendar.setTime(date);
+		// calendar = Calendar.getInstance();
+		// calendar.setTime(date);
 		
 		titleLabel = new JLabel();
 		String title = Integer.toString(calendar.get(Calendar.DAY_OF_MONTH));
