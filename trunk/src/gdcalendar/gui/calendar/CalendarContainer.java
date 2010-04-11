@@ -17,7 +17,7 @@ import javax.swing.JPanel;
 
 /**
  * Container for the calendar.
- * @author Tomas, Håkan, James
+ * @author Tomas, Hï¿½kan, James
  */
 public class CalendarContainer extends JPanel {
 
@@ -64,7 +64,7 @@ public class CalendarContainer extends JPanel {
         // Confusing! Set as (Year, Month(0-11), Day(1-*))
         // Calendar cal = new GregorianCalendar(2010, 4, 5);
         //The days contained in the dayTitle
-        String[] days = {"Måndag", "Tisdag", "Onsdag", "Torsdag", "Fredag", "Lördag", "Söndag"};
+        String[] days = {"Mï¿½ndag", "Tisdag", "Onsdag", "Torsdag", "Fredag", "Lï¿½rdag", "Sï¿½ndag"};
 
         monthTitle = new JPanel(new FlowLayout(FlowLayout.CENTER));
         monthTitle.add(new JLabel(cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH)));
@@ -119,7 +119,8 @@ public class CalendarContainer extends JPanel {
                  * we may want to change this date creation line
                  * since this constructor is deprecated
                  */
-	            Date date = new Date(2010, 04, i - startDay + 1);
+                //Date date = new Date(2010, 04, i - startDay + 1);
+                    Calendar date = new GregorianCalendar(2010, 4, i - startDay + 1);
 	        	MonthDayCard daycard = new MonthDayCard(date, MonthDayCard.CardView.SIMPLE);
 	        	daycard.setBorder(BorderFactory.createLineBorder(Color.lightGray));
 	        	//temporary code to make every other day card show the
