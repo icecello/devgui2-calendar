@@ -1,5 +1,7 @@
+
 package gdcalendar.gui.calendar;
 
+import gdcalendar.data.DayEvent;
 import gdcalendar.gui.calendar.daycard.MonthDayCard;
 
 import java.awt.BorderLayout;
@@ -7,7 +9,6 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import javax.swing.BorderFactory;
@@ -63,7 +64,7 @@ public class CalendarContainer extends JPanel {
         // Confusing! Set as (Year, Month(0-11), Day(1-*))
         // Calendar cal = new GregorianCalendar(2010, 4, 5);
         //The days contained in the dayTitle
-        String[] days = {"M�ndag", "Tisdag", "Onsdag", "Torsdag", "Fredag", "L�rdag", "S�ndag"};
+//        String[] days = {"Söndag","Måndag", "Tisdag", "Onsdag", "Torsdag", "Fredag", "Lördag"};
 
         monthTitle = new JPanel(new FlowLayout(FlowLayout.CENTER));
         monthTitle.add(new JLabel(cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH)));
@@ -73,8 +74,11 @@ public class CalendarContainer extends JPanel {
         dayTitle = new JPanel(new GridLayout(1, 7));
         dayTitle.setBackground(new Color(220, 220, 220));
         dayTitle.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        for (int i = 0; i < 7; i++) {
-            dayTitle.add(new JLabel("" + days[i]));
+
+        Calendar tempCalendar = GregorianCalendar.getInstance();
+        for (int i = 1; i <= 7; i++) {
+            tempCalendar.set(Calendar.DAY_OF_WEEK, i);
+            dayTitle.add(new JLabel(tempCalendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH)));
         }
 
         topPanel.add(monthTitle, BorderLayout.PAGE_START);
@@ -87,9 +91,11 @@ public class CalendarContainer extends JPanel {
         int numDays = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
         // The start day of the month in integer form, so we know where to
         // start placing numbers in the grid.
+        cal.set(Calendar.DAY_OF_MONTH, 1);
         int startDay = cal.get(Calendar.DAY_OF_WEEK);
+        System.out.println(startDay);
 
-        for (int i = 0; i < 42; i++) {
+        for (int i = 1; i <= 42; i++) {
             /*
              * JPanel day = new JPanel();
             // Add date label for days in the current month. No label for
@@ -102,35 +108,35 @@ public class CalendarContainer extends JPanel {
             day.setForeground(Color.lightGray);
             monthView.add(day);
             */
-        	
+
         	/*
         	 * This is pretty much the same code as above, I made a small
         	 * change to the test against day, since the previous version
         	 * seemed to be one day off.
-        	 * 
+        	 *
         	 * This uses the current implementation of day cards, which can
         	 * be seen in MonthDayCard. The interface is a combination of
         	 * the proposal Tomas had and the version that I had built in
         	 * parallel.
         	 */
-            if (i > (startDay - 1) && i < (startDay + numDays)) {
+            if (i >= (startDay) && i < (startDay + numDays)) {
 				/*
 				 * Good call, let's use Calendar's instead.
-				 * 
-				 * Note: this still shows dates incorrectly for me. 
+				 *
+				 * Note: this still shows dates incorrectly for me.
 				 * For instance, 1st of April shows up on a Tuesday, while
 				 * it should be a Thursday.
 				 */
-                
+
             	Calendar date = new GregorianCalendar(2010, 4, i - startDay + 1);
 	        	MonthDayCard daycard = new MonthDayCard(date, MonthDayCard.CardView.SIMPLE);
 	        	daycard.setBorder(BorderFactory.createLineBorder(Color.lightGray));
 	        	//temporary code to make every other day card show the
 	        	//event indicator
 	        	if (i % 2 == 1)
-	        		daycard.addEvent(new Event());
+	        		daycard.addEvent(new DayEvent());
 	        	monthView.add(daycard);
-	        	
+
             } else
             	monthView.add(new MonthDayCard());
         }
