@@ -4,30 +4,28 @@
 package gdcalendar.gui.calendar.daycard;
 
 
-import gdcalendar.gui.calendar.Event;
 
+
+
+
+import gdcalendar.data.DayEvent;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Font;
+import java.awt.Event;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Polygon;
-import java.awt.Shape;
-import java.awt.TextComponent;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
 
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MaximizeAction;
 
 /**
- * @author H�kan
+ * @author Håkan
  *
  * This is the implementation of a day card that can be used in the standard
  * calendar if we omit the week view for now. It's quite simple to change if 
@@ -37,7 +35,7 @@ import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MaximizeAction;
  * triangle in the corner...
  * 
  */
-public class MonthDayCard extends JPanel implements IDayCard2 {
+public class MonthDayCard extends JPanel implements IDayCard {
 	
 	public enum CardView {
 		SIMPLE,
@@ -49,7 +47,7 @@ public class MonthDayCard extends JPanel implements IDayCard2 {
 	 */
 	private Calendar calendar;
 	private CardView view = CardView.SIMPLE; 
-	private Collection<Event> dayEvents;
+	private Collection<DayEvent> dayEvents;
 	
 	private Polygon eventIndicatorPolygon;
 	/*
@@ -64,7 +62,7 @@ public class MonthDayCard extends JPanel implements IDayCard2 {
 		titleLabel = new JLabel();
 		titleLabel.setAlignmentY(CENTER_ALIGNMENT);
 		this.add(titleLabel, BorderLayout.CENTER);
-		dayEvents = new ArrayList<Event>();
+		dayEvents = new ArrayList<DayEvent>();
 	}
 	
 	/**
@@ -92,13 +90,13 @@ public class MonthDayCard extends JPanel implements IDayCard2 {
 		titleLabel.setAlignmentY(CENTER_ALIGNMENT);
 		this.add(titleLabel, BorderLayout.CENTER);
 		
-		dayEvents = new ArrayList<Event>();
+		dayEvents = new ArrayList<DayEvent>();
 		
 	}
 	
 	/**
 	 * 
-	 * @see gdcalendar.gui.calendar.daycard.IDayCard2#getDate()
+	 * @see gdcalendar.gui.calendar.daycard.IDayCard#getDate()
 	 */
 	@Override
 	public Calendar getDate() {
@@ -107,29 +105,11 @@ public class MonthDayCard extends JPanel implements IDayCard2 {
 
 	/**
 	 * 
-	 * @see gdcalendar.gui.calendar.daycard.IDayCard2#setDate()
+	 * @see gdcalendar.gui.calendar.daycard.IDayCard#setDate()
 	 */
 	@Override
 	public void setDate(Calendar date) {
 		this.calendar = date;
-	}
-
-	/**
-	 * Set which view this day card should use for displaying it's contents
-	 * 
-	 * @param view		view to use
-	 */
-	public void setCardView(CardView view) {
-		this.view = view;
-	}
-
-	/**
-	 * Get the cardview used by this day card
-	 * 
-	 * @return current cardview in use by the day card
-	 */
-	public CardView getCardView() {
-		return view;
 	}
 
     public void setImage(Image image) {
@@ -231,7 +211,7 @@ public class MonthDayCard extends JPanel implements IDayCard2 {
 	 * @return true if the event was added successfully
 	 */
 	@Deprecated
-	public boolean addEvent(Event newEvent) {
+	public boolean addEvent(DayEvent newEvent) {
         return dayEvents.add(newEvent);
     }
 }

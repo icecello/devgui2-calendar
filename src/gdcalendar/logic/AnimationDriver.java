@@ -29,7 +29,7 @@ public class AnimationDriver {
 
     /**
      * Get the single instance of the AnimationDriver
-     * @return
+     * @return An instace of the AnimationDriver
      */
     public AnimationDriver getInstance() {
         return _instance;

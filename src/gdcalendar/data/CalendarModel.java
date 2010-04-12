@@ -1,4 +1,4 @@
-package gdcalendar.gui.calendar;
+package gdcalendar.data;
 
 import java.util.Calendar;
 

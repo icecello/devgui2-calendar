@@ -2,11 +2,7 @@ package gdcalendar.gui;
 
 import gdcalendar.gui.calendar.CalendarContainer;
 import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 /**
  *
