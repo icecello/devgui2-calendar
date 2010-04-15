@@ -67,9 +67,12 @@ public class CalendarContainer extends JPanel {
 
         // Create a calendar for current day
         Calendar cal = GregorianCalendar.getInstance();
-        // Debug calendar to manually set the date
-        // Confusing! Set as (Year, Month(0-11), Day(1-*))
+        /*
+         * Debug calendar to manually set the date
+         * Confusing! Set as (Year, Month(0-11), Day(1-*))
+         */
         // Calendar cal = new GregorianCalendar(2010, 4, 5);
+
         //The days contained in the dayTitle
 //        String[] days = {"Söndag","Måndag", "Tisdag", "Onsdag", "Torsdag", "Fredag", "Lördag"};
 
@@ -78,6 +81,8 @@ public class CalendarContainer extends JPanel {
         monthTitle.setBackground(new Color(220, 220, 220));
         monthTitle.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
+        // Need to decide on Action/Listener pattern before making these work.
+        // Should be simple though! (I've already been doing it by hand)
         leftButton = new JButton("<<");
         rightButton = new JButton(">>");
         
