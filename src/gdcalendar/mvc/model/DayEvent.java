@@ -1,4 +1,4 @@
-package gdcalendar.data;
+package gdcalendar.mvc.model;
 
 /**
  * A DayEvent is an event taking place during a specified time slot. The DayEvent

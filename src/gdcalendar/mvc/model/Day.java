@@ -1,4 +1,7 @@
-package gdcalendar.data;
+package gdcalendar.mvc.model;
+
+
+import gdcalendar.mvc.controller.DefaultController;
 
 import java.util.Calendar;
 import java.util.Collection;
@@ -11,7 +14,7 @@ import java.util.Set;
  * is identified by a unique String value
  * @author Tomas
  */
-public class Day {
+public class Day extends AbstractModel {
 
     private Map<String, DayEvent> events = new HashMap<String, DayEvent>();
     private Calendar cal = Calendar.getInstance();
@@ -39,6 +42,8 @@ public class Day {
      * @param event the new event that is supposed to take place this day
      */
     public void addEvent(String eventId, DayEvent event) {
+        firePropertyChange(DefaultController.ADD_EVENT_PROPERTY, null, event);
+        
         events.put(eventId, event);
     }
 
@@ -50,6 +55,7 @@ public class Day {
      * contained in the Day
      */
     public DayEvent removeEvent(String eventId) {
+    	firePropertyChange(DefaultController.REMOVE_EVENT_PROPERTY, events.get(eventId), null);
         return events.remove(eventId);
     }
 

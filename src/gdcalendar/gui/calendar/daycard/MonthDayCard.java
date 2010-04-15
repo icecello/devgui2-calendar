@@ -4,15 +4,11 @@
 package gdcalendar.gui.calendar.daycard;
 
 
+import gdcalendar.mvc.model.DayEvent;
 
-
-
-
-import gdcalendar.data.DayEvent;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Event;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -199,6 +195,7 @@ public class MonthDayCard extends JPanel implements IDayCard {
 	 * 
 	 */
 	private void paintDetailed(Graphics g) {
+		//draw on glass pane
 		
 	}
 	
