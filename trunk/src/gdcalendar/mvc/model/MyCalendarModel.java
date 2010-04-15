@@ -1,4 +1,5 @@
-package gdcalendar.data;
+package gdcalendar.mvc.model;
+
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -12,7 +13,7 @@ import java.util.HashMap;
  * @author Håkan, Tomas
  *
  */
-public class MyCalendarModel implements CalendarModel {
+public class MyCalendarModel {
 
     private HashMap<Calendar, Day> dayMap;
 
@@ -41,7 +42,7 @@ public class MyCalendarModel implements CalendarModel {
         return dayMap.remove(date);
     }
 
-    @Override
+   
     public Object getValueAt(Calendar date) {
         // TODO Auto-generated method stub
         return null;

@@ -1,4 +1,4 @@
-package gdcalendar.data;
+package gdcalendar.mvc.model;
 
 /**
  * Low weight time stamp class, representing a time 00:00 - 24:00 for a non
