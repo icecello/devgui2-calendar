@@ -12,6 +12,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -33,10 +34,16 @@ public class CalendarContainer extends JPanel {
     //|_______________________________|
     private JPanel topPanel;
     // _____________________________
-    //|         monthTitle          |
+    //|       monthNavPanel         |
     //|_____________________________|
     //|         dayTitle            |
     //|_____________________________|
+    private JPanel monthNavPanel;
+    // ___________________________________
+    //|leftButton| monthTitle |rightButton|
+    //|__________|____________|___________|
+    private JButton leftButton;
+    private JButton rightButton;
     private JPanel monthTitle;
     // _____________________________
     //|         monthTitle          |
@@ -71,6 +78,15 @@ public class CalendarContainer extends JPanel {
         monthTitle.setBackground(new Color(220, 220, 220));
         monthTitle.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
+        leftButton = new JButton("<<");
+        rightButton = new JButton(">>");
+        
+        monthNavPanel = new JPanel(new BorderLayout());
+        monthNavPanel.add(leftButton, BorderLayout.LINE_START);
+        monthNavPanel.add(monthTitle, BorderLayout.CENTER);
+        monthNavPanel.add(rightButton, BorderLayout.LINE_END);
+        monthNavPanel.setBackground(new Color(220, 220, 220));
+
         dayTitle = new JPanel(new GridLayout(1, 7));
         dayTitle.setBackground(new Color(220, 220, 220));
         dayTitle.setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -81,7 +97,7 @@ public class CalendarContainer extends JPanel {
             dayTitle.add(new JLabel(tempCalendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH)));
         }
 
-        topPanel.add(monthTitle, BorderLayout.PAGE_START);
+        topPanel.add(monthNavPanel, BorderLayout.PAGE_START);
         topPanel.add(dayTitle, BorderLayout.CENTER);
 
 
