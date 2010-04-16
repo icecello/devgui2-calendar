@@ -20,7 +20,7 @@ public class TimeStamp implements Comparable<TimeStamp> {
      * @param hour Hour of the time stamp,  0<hour<24
      * @param min Minute of the time stamp, 0<min<60
      */
-    TimeStamp(int hour, int min) {
+   public TimeStamp(int hour, int min) {
         if (hour < 0 || hour > 24 || hour >= 24 && min > 0 || min < 0 || min > 60) {
             throw new IllegalArgumentException("Time stamp range from 00:00 - 24:00");
         }

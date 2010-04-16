@@ -8,7 +8,7 @@ import java.beans.PropertyChangeSupport;
  * changes to an implementation of this model.
  * 
  * 
- * @author Håkan
+ * @author Hï¿½kan
  * @author Tomas
  * @author James
  *
@@ -30,7 +30,7 @@ public abstract class AbstractModel
         propertyChangeSupport.removePropertyChangeListener(listener);
     }
 
-    protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
+    public  void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
         propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
     }
 
