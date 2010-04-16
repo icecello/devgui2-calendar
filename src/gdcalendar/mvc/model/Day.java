@@ -1,10 +1,10 @@
 package gdcalendar.mvc.model;
 
-
 import gdcalendar.mvc.controller.DefaultController;
 
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -42,9 +42,8 @@ public class Day extends AbstractModel {
      * @param event the new event that is supposed to take place this day
      */
     public void addEvent(String eventId, DayEvent event) {
-        firePropertyChange(DefaultController.ADD_EVENT_PROPERTY, null, event);
-        
         events.put(eventId, event);
+        firePropertyChange(DefaultController.ADD_EVENT_PROPERTY, null, event);
     }
 
     /**
@@ -55,7 +54,7 @@ public class Day extends AbstractModel {
      * contained in the Day
      */
     public DayEvent removeEvent(String eventId) {
-    	firePropertyChange(DefaultController.REMOVE_EVENT_PROPERTY, events.get(eventId), null);
+        firePropertyChange(DefaultController.REMOVE_EVENT_PROPERTY, events.get(eventId), null);
         return events.remove(eventId);
     }
 
@@ -73,6 +72,10 @@ public class Day extends AbstractModel {
      */
     public Set<String> getEventIds() {
         return events.keySet();
+    }
+
+    public Date getDate() {
+        return cal.getTime();
     }
 
     @Override
@@ -95,16 +98,17 @@ public class Day extends AbstractModel {
         return sBuffer.toString();
     }
 
+    //Used for debugging
     public static void main(String[] args) {
         Day d = new Day(Calendar.getInstance());
         DayEvent event1 = new DayEvent("Event1");
         DayEvent event2 = new DayEvent("Event2");
         DayEvent event3 = new DayEvent("Event3");
         DayEvent event4 = new DayEvent("Event4", new TimeStamp(12, 00), new TimeStamp(13, 45));
-        d.addEvent("e1",event1);
-        d.addEvent("e2",event2);
-        d.addEvent("e3",event3);
-        d.addEvent("e4",event4);
+        d.addEvent("e1", event1);
+        d.addEvent("e2", event2);
+        d.addEvent("e3", event3);
+        d.addEvent("e4", event4);
         System.out.println(d);
     }
 }

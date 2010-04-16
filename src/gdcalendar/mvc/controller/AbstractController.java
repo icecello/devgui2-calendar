@@ -1,29 +1,31 @@
 package gdcalendar.mvc.controller;
 
 import gdcalendar.mvc.model.AbstractModel;
+import gdcalendar.mvc.model.Day;
 import gdcalendar.mvc.view.AbstractViewPanel;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * abstract controller
  * 
- * @author Håkan
+ * @author Hï¿½kan
  * @author Tomas
  * @author James
  *
  */
 public abstract class AbstractController implements PropertyChangeListener {
 
-    private ArrayList registeredViews;
-    private ArrayList registeredModels;
+    private ArrayList <AbstractViewPanel> registeredViews;
+    private ArrayList <AbstractModel> registeredModels;
 
     public AbstractController() {
-        registeredViews = new ArrayList();
-        registeredModels = new ArrayList();
+        registeredViews = new ArrayList<AbstractViewPanel>();
+        registeredModels = new ArrayList<AbstractModel>();
     }
 
 
@@ -51,7 +53,7 @@ public abstract class AbstractController implements PropertyChangeListener {
 
 
     public void propertyChange(PropertyChangeEvent evt) {
-
+        
         for (AbstractViewPanel view: registeredViews) {
             view.modelPropertyChange(evt);
         }
@@ -88,6 +90,12 @@ public abstract class AbstractController implements PropertyChangeListener {
                 //  Handle exception.
             }
         }
+    }
+
+    public static void main(String[] args){
+        Day d = new Day(Calendar.getInstance());
+        DefaultController def = new DefaultController();
+        def.addModel(d);
     }
 
 

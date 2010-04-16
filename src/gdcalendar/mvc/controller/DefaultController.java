@@ -2,7 +2,6 @@ package gdcalendar.mvc.controller;
 
 import gdcalendar.mvc.model.DayEvent;
 
-import java.awt.Font;
 
 /**
  * This controller implements the required methods and provides the properties
@@ -10,7 +9,7 @@ import java.awt.Font;
  * methods in this class can be called upon by the views to update to state of the
  * registered models.
  *
- * @author Håkan
+ * @author Hï¿½kan
  * @author Tomas
  * @author James
  * 

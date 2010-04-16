@@ -44,7 +44,6 @@ public class MyCalendarModel {
 
    
     public Object getValueAt(Calendar date) {
-        // TODO Auto-generated method stub
-        return null;
+        return dayMap.get(date);
     }
 }
