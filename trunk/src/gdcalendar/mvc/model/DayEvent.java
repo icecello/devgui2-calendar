@@ -81,7 +81,7 @@ public class DayEvent {
 
     @Override
     public String toString() {
-        return eventName + " " + startTime + "-" + endTime;
+        return startTime + "-" + endTime + " " +eventName;
     }
 
     public static void main(String[] args) {
