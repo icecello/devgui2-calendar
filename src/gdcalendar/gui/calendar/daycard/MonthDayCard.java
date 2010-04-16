@@ -106,6 +106,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
         //the data in the given day
         dayEvents = day.getEvents();
         calendar.setTime(day.getDate());
+        titleLabel.setText("" + calendar.get(Calendar.DAY_OF_MONTH));
 
         for (DayEvent events : dayEvents) {
             simpleView.add(new JLabel(events.toString()));

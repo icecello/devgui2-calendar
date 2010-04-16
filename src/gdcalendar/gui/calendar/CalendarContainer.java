@@ -1,4 +1,3 @@
-
 package gdcalendar.gui.calendar;
 
 import gdcalendar.gui.calendar.daycard.MonthDayCard;
@@ -73,14 +72,6 @@ public class CalendarContainer extends JPanel {
 
         // Create a calendar for current day
         Calendar cal = GregorianCalendar.getInstance();
-        /*
-         * Debug calendar to manually set the date
-         * Confusing! Set as (Year, Month(0-11), Day(1-*))
-         */
-        // Calendar cal = new GregorianCalendar(2010, 4, 5);
-
-        //The days contained in the dayTitle
-//        String[] days = {"Söndag","Måndag", "Tisdag", "Onsdag", "Torsdag", "Fredag", "Lördag"};
 
         monthTitle = new JPanel(new FlowLayout(FlowLayout.CENTER));
         monthTitle.add(new JLabel(cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH)));
@@ -91,7 +82,7 @@ public class CalendarContainer extends JPanel {
         // Should be simple though! (I've already been doing it by hand)
         leftButton = new JButton("<<");
         rightButton = new JButton(">>");
-        
+
         monthNavPanel = new JPanel(new BorderLayout());
         monthNavPanel.add(leftButton, BorderLayout.LINE_START);
         monthNavPanel.add(monthTitle, BorderLayout.CENTER);
@@ -123,59 +114,31 @@ public class CalendarContainer extends JPanel {
         System.out.println(startDay);
 
         for (int i = 1; i <= 42; i++) {
-            /*
-             * JPanel day = new JPanel();
-            // Add date label for days in the current month. No label for
-            // days not in the month.
-            if (i > startDay && i < (startDay + numDays + 1)) {
-                day.add(new JLabel("" + (i - startDay)));
-            }
-            day.setBorder(BorderFactory.createLineBorder(Color.lightGray));
-            day.setMinimumSize(new Dimension(100, 100));
-            day.setForeground(Color.lightGray);
-            monthView.add(day);
-            */
 
-        	/*
-        	 * This is pretty much the same code as above, I made a small
-        	 * change to the test against day, since the previous version
-        	 * seemed to be one day off.
-        	 *
-        	 * This uses the current implementation of day cards, which can
-        	 * be seen in MonthDayCard. The interface is a combination of
-        	 * the proposal Tomas had and the version that I had built in
-        	 * parallel.
-        	 */
             if (i >= (startDay) && i < (startDay + numDays)) {
-				/*
-				 * Good call, let's use Calendar's instead.
-				 *
-				 * Note: this still shows dates incorrectly for me.
-				 * For instance, 1st of April shows up on a Tuesday, while
-				 * it should be a Thursday.
-				 */
 
-            	Calendar date = new GregorianCalendar(2010, 4, i - startDay + 1);
-                        //Create a event shared by all DayCards
-                        HashMap<String,DayEvent> dayEvents = new HashMap<String, DayEvent>();
-                        dayEvents.put("evt0",new DayEvent("Event 1"));
-                        Day day = new Day(date,dayEvents);
-	        	MonthDayCard daycard = new MonthDayCard(day, MonthDayCard.CardView.SIMPLE);
-                        //Create a controller for each dayCard, and attach the view and model together
-                        DefaultController controller = new DefaultController();
-                        controller.addView(daycard);
-                        controller.addModel(day);
-	        	daycard.setBorder(BorderFactory.createLineBorder(Color.lightGray));
-	        	//temporary code to make every other day card show contain
-                        //more events
-	        	if (i % 2 == 1){
-                            day.addEvent("evt1" + i, new DayEvent("School",new TimeStamp(11, 15), new TimeStamp(15, 00)));
-                            day.addEvent("evt3" + i, new DayEvent("Sleep",new TimeStamp(17, 15), new TimeStamp(21, 00)));
-                        }
-	        	monthView.add(daycard);
+                Calendar date = new GregorianCalendar(2010, 4, i - startDay + 1);
+                //Create a event shared by all DayCards
+                HashMap<String, DayEvent> dayEvents = new HashMap<String, DayEvent>();
+                dayEvents.put("evt0", new DayEvent("Event 1"));
+                Day day = new Day(date, dayEvents);
+                MonthDayCard daycard = new MonthDayCard(day, MonthDayCard.CardView.SIMPLE);
+                //Create a controller for each dayCard, and attach the view and model together
+                DefaultController controller = new DefaultController();
+                controller.addView(daycard);
+                controller.addModel(day);
+                daycard.setBorder(BorderFactory.createLineBorder(Color.lightGray));
+                //temporary code to make every other day card show contain
+                //more events
+                if (i % 2 == 1) {
+                    day.addEvent("evt1" + i, new DayEvent("School", new TimeStamp(11, 15), new TimeStamp(15, 00)));
+                    day.addEvent("evt3" + i, new DayEvent("Sleep", new TimeStamp(17, 15), new TimeStamp(21, 00)));
+                }
+                monthView.add(daycard);
 
-            } else
-            	monthView.add(new MonthDayCard());
+            } else {
+                monthView.add(new MonthDayCard());
+            }
         }
 
         add(topPanel, BorderLayout.PAGE_START);
