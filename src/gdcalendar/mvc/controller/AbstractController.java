@@ -73,7 +73,6 @@ public abstract class AbstractController implements PropertyChangeListener {
      * of the property.
      */
     protected void setModelProperty(String propertyName, Object newValue) {
-
         for (AbstractModel model: registeredModels) {
             try {
 
@@ -81,7 +80,7 @@ public abstract class AbstractController implements PropertyChangeListener {
                     getMethod(propertyName, new Class[] {
                                                       newValue.getClass()
                                                   }
-
+                    
 
                              );
                 method.invoke(model, newValue);
@@ -91,6 +90,25 @@ public abstract class AbstractController implements PropertyChangeListener {
             }
         }
     }
+
+//    protected void modifyModelProperty(String propertyName, Collection newValues) {
+//        for (AbstractModel model: registeredModels) {
+//            try {
+//
+//                ArrayList<Class> args = new ArrayList<Class>();
+//                for(Object values : newValues){
+//                    args.add(values.getClass());
+//                }
+//                Method method = model.getClass().
+//                    getMethod(propertyName, (Class[])args.toArray());
+//
+//                method.invoke(model, newValues);
+//
+//            } catch (Exception ex) {
+//                //  Handle exception.
+//            }
+//        }
+//    }
 
     public static void main(String[] args){
         Day d = new Day(Calendar.getInstance());
