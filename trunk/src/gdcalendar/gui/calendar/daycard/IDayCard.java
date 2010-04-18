@@ -37,8 +37,6 @@ public interface IDayCard {
 	public Calendar getDate();
 	
 
-    public void setImage(Image image);
-    public Image getImage();
     public boolean  displayImage();
     public void hideImage();
 	

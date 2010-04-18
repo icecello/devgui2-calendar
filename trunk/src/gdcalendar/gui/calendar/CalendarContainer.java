@@ -10,9 +10,10 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.Locale;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -111,28 +112,28 @@ public class CalendarContainer extends JPanel {
         // start placing numbers in the grid.
         cal.set(Calendar.DAY_OF_MONTH, 1);
         int startDay = cal.get(Calendar.DAY_OF_WEEK);
-        System.out.println(startDay);
 
         for (int i = 1; i <= 42; i++) {
 
             if (i >= (startDay) && i < (startDay + numDays)) {
 
                 Calendar date = new GregorianCalendar(2010, 4, i - startDay + 1);
-                //Create a event shared by all DayCards
-                HashMap<String, DayEvent> dayEvents = new HashMap<String, DayEvent>();
-                dayEvents.put("evt0", new DayEvent("Event 1"));
-                Day day = new Day(date, dayEvents);
-                MonthDayCard daycard = new MonthDayCard(day, MonthDayCard.CardView.SIMPLE);
-                //Create a controller for each dayCard, and attach the view and model together
                 DefaultController controller = new DefaultController();
+                //Create a event shared by all DayCards
+                Collection <DayEvent> dayEvents = new ArrayList<DayEvent>();
+                dayEvents.add(new DayEvent("Event 1"));
+                Day day = new Day(date, dayEvents);
+                MonthDayCard daycard = new MonthDayCard(day, MonthDayCard.CardView.SIMPLE, controller);
+                //Create a controller for each dayCard, and attach the view and model together
+                
                 controller.addView(daycard);
                 controller.addModel(day);
                 daycard.setBorder(BorderFactory.createLineBorder(Color.lightGray));
-                //temporary code to make every other day card show contain
+                //temporary code to make every other day card show 
                 //more events
                 if (i % 2 == 1) {
-                    day.addEvent("evt1" + i, new DayEvent("School", new TimeStamp(11, 15), new TimeStamp(15, 00)));
-                    day.addEvent("evt3" + i, new DayEvent("Sleep", new TimeStamp(17, 15), new TimeStamp(21, 00)));
+                    day.addEvent(new DayEvent("School", new TimeStamp(11, 15), new TimeStamp(15, 00)));
+                    day.addEvent(new DayEvent("Sleep", new TimeStamp(17, 15), new TimeStamp(21, 00)));
                 }
                 monthView.add(daycard);
 

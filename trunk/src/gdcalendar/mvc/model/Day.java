@@ -1,12 +1,11 @@
 package gdcalendar.mvc.model;
 
 import gdcalendar.mvc.controller.DefaultController;
+import java.util.ArrayList;
 
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -16,8 +15,9 @@ import java.util.Set;
  */
 public class Day extends AbstractModel {
 
-    private Map<String, DayEvent> events = new HashMap<String, DayEvent>();
+    private Collection<DayEvent> events = new ArrayList<DayEvent>();
     private Calendar cal = Calendar.getInstance();
+    private int eventCount = 0;
 
     /**
      * Create a day containing no events, identified by it´s date
@@ -32,7 +32,7 @@ public class Day extends AbstractModel {
      * @param dayId the Date identifying the Day
      * @param dayEvents the set of events that taking place for this day
      */
-    public Day(Calendar dayId, Map<String, DayEvent> dayEvents) {
+    public Day(Calendar dayId, Collection<DayEvent> dayEvents) {
         this(dayId);
         events = dayEvents;
     }
@@ -41,10 +41,11 @@ public class Day extends AbstractModel {
      * add an event to the day
      * @param event the new event that is supposed to take place this day
      */
-    public void addEvent(String eventId, DayEvent event) {
-        events.put(eventId, event);
+    public void addEvent(DayEvent event) {
+        events.add(event);
         firePropertyChange(DefaultController.ADD_EVENT_PROPERTY, null, event);
     }
+    
 
     /**
      * Remove the specified Event from the day. Returns the DayEvent that is removed.
@@ -53,25 +54,19 @@ public class Day extends AbstractModel {
      * @return The DayEvent removed from the Day, NLLL is returned if no matching DayEvent is
      * contained in the Day
      */
-    public DayEvent removeEvent(String eventId) {
-        firePropertyChange(DefaultController.REMOVE_EVENT_PROPERTY, events.get(eventId), null);
-        return events.remove(eventId);
+    public boolean removeEvent(DayEvent event) {
+        firePropertyChange(DefaultController.REMOVE_EVENT_PROPERTY, event, null);
+        System.out.println(event);
+        return events.remove(event);
     }
+
 
     /**
      * Get the complete set of Events taking place during the Day
      * @return the set of Events for the Day
      */
     public Collection<DayEvent> getEvents() {
-        return events.values();
-    }
-
-    /**
-     * Get the complete set of event Id:s (unique Strings) of the Day
-     * @return All of the DayEvent id:s of the Day
-     */
-    public Set<String> getEventIds() {
-        return events.keySet();
+        return new ArrayList<DayEvent>(events);
     }
 
     public Date getDate() {
@@ -91,7 +86,7 @@ public class Day extends AbstractModel {
         String day = d < 10 ? "" + 0 + d : "" + d;
         sBuffer.append(year + "-" + month + "-" + day + "\n");
 
-        for (DayEvent dEvent : events.values()) {
+        for (DayEvent dEvent : events) {
             sBuffer.append(dEvent.toString() + "\n");
         }
 
@@ -105,10 +100,10 @@ public class Day extends AbstractModel {
         DayEvent event2 = new DayEvent("Event2");
         DayEvent event3 = new DayEvent("Event3");
         DayEvent event4 = new DayEvent("Event4", new TimeStamp(12, 00), new TimeStamp(13, 45));
-        d.addEvent("e1", event1);
-        d.addEvent("e2", event2);
-        d.addEvent("e3", event3);
-        d.addEvent("e4", event4);
+        d.addEvent(event1);
+        d.addEvent(event2);
+        d.addEvent(event3);
+        d.addEvent(event4);
         System.out.println(d);
     }
 }

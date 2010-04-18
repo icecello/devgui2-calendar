@@ -6,20 +6,23 @@ package gdcalendar.gui.calendar.daycard;
 import gdcalendar.mvc.controller.DefaultController;
 import gdcalendar.mvc.model.Day;
 import gdcalendar.mvc.model.DayEvent;
+import gdcalendar.mvc.model.TimeStamp;
 import gdcalendar.mvc.view.AbstractViewPanel;
 
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Polygon;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import javax.swing.BoxLayout;
 
 import javax.swing.JLabel;
@@ -49,26 +52,30 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
      */
     private Calendar calendar;
     private CardView view = CardView.SIMPLE;
-    private Collection<DayEvent> dayEvents = new ArrayList<DayEvent>();
-    private JPanel simpleView = new JPanel();
-    private JPanel detailedView = new JPanel();
-    private String newEventName;
-    private JLabel titleLabel;
-    /*
-     * member components
-     */
-
+    private JPanel simpleView = new JPanel();   //The simple visual representation of the day
+    private JPanel detailedView = new JPanel(); //The advanced visual representation of the day
+    private String newEventName;        //temporary storage for a new event name
+    private JLabel titleLabel;          //Title label, showing the day of the month
+    private JLabel addEventLabel;       //Label, used for adding new events
+    private JLabel removeEventLabel;    //Label, used for removing events
+    private DefaultController controller;   //The controller, responsible for updating the
+                                            //connected models
+    private ArrayList<JLabel> eventLabels;  //The visual representation of the day events
+    private ArrayList<DayEvent> events;     //The events of the day
     /**
      * Default constructor, creating an empty MonthDayCard
      */
     public MonthDayCard() {
         setLayout(new BorderLayout());
         titleLabel = new JLabel();
-        dayEvents = new ArrayList<DayEvent>();
+        eventLabels = new ArrayList<JLabel>();
+        events = new ArrayList<DayEvent>();
 
+        //Make the day of the month appear in the top center position of the card
         JPanel titleContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
         titleContainer.add(titleLabel);
-        add(titleContainer, BorderLayout.CENTER);
+        add(titleLabel, BorderLayout.PAGE_START);
+
     }
 
     /**
@@ -83,33 +90,49 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
         this.view = view;
         this.calendar = calendar;
 
+        addEventLabel = new JLabel("+");
+        addEventLabel.setFont(new Font("Arial", Font.PLAIN, 18));
+        removeEventLabel = new JLabel("-");
+        removeEventLabel.setFont(new Font("Arial", Font.PLAIN, 18));
+
+        JPanel eventModifyContainer = new JPanel(new BorderLayout());
         simpleView.setLayout(new BoxLayout(simpleView, BoxLayout.PAGE_AXIS));
         detailedView.setLayout(new BoxLayout(detailedView, BoxLayout.PAGE_AXIS));
         //The title is set to the current day of the month
         String title = Integer.toString(calendar.get(Calendar.DAY_OF_MONTH));
         titleLabel.setText(title);
 
+        initListners();
+
         //Make the monthcard show the correct view
         if (view == CardView.SIMPLE) {
-            add(simpleView, BorderLayout.PAGE_END);
+            add(simpleView, BorderLayout.CENTER);
         } else {
-            add(detailedView, BorderLayout.PAGE_END);
+            add(detailedView, BorderLayout.CENTER);
         }
+        eventModifyContainer.add(removeEventLabel, BorderLayout.LINE_START);
+        eventModifyContainer.add(addEventLabel, BorderLayout.LINE_END);
+        add(eventModifyContainer, BorderLayout.PAGE_END);
+
+
     }
 
-    public MonthDayCard(Day day, CardView view) {
+    public MonthDayCard(Day day, CardView view, DefaultController controller) {
         /*
          * Call MonthDayCard with current date and the given view
          */
         this(Calendar.getInstance(), view);
         //Make the necessary adjustments, so that the monthcard reflectes
         //the data in the given day
-        dayEvents = day.getEvents();
+        this.controller = controller;
         calendar.setTime(day.getDate());
         titleLabel.setText("" + calendar.get(Calendar.DAY_OF_MONTH));
 
-        for (DayEvent events : dayEvents) {
-            simpleView.add(new JLabel(events.toString()));
+        for (DayEvent event : day.getEvents()) {
+            JLabel eventLabel = new JLabel(event.toString());
+            eventLabels.add(eventLabel);
+            this.events.add(event);
+            simpleView.add(eventLabel);
         }
 
     }
@@ -139,7 +162,8 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
                 }
             }
         });
-
+        revalidate();
+        repaint();
     }
 
     /**
@@ -149,14 +173,6 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
     @Override
     public void setDate(Calendar date) {
         this.calendar = date;
-    }
-
-    public void setImage(Image image) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public Image getImage() {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     public boolean displayImage() {
@@ -195,7 +211,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
      */
     private void paintSimple(Graphics g) {
         //only draw if there are any events for this day card
-        if (dayEvents.size() > 0) {
+        if (eventLabels.size() > 0) {
 
             /*
              * we may want to move these calculations into a resize event instead of paint
@@ -225,7 +241,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
             //draw string showing how many events are available for this day
             //very crude, needs refinement
             //probably easier to switch to a label for this...
-            String str = "Events: " + Integer.toString(dayEvents.size());
+            String str = "Events: " + Integer.toString(eventLabels.size());
             int stringY = Math.max(getHeight() - g2.getFontMetrics().getHeight(), getHeight() - 10);
             g2.drawString(str, 10, stringY);
         }
@@ -242,40 +258,91 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
     }
 
     /**
-     * Add a new event to display in this day card.
-     * This method is temporary and should probably be removed in favor of
-     * using a CalendarModel to provide event data.
-     *
-     * @param newEvent		a new event
-     * @return true if the event was added successfully
+     * @see gdcalendar.mvc.view.AbstractViewPanel#modelPropertyChange(java.beans.PropertyChangeEvent)
+     * @param evt the event responsible for the call
      */
-    @Deprecated
-    public boolean addEvent(DayEvent newEvent) {
-        return dayEvents.add(newEvent);
-    }
-
     @Override
-    public void modelPropertyChange(PropertyChangeEvent evt) {
+    public void modelPropertyChange(final PropertyChangeEvent evt) {
         String evtName = evt.getPropertyName();
-        newEventName = evt.getNewValue().toString();
+        if (evt.getNewValue() != null) {
+            newEventName = evt.getNewValue().toString();
+        }
+
+        //Add an event label to the DayCard, invoked in EDT
         if (evtName.equals(DefaultController.ADD_EVENT_PROPERTY)) {
             SwingUtilities.invokeLater(new Runnable() {
-                String name = newEventName;
+
+                String name = newEventName; //Store a local copy of the event name
+                                            //Since we don't know when it's called
+
                 public void run() {
-                    simpleView.add(new JLabel(name));
+                    JLabel event = new JLabel(name);
+
+                    simpleView.add(event);
+                    eventLabels.add(event);
+                    events.add(new DayEvent(name));
                 }
             });
 
-
+        //Remove an event (the one at the bottom) from the DayCard, invoked in EDT
         } else if (evtName.equals(DefaultController.REMOVE_EVENT_PROPERTY)) {
             SwingUtilities.invokeLater(new Runnable() {
 
                 public void run() {
-                    //TODO: Do something here!
+                    simpleView.remove(eventLabels.get(eventLabels.size()-1));
+                    eventLabels.remove(eventLabels.size()-1);
+                    events.remove(events.get(events.size()-1));
                 }
             });
 
         }
+        revalidate();
         repaint();
+    }
+
+    private void initListners() {
+        addEventLabel.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                MonthDayCard.this.addEventMouseClicked(e);
+            }
+        });
+
+        removeEventLabel.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                MonthDayCard.this.removeEventMouseClicked(e);
+            }
+        });
+    }
+
+    /**
+     * Add an event to the by calling the controller
+     * @param e the mouse event responsible for the call
+     */
+    private void addEventMouseClicked(MouseEvent e) {
+        //For now, create a new event labeled with "New Event"
+        try {
+            DayEvent newEvent = new DayEvent("New Event",new TimeStamp(10, 00), new TimeStamp(12, 30));
+            controller.addEvent(newEvent);
+        } catch (Exception ex) {
+            //  Handle exception
+        }
+    }
+
+    /**
+     * Remove the event appering at the bottom of the DayCard
+     * @param e the mouse event responsible for the call
+     */
+    private void removeEventMouseClicked(MouseEvent e) {
+
+        //Let the controller remove the event from the model, and update the view.
+        try {   
+            controller.removeEvent(events.get(events.size()-1));
+        } catch (Exception ex) {
+            // Handle exception
+        }
     }
 }
