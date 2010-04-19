@@ -2,23 +2,12 @@ package gdcalendar.gui.calendar;
 
 import gdcalendar.gui.calendar.daycard.MonthDayCard;
 import gdcalendar.mvc.controller.DefaultController;
-import gdcalendar.mvc.model.Day;
-import gdcalendar.mvc.model.DayEvent;
-import gdcalendar.mvc.model.TimeStamp;
+import gdcalendar.mvc.model.*;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.GregorianCalendar;
-import java.util.Locale;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
+import javax.swing.*;
 
 /**
  * Container for the calendar.
@@ -46,9 +35,10 @@ public class CalendarContainer extends JPanel {
     // ___________________________________
     //|leftButton| monthTitle |rightButton|
     //|__________|____________|___________|
-    private JButton leftButton;
-    private JButton rightButton;
+    private JButton previousMonthButton;
+    private JButton nextMonthButton;
     private JPanel monthTitle;
+    private JLabel monthTitleLabel;
     // _____________________________
     //|         monthTitle          |
     //|_____________________________|
@@ -64,30 +54,29 @@ public class CalendarContainer extends JPanel {
     //|_#_|_#_|_#_|_#_|_#_|_#_|_#_|
     //|_#_|_#_|_#_|_#_|_#_|_#_|_#_|
 
+    Calendar cal;
+
     public CalendarContainer() {
-
-
 
         setLayout(new BorderLayout());
         topPanel = new JPanel(new BorderLayout());
 
         // Create a calendar for current day
-        Calendar cal = GregorianCalendar.getInstance();
+        cal = GregorianCalendar.getInstance();
 
         monthTitle = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        monthTitle.add(new JLabel(cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH)));
+        monthTitleLabel = new JLabel();
+        monthTitle.add(monthTitleLabel);
         monthTitle.setBackground(new Color(220, 220, 220));
         monthTitle.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
-        // Need to decide on Action/Listener pattern before making these work.
-        // Should be simple though! (I've already been doing it by hand)
-        leftButton = new JButton("<<");
-        rightButton = new JButton(">>");
+        previousMonthButton = new JButton("<<");
+        nextMonthButton = new JButton(">>");
 
         monthNavPanel = new JPanel(new BorderLayout());
-        monthNavPanel.add(leftButton, BorderLayout.LINE_START);
+        monthNavPanel.add(previousMonthButton, BorderLayout.LINE_START);
         monthNavPanel.add(monthTitle, BorderLayout.CENTER);
-        monthNavPanel.add(rightButton, BorderLayout.LINE_END);
+        monthNavPanel.add(nextMonthButton, BorderLayout.LINE_END);
         monthNavPanel.setBackground(new Color(220, 220, 220));
 
         dayTitle = new JPanel(new GridLayout(1, 7));
@@ -103,8 +92,22 @@ public class CalendarContainer extends JPanel {
         topPanel.add(monthNavPanel, BorderLayout.PAGE_START);
         topPanel.add(dayTitle, BorderLayout.CENTER);
 
-
         monthView = new JPanel(new GridLayout(6, 7));
+        displayMonth();
+
+        add(topPanel, BorderLayout.PAGE_START);
+        add(monthView, BorderLayout.CENTER);
+
+        initListeners();
+    }
+
+    private void displayMonth() {
+        // Clear month view
+        monthView.removeAll();
+
+        // Display the month title
+        monthTitleLabel.setText(cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH)
+                + " " + cal.get(Calendar.YEAR));
 
         // The number of days in the current month.
         int numDays = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
@@ -125,11 +128,11 @@ public class CalendarContainer extends JPanel {
                 Day day = new Day(date, dayEvents);
                 MonthDayCard daycard = new MonthDayCard(day, MonthDayCard.CardView.SIMPLE, controller);
                 //Create a controller for each dayCard, and attach the view and model together
-                
+
                 controller.addView(daycard);
                 controller.addModel(day);
                 daycard.setBorder(BorderFactory.createLineBorder(Color.lightGray));
-                //temporary code to make every other day card show 
+                //temporary code to make every other day card show
                 //more events
                 if (i % 2 == 1) {
                     day.addEvent(new DayEvent("School", new TimeStamp(11, 15), new TimeStamp(15, 00)));
@@ -141,9 +144,34 @@ public class CalendarContainer extends JPanel {
                 monthView.add(new MonthDayCard());
             }
         }
+    }
 
-        add(topPanel, BorderLayout.PAGE_START);
-        add(monthView, BorderLayout.CENTER);
+    private void initListeners() {
+        previousMonthButton.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                CalendarContainer.this.previousMonthMouseClicked(e);
+            }
+        });
+
+        nextMonthButton.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                CalendarContainer.this.nextMonthMouseClicked(e);
+            }
+        });
+    }
+
+    private void nextMonthMouseClicked(MouseEvent e) {
+        cal.set(Calendar.MONTH, cal.get(Calendar.MONTH) + 1);
+        displayMonth();
+    }
+
+    private void previousMonthMouseClicked(MouseEvent e) {
+        cal.set(Calendar.MONTH, cal.get(Calendar.MONTH) - 1);
+        displayMonth();
     }
 }
 
