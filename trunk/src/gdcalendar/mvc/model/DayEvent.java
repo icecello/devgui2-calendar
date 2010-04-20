@@ -39,6 +39,21 @@ public class DayEvent {
         return endTime;
     }
 
+    public boolean isActive(TimeStamp stamp) {
+        if (stamp.compareTo(startTime) >= 0 && stamp.compareTo(endTime) <= 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public int[] timeSpan(){
+        int[] toReturn = new int[2];
+        toReturn[0] = endTime.getHour() - startTime.getHour();
+        toReturn[1] = endTime.getMin()-startTime.getMin();
+        return toReturn;
+    }
+
     /**
      * Set the time when the event should end
      * @param The time when the event should end
@@ -81,13 +96,16 @@ public class DayEvent {
 
     @Override
     public String toString() {
-        return startTime + "-" + endTime + " " +eventName;
+        return startTime + "-" + endTime + " " + eventName;
     }
+
+
 
     public static void main(String[] args) {
         TimeStamp ts1 = new TimeStamp(9, 59);
         TimeStamp ts2 = new TimeStamp(10, 59);
-        DayEvent e = new DayEvent();
+        DayEvent e = new DayEvent("event",ts1,ts2);
+        System.out.println(e.isActive(new TimeStamp(10, 00)));
         System.out.println(e);
     }
 }
