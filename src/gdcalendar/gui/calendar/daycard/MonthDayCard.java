@@ -192,6 +192,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        super.paintChildren(g);
 
         switch (view) {
             case SIMPLE:
@@ -201,6 +202,10 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
                 paintDetailed(g);
                 break;
         }
+
+    }
+    @Override
+    protected void paintChildren(Graphics g){
 
     }
 
