@@ -20,6 +20,7 @@ import java.awt.Image;
 import java.awt.Polygon;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -31,6 +32,7 @@ import javax.swing.SwingUtilities;
 
 /**
  * @author Håkan
+ * @author James
  *
  * This is the implementation of a day card that can be used in the standard
  * calendar if we omit the week view for now. It's quite simple to change if 
@@ -39,7 +41,11 @@ import javax.swing.SwingUtilities;
  * One possibility is to switch to detailed view on clicking the indicator
  * triangle in the corner...
  * 
+ * Update 21/4-10: This comment is outdated, the class has changed quite a bit
+ * since it was made... 
+ * 
  */
+@SuppressWarnings("serial")
 public class MonthDayCard extends AbstractViewPanel implements IDayCard {
 
     public enum CardView {
@@ -102,7 +108,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
         String title = Integer.toString(calendar.get(Calendar.DAY_OF_MONTH));
         titleLabel.setText(title);
 
-        initListners();
+        //initListners();
 
         //Make the monthcard show the correct view
         if (view == CardView.SIMPLE) {
@@ -305,12 +311,13 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
         repaint();
     }
 
+    @Deprecated
     private void initListners() {
         addEventLabel.addMouseListener(new MouseAdapter() {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                MonthDayCard.this.addEventMouseClicked(e);
+                //MonthDayCard.this.addEventMouseClicked(e);
             }
         });
 
@@ -318,36 +325,27 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                MonthDayCard.this.removeEventMouseClicked(e);
+                //MonthDayCard.this.removeEventMouseClicked(e);
             }
         });
     }
 
     /**
-     * Add an event to the by calling the controller
-     * @param e the mouse event responsible for the call
+     * Add a listener for the add new event component
+     * Note that this is still internal within the CalendarContainer.
+     * @param l
      */
-    private void addEventMouseClicked(MouseEvent e) {
-        //For now, create a new event labeled with "New Event"
-        try {
-            DayEvent newEvent = new DayEvent("New Event",new TimeStamp(10, 00), new TimeStamp(12, 30));
-            controller.addEvent(newEvent);
-        } catch (Exception ex) {
-            //  Handle exception
-        }
+    public void addAddEventListener(MouseListener l) {
+    	addEventLabel.addMouseListener(l);
     }
-
+    
     /**
-     * Remove the event appering at the bottom of the DayCard
-     * @param e the mouse event responsible for the call
+     * Add a listener for the remove event component
+     * Note that this is still internal within the CalendarContainer.
+     * @param l
      */
-    private void removeEventMouseClicked(MouseEvent e) {
-
-        //Let the controller remove the event from the model, and update the view.
-        try {   
-            controller.removeEvent(events.get(events.size()-1));
-        } catch (Exception ex) {
-            // Handle exception
-        }
+    public void addRemoveEventListener(MouseListener l) {
+    	removeEventLabel.addMouseListener(l);
     }
+    
 }

@@ -1,0 +1,173 @@
+package undomanager;
+
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
+/**
+ * This is the Invoker class from the Command pattern. It's a general purpose command
+ * queue that can remember a specified amount of commands. This can for example be used
+ * to implement undo/redo operations or macros.
+ * 
+ * Note: the idea here is that we associate one CommandManager with one calendar, that way
+ * if we allow adding multiple calendars they have their own CommandManagers.
+ * 
+ * Important: for some reason I can't figure out atm, any undo/redo operation is not updated
+ * immediately, instead it seems the previously done operation will be refreshed on the GUI 
+ * if you do a sequence of undo/redo's. I'm talking about the view only here if that's not clear,
+ * the labels showing events for the days... if you have any ideas feel free to let me know or
+ * adjust it and explain what the problem was :) 
+ * 
+ * @author Håkan
+ *
+ */
+public class CommandManager {
+
+	private int commandLimit;
+	private List<ICommand> commandQueue;
+	/*
+	 * iterator pointing at the currently active command
+	 * this will change in case we undo/redo commands
+	 */
+	private Iterator<ICommand> commandIterator;
+	private int lastCommand;
+	
+	/**
+	 * constructor
+	 * Initialize the CommandManager and specify how many levels of commands
+	 * that it will remember.
+	 * 
+	 * @param limit		integer count for how many commands it will remember
+	 */
+	public CommandManager(int limit) {
+		commandLimit = limit;
+		commandQueue = new LinkedList<ICommand>();
+		lastCommand = 0;
+		
+	}
+	
+	/**
+	 * Execute all commands entered into the manager from
+	 * start to finish.
+	 */
+	public void execute() {
+		Iterator<ICommand> iterator = commandQueue.iterator();
+		
+		while (iterator.hasNext()) {
+			ICommand command = iterator.next();
+			command.execute();
+		}
+	}
+	
+	/**
+	 * Execute and store specified command in the manager
+	 * TODO: fix so that the queue is handled correctly after an undo
+	 * operation has been performed. Currently, if you add a command
+	 * after undoing a bunch of them previously, it will "redo" all of
+	 * them, in that the queue still contains them and the new command
+	 * is added in the end...
+	 * @param command
+	 */
+	public void execute(ICommand command) {
+		/*
+		 * If we have reached the command limit, we must remove the
+		 * first element of the queue before we can add a new one.
+		 */
+		if (commandQueue.size() >= commandLimit)
+			commandQueue.remove(0);
+		
+		/* 
+		 * If the commandIterator is not equal to the current last element
+		 * of the commandQueue, we have undone commands and should thus
+		 * overwrite those. We do this by first removing all undone commands
+		 * from the queue and then adding the new command.
+		 * 
+		 */
+		//TODO: add the code for the above comment so this works properly
+		
+		commandQueue.add(command);
+		command.execute();
+		lastCommand++;
+		
+		System.out.println("size: " + commandQueue.size());
+	}
+	
+	/**
+	 * Remove specified command from the manager
+	 * Throws an exception if the removal fails.
+	 * 
+	 * @param command	command to remove from the manager
+	 */
+	public void remove(ICommand command) {
+		commandQueue.remove(commandQueue.lastIndexOf(command));
+		lastCommand--;
+	}
+	
+	/**
+	 * Remove the last command entered into the manager
+	 * Throws an exception if this fails.
+	 * 
+	 */
+	public void removeLast() {
+		ICommand command = commandQueue.get(commandQueue.size());
+		/*
+		 * we use the undo operation for removal as well since
+		 * the behaviour is essentially the same
+		 */
+		command.undo();
+		commandQueue.remove(commandQueue.size());
+		lastCommand--;
+	}
+	
+	/**
+	 * 
+	 * @param levels		how many levels of commands to undo
+	 * @throws Exception 
+	 */
+	public void undo(int levels) throws Exception {
+		//ensure we don't try to undo more commands than there are available in the queue
+		if (commandQueue.size() < levels)
+			throw new Exception("Unable to undo more commands than there are available in the queue");
+		
+		ICommand command = commandQueue.get(lastCommand-1);
+		while (levels > 0) {			
+			command.undo();
+			levels--;
+			/*
+			 * only decrease lastCommand and fetch the commmand
+			 * if we are above 0, otherwise we go out of bounds
+			 */
+			if (lastCommand > 0) {
+				lastCommand--;
+				command = commandQueue.get(lastCommand);
+			}
+		}
+		
+	}
+	
+	/**
+	 * Redo a specified number of commands that have previously been
+	 * undone. If no commands have been undone we throw an exception.
+	 * 
+	 * @param levels		how many levels of commands to redo
+	 */
+	public void redo(int levels) throws Exception {
+		if (lastCommand == (commandQueue.size()))
+			throw new Exception("There are no commands to redo");
+		
+		ICommand command = commandQueue.get(lastCommand-1);
+		while (levels > 0) {	
+			command.execute();
+			levels--;
+			
+			/*
+			 * conditional increase of lastCommand to avoid
+			 * going out of bounds on the list of commands
+			 */
+			if (lastCommand < commandQueue.size()) {
+				lastCommand++;
+				command = commandQueue.get(lastCommand-1);
+			}
+		}
+	}
+}

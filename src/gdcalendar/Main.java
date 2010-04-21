@@ -1,7 +1,6 @@
 package gdcalendar;
 
 import gdcalendar.gui.MainWindow;
-import gdcalendar.mvc.controller.DefaultController;
 
 /**
  *
