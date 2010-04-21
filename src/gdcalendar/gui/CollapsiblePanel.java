@@ -47,6 +47,7 @@ public class CollapsiblePanel extends JPanel implements MouseListener {
 
         setLayout(new BorderLayout());
         contentPanel = new JPanel();
+        contentPanel.setLayout(new BorderLayout());
         orientation = collapseOrientation;
 
         //Check if the collapseOrientation is in the correct range
