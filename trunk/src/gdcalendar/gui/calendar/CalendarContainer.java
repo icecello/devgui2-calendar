@@ -1,6 +1,8 @@
 package gdcalendar.gui.calendar;
 
 import gdcalendar.gui.calendar.daycard.MonthDayCard;
+import gdcalendar.gui.calendar.undoredo.AddEventCommand;
+import gdcalendar.gui.calendar.undoredo.RemoveEventCommand;
 import gdcalendar.mvc.controller.DefaultController;
 import gdcalendar.mvc.model.*;
 
@@ -9,10 +11,15 @@ import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 
+import undomanager.CommandManager;
+
 /**
  * Container for the calendar.
- * @author Tomas, H�kan, James
+ * @author Tomas
+ * @author H�kan
+ * @author James
  */
+@SuppressWarnings("serial")
 public class CalendarContainer extends JPanel {
 
     // Container layout
@@ -54,10 +61,18 @@ public class CalendarContainer extends JPanel {
     //|_#_|_#_|_#_|_#_|_#_|_#_|_#_|
     //|_#_|_#_|_#_|_#_|_#_|_#_|_#_|
 
-    Calendar cal;
+    private Calendar cal;
+    private CommandManager undoManager;
 
-    public CalendarContainer() {
-
+    /**
+     * Construct the calendar, with all it's child components and data it needs.
+     * 
+     * 
+     * @param undoManager		command manager to use for this calendar for handling all commands
+     */
+    public CalendarContainer(CommandManager undoManager) {
+    	this.undoManager = undoManager;
+    	
         setLayout(new BorderLayout());
         topPanel = new JPanel(new BorderLayout());
 
@@ -121,12 +136,39 @@ public class CalendarContainer extends JPanel {
             if (i >= (startDay) && i < (startDay + numDays)) {
 
                 Calendar date = new GregorianCalendar(2010, 4, i - startDay + 1);
-                DefaultController controller = new DefaultController();
+                final DefaultController controller = new DefaultController();
                 //Create a event shared by all DayCards
                 Collection <DayEvent> dayEvents = new ArrayList<DayEvent>();
                 dayEvents.add(new DayEvent("Event 1"));
                 Day day = new Day(date, dayEvents);
                 MonthDayCard daycard = new MonthDayCard(day, MonthDayCard.CardView.SIMPLE, controller);
+                /*
+                 * as mentioned in MonthDayCard previously, this is a temporary way of adding new events
+                 * we would like a method for the user to specify his data...
+                 */
+                daycard.addAddEventListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						DayEvent newEvent = new DayEvent("New Event",new TimeStamp(10, 00), new TimeStamp(12, 30));
+			            
+						undoManager.execute(new AddEventCommand(controller, newEvent));
+						
+					}
+				});
+                
+                daycard.addRemoveEventListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						try {
+							//undoManager.execute(new RemoveEventCommand(controller))
+							undoManager.removeLast();
+						} catch (Exception e1) {
+							
+						}
+						
+					}
+				});
+                
                 //Create a controller for each dayCard, and attach the view and model together
 
                 controller.addView(daycard);
@@ -139,6 +181,7 @@ public class CalendarContainer extends JPanel {
                     day.addEvent(new DayEvent("Sleep", new TimeStamp(17, 15), new TimeStamp(21, 00)));
                 }
                 monthView.add(daycard);
+                
 
             } else {
                 monthView.add(new MonthDayCard());

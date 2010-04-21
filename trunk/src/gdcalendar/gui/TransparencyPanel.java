@@ -12,9 +12,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 /**
- *
+ * 
  * @author James
  */
+@SuppressWarnings({ "restriction", "serial" })
 public class TransparencyPanel extends JPanel {
     private Window transparencyFrame;
     private JSlider opacitySlider;
