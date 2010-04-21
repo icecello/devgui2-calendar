@@ -19,7 +19,7 @@ public class MainWindow extends JFrame {
         collapsiblePanel.setLayout(new BorderLayout());
         collapsiblePanel.setCollapsButtonSize(5);
         collapsiblePanel.add(new LeftItemPanel(), BorderLayout.PAGE_START, -1);
-        collapsiblePanel.add(new TransparencyPanel(), BorderLayout.PAGE_END, -1);
+        collapsiblePanel.add(new TransparencyPanel(this), BorderLayout.PAGE_END, -1);
 
         add(new CalendarContainer(), BorderLayout.CENTER);
         add(collapsiblePanel, BorderLayout.LINE_START);
