@@ -5,7 +5,9 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Graphics;
+import java.awt.LayoutManager;
 import java.awt.Polygon;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -44,10 +46,9 @@ public class CollapsiblePanel extends JPanel implements MouseListener {
      *          button should be located
      */
     public CollapsiblePanel(int collapseOrientation) {
-
-        setLayout(new BorderLayout());
         contentPanel = new JPanel();
-        contentPanel.setLayout(new BorderLayout());
+
+        super.setLayout(new BorderLayout());
         orientation = collapseOrientation;
 
         //Check if the collapseOrientation is in the correct range
@@ -275,16 +276,39 @@ public class CollapsiblePanel extends JPanel implements MouseListener {
     }
 
     /**
-     * Add a component to the collapsible panel,with layout defined by the
+     * Add a component to the collapsible panel, with layout defined by the
      * constraints
      * @param comp The component to be added
      * @param constraints An object expressing layout contraints for this component
-     * @deprecated To add a component to the collapsible panel, use {@link #add(Component)}
      */
-    @Deprecated
     @Override
     public void add(Component comp, Object constraints) {
-        //Don't do anything
+        contentPanel.add(comp, constraints);
+    }
+
+    /**
+     * Add a component to the collapsible panel, with layout defined by the
+     * constraints.
+     * @param comp The component to be added
+     * @param constraints An object expressing layout contraints for this component
+     * @param  the position in the container's list at which to insert the component;
+     * -1 means insert at the end component
+     */
+    @Override
+    public void add(Component comp, Object constraints, int index) {
+        contentPanel.add(comp, constraints, index);
+    }
+
+    /**
+     * Sets the layout manager for this container.
+     * @param layMgr the specified layout manager
+     */
+    @Override
+    public void setLayout(LayoutManager layMgr) {
+        if (contentPanel == null) {
+        } else {
+            contentPanel.setLayout(layMgr);
+        }
     }
 
     /**

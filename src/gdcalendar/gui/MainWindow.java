@@ -2,6 +2,7 @@ package gdcalendar.gui;
 
 import gdcalendar.gui.calendar.CalendarContainer;
 import java.awt.BorderLayout;
+import java.awt.LayoutManager2;
 import javax.swing.JFrame;
 
 /**
@@ -15,6 +16,7 @@ public class MainWindow extends JFrame {
 
 
         CollapsiblePanel collapsiblePanel = new CollapsiblePanel(CollapsiblePanel.EAST);
+        collapsiblePanel.setLayout(new BorderLayout());
         collapsiblePanel.setCollapsButtonSize(5);
         collapsiblePanel.add(new LeftItemPanel(), BorderLayout.PAGE_START, -1);
         collapsiblePanel.add(new TransparencyPanel(), BorderLayout.PAGE_END, -1);

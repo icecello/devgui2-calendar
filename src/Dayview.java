@@ -102,7 +102,6 @@ public class Dayview extends JPanel {
                 //Remove the conflicting events
                 public void run() {
                     view.remove(eventCard.eventLabel);
-                    System.out.println("Remove event " + eventCard.event);
                 }
             });
         }
