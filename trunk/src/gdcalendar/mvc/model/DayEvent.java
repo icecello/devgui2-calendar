@@ -40,7 +40,7 @@ public class DayEvent {
     }
 
     public boolean isActive(TimeStamp stamp) {
-        if (stamp.compareTo(startTime) >= 0 && stamp.compareTo(endTime) <= 0) {
+        if (stamp.compareTo(startTime) > 0 && stamp.compareTo(endTime) < 0) {
             return true;
         } else {
             return false;
