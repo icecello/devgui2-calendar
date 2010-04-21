@@ -1,27 +1,29 @@
 package gdcalendar.gui;
 
+import com.sun.awt.AWTUtilities;
 import java.awt.BorderLayout;
+import java.awt.Window;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.plaf.basic.BasicSliderUI.ChangeHandler;
 
 /**
  *
  * @author James
  */
 public class TransparencyPanel extends JPanel {
-    
+    private Window transparencyFrame;
     private JSlider opacitySlider;
     private JLabel percentLabel;
 
-    public TransparencyPanel() {
+    public TransparencyPanel(JFrame transparencyFrame) {
         setLayout(new BorderLayout());
-        
-        opacitySlider = new JSlider(SwingConstants.VERTICAL, 0, 100, 100);
+        this.transparencyFrame = transparencyFrame;
+        opacitySlider = new JSlider(SwingConstants.VERTICAL, 20, 100, 100);
         percentLabel = new JLabel(Integer.toString(opacitySlider.getValue()) + "%");
 
         add(new JLabel("Opacity"), BorderLayout.PAGE_START);
@@ -43,5 +45,8 @@ public class TransparencyPanel extends JPanel {
 
     private void sliderChanged(ChangeEvent e) {
         percentLabel.setText(Integer.toString(opacitySlider.getValue()) + "%");
+        AWTUtilities.setWindowOpacity(transparencyFrame, (float) opacitySlider.getValue()/100);
+
+
     }
 }
