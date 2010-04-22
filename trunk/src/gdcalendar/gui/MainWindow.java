@@ -10,7 +10,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
-import undomanager.CommandManager;
+import commandmanager.CommandManager;
+
 
 /**
  *
@@ -29,8 +30,8 @@ public class MainWindow extends JFrame {
          * may want to change how we use actions for instance
          */
         JMenuBar mb = new JMenuBar();
-        JMenu menu = new JMenu("menu");
-        JMenuItem undoItem = new JMenuItem(new AbstractAction() {
+        JMenu menu = new JMenu("Edit");
+        JMenuItem undoItem = new JMenuItem(new AbstractAction("Undo") {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -44,11 +45,11 @@ public class MainWindow extends JFrame {
 			}
 		});
         
-        JMenuItem redoItem = new JMenuItem(new AbstractAction() {
+        JMenuItem redoItem = new JMenuItem(new AbstractAction("Redo") {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+					
 					try {
 						cm.redo(1);
 					} catch (Exception e1) {

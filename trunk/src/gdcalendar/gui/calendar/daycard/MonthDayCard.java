@@ -311,25 +311,6 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
         repaint();
     }
 
-    @Deprecated
-    private void initListners() {
-        addEventLabel.addMouseListener(new MouseAdapter() {
-
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                //MonthDayCard.this.addEventMouseClicked(e);
-            }
-        });
-
-        removeEventLabel.addMouseListener(new MouseAdapter() {
-
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                //MonthDayCard.this.removeEventMouseClicked(e);
-            }
-        });
-    }
-
     /**
      * Add a listener for the add new event component
      * Note that this is still internal within the CalendarContainer.

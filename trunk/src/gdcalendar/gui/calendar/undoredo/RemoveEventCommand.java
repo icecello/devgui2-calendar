@@ -1,8 +1,9 @@
 package gdcalendar.gui.calendar.undoredo;
 
+import commandmanager.ICommand;
+
 import gdcalendar.mvc.controller.DefaultController;
 import gdcalendar.mvc.model.DayEvent;
-import undomanager.ICommand;
 
 /**
  * This class implements the remove event command.
