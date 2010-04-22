@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.LayoutManager;
 import java.awt.Polygon;
@@ -20,6 +19,7 @@ import javax.swing.JPanel;
  * NORTH,WEST,SOUTH and EAST
  * @author Tomas
  */
+@SuppressWarnings("serial")
 public class CollapsiblePanel extends JPanel implements MouseListener {
 
     /**

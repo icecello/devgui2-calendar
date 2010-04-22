@@ -6,7 +6,6 @@ package gdcalendar.gui.calendar.daycard;
 import gdcalendar.mvc.controller.DefaultController;
 import gdcalendar.mvc.model.Day;
 import gdcalendar.mvc.model.DayEvent;
-import gdcalendar.mvc.model.TimeStamp;
 import gdcalendar.mvc.view.AbstractViewPanel;
 
 import java.awt.BasicStroke;
@@ -16,10 +15,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Polygon;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;

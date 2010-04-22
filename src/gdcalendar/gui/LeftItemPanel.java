@@ -9,6 +9,7 @@ import javax.swing.JPanel;
  *
  * @author Tomas
  */
+@SuppressWarnings("serial")
 public class LeftItemPanel extends JPanel {
 
     public LeftItemPanel() {

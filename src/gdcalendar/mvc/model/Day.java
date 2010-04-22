@@ -28,7 +28,7 @@ public class Day extends AbstractModel {
     }
 
     /**
-     * Create a Day containig a set of events, identified by it´s date
+     * Create a Day containing a set of events, identified by it´s date
      * @param dayId the Date identifying the Day
      * @param dayEvents the set of events that taking place for this day
      */

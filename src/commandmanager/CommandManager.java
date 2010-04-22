@@ -160,7 +160,7 @@ public class CommandManager {
 		if (lastCommand == commandQueue.size())
 			throw new Exception("There are no commands to redo");
 		
-		ICommand command = commandQueue.get(lastCommand-1);
+		ICommand command = commandQueue.get(lastCommand);
 		while (levels > 0) {	
 			command.execute();
 			levels--;
@@ -174,5 +174,29 @@ public class CommandManager {
 				command = commandQueue.get(lastCommand-1);
 			}
 		}
+	}
+	
+	/**
+	 * 
+	 * @return	true if the command queue is empty
+	 */
+	public boolean isEmpty() {
+		return commandQueue.isEmpty();
+	}
+	
+	/**
+	 * 
+	 * @return		true if it is possible to undo commands
+	 */
+	public boolean canUndo() {
+		return (lastCommand > 0);
+	}
+	
+	/**
+	 * 
+	 * @return		true if it is possible to redo any commands
+	 */
+	public boolean canRedo() {
+		return (lastCommand < commandQueue.size());
 	}
 }

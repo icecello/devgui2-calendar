@@ -1,7 +1,6 @@
 package gdcalendar.gui.calendar.daycard;
 
 
-import java.awt.Image;
 import java.util.Calendar;
 
 /**
