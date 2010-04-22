@@ -3,13 +3,13 @@ package gdcalendar.gui;
 import com.sun.awt.AWTUtilities;
 import java.awt.BorderLayout;
 import java.awt.Window;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.JFrame;
 
 /**
  * 
@@ -47,7 +47,5 @@ public class TransparencyPanel extends JPanel {
     private void sliderChanged(ChangeEvent e) {
         percentLabel.setText(Integer.toString(opacitySlider.getValue()) + "%");
         AWTUtilities.setWindowOpacity(transparencyFrame, (float) opacitySlider.getValue()/100);
-
-
     }
 }
