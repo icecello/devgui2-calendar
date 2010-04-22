@@ -1,4 +1,4 @@
-package undomanager;
+package commandmanager;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -26,10 +26,9 @@ public class CommandManager {
 	private int commandLimit;
 	private List<ICommand> commandQueue;
 	/*
-	 * iterator pointing at the currently active command
-	 * this will change in case we undo/redo commands
+	 * Integer keeping track of which command in in the queue
+	 * is the latest active one.
 	 */
-	private Iterator<ICommand> commandIterator;
 	private int lastCommand;
 	
 	/**
@@ -120,6 +119,12 @@ public class CommandManager {
 	}
 	
 	/**
+	 * Undo a specified level of commands. This calls the undo()
+	 * method of each command from the end of the queue and
+	 * 'levels' amount of commands back, reverting anything they
+	 * have previously done. They are all still kept in the
+	 * manager so they can be redone. Adding new commands to the
+	 * queue will overwrite any undone commands.
 	 * 
 	 * @param levels		how many levels of commands to undo
 	 * @throws Exception 
@@ -152,7 +157,7 @@ public class CommandManager {
 	 * @param levels		how many levels of commands to redo
 	 */
 	public void redo(int levels) throws Exception {
-		if (lastCommand == (commandQueue.size()))
+		if (lastCommand == commandQueue.size())
 			throw new Exception("There are no commands to redo");
 		
 		ICommand command = commandQueue.get(lastCommand-1);

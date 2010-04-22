@@ -11,7 +11,8 @@ import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 
-import undomanager.CommandManager;
+import commandmanager.CommandManager;
+
 
 /**
  * Container for the calendar.
@@ -116,6 +117,7 @@ public class CalendarContainer extends JPanel {
         initListeners();
     }
 
+    
     private void displayMonth() {
         // Clear month view
         monthView.removeAll();
