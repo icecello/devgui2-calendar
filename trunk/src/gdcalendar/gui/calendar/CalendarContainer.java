@@ -1,8 +1,12 @@
 package gdcalendar.gui.calendar;
 
+import gdcalendar.gui.MainWindow;
 import gdcalendar.gui.calendar.daycard.MonthDayCard;
 import gdcalendar.gui.calendar.undoredo.AddEventCommand;
-import gdcalendar.gui.calendar.undoredo.RemoveEventCommand;
+//this import will be used later as we sort out the details of how
+//to deal with removing events
+//see adding of events for functioning undo/redo operations
+//import gdcalendar.gui.calendar.undoredo.RemoveEventCommand;
 import gdcalendar.mvc.controller.DefaultController;
 import gdcalendar.mvc.model.*;
 
@@ -64,15 +68,17 @@ public class CalendarContainer extends JPanel {
 
     private Calendar cal;
     private CommandManager undoManager;
-
+    private MainWindow parent;
+    
     /**
      * Construct the calendar, with all it's child components and data it needs.
      * 
      * 
      * @param undoManager		command manager to use for this calendar for handling all commands
      */
-    public CalendarContainer(CommandManager undoManager) {
+    public CalendarContainer(CommandManager undoManager, MainWindow parent) {
     	this.undoManager = undoManager;
+    	this.parent = parent;
     	
         setLayout(new BorderLayout());
         topPanel = new JPanel(new BorderLayout());
@@ -85,7 +91,7 @@ public class CalendarContainer extends JPanel {
         monthTitle.add(monthTitleLabel);
         monthTitle.setBackground(new Color(220, 220, 220));
         monthTitle.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-
+        
         previousMonthButton = new JButton("<<");
         nextMonthButton = new JButton(">>");
 
@@ -117,7 +123,12 @@ public class CalendarContainer extends JPanel {
         initListeners();
     }
 
-    
+    /*
+     * utility function used to construct and arrange everything so that
+     * the currently specified month is displayed properly
+     * 
+     * called by: constructor, nextMonthMouseClicked, previousMonthMouseClicked
+     */
     private void displayMonth() {
         // Clear month view
         monthView.removeAll();
@@ -153,6 +164,7 @@ public class CalendarContainer extends JPanel {
 					public void mouseClicked(MouseEvent e) {
 						DayEvent newEvent = new DayEvent("New Event",new TimeStamp(10, 00), new TimeStamp(12, 30));
 			            
+						parent.setUndoEnabled(true);
 						undoManager.execute(new AddEventCommand(controller, newEvent));
 						
 					}
