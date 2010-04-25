@@ -228,28 +228,17 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
      *
      */
     @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
+    protected void paintChildren(Graphics g) {
 
-
-
+        super.paintChildren(g);
         switch (view) {
             case SIMPLE:
                 paintSimple(g);
-
-
                 break;
-
-
             case DETAILED:
                 paintDetailed(g);
-
-
                 break;
-
-
         }
-
     }
 
     /**
@@ -260,10 +249,8 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
     private void paintSimple(Graphics g) {
         //only draw if there are any events for this day card
         if (eventLabels.size() > 0) {
-
             /*
              * we may want to move these calculations into a resize event instead of paint
-             *
              */
             int x[] = {
                 (int) (getWidth() * 0.8),
@@ -273,19 +260,19 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
 
 
             int y[] = {
-                getHeight(),
-                (int) (getHeight() * 0.8),
-                getHeight()
+                0,
+                (int) (getHeight() * 0.2),
+                0
             };
 
 
             Polygon triangle = new Polygon(x, y, 3);
 
             Graphics2D g2 = (Graphics2D) g;
-            g2.setColor(new Color(30, 30, 220));
+            g2.setColor(new Color(100, 230, 100));
             g2.fillPolygon(triangle);
             g2.setColor(new Color(30, 30, 100));
-            g2.setStroke(new BasicStroke(3));
+            g2.setStroke(new BasicStroke(1));
             g2.drawPolygon(triangle);
 
             //draw string showing how many events are available for this day
@@ -293,11 +280,8 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
             //probably easier to switch to a label for this...
             String str = "Events: " + Integer.toString(eventLabels.size());
 
-
             int stringY = Math.max(getHeight() - g2.getFontMetrics().getHeight(), getHeight() - 10);
             g2.drawString(str, 10, stringY);
-
-
         }
 
     }
