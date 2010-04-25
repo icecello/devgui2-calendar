@@ -144,6 +144,7 @@ public class CalendarContainer extends JPanel {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     DayEvent newEvent = new DayEvent("New Event", new TimeStamp(10, 00), new TimeStamp(12, 30));
+                    parent.setUndoEnabled(true);
                     undoManager.execute(new AddEventCommand(controller, newEvent));
                 }
             });
