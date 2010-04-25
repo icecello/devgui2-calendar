@@ -10,7 +10,7 @@ import javax.swing.JPanel;
  * modelPropertyChange() method that controllers can use to propogate model 
  * property changes.
  *
- * @author Håkan
+ * @author HÃ¥kan
  * @author Tomas
  * @author James
  */

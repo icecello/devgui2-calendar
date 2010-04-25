@@ -21,7 +21,6 @@ public class RemoveEventCommand implements ICommand {
 	/**
 	 * 
 	 * @param controller
-	 * @param event
 	 */
 	public RemoveEventCommand(DefaultController controller) {
 		this.controller = controller;

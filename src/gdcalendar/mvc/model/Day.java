@@ -61,6 +61,7 @@ public class Day extends AbstractModel {
     }
 
 
+
     /**
      * Get the complete set of Events taking place during the Day
      * @return the set of Events for the Day
@@ -71,6 +72,10 @@ public class Day extends AbstractModel {
 
     public Date getDate() {
         return cal.getTime();
+    }
+
+    public int getDayOfMonth(){
+        return cal.get(Calendar.DAY_OF_MONTH);
     }
 
     @Override

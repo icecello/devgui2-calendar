@@ -56,7 +56,7 @@ public class DayEvent {
 
     /**
      * Set the time when the event should end
-     * @param The time when the event should end
+     * @param endTime The time when the event should end
      */
     public void setEndTime(TimeStamp endTime) {
         this.endTime = endTime;
@@ -88,7 +88,7 @@ public class DayEvent {
 
     /**
      * Set the time when the event should start
-     * @param The time when the event should start
+     * @param startTime The time when the event should start
      */
     public void setStartTime(TimeStamp startTime) {
         this.startTime = startTime;

@@ -24,7 +24,7 @@ public class MyCalendarModel {
      * Add a new event to the specified date.
      *
      * @param date			which date to add the new event to
-     * @param newEvent		a new event 
+     * @param newDay		a new event
      */
     public void addDay(Calendar date, Day newDay) {
         dayMap.put(date, newDay);
@@ -34,7 +34,7 @@ public class MyCalendarModel {
      * Remove specified event from a certain day.
      *
      * @param date		which date to remove the event from
-     * @param event		which event to remove
+     * @param day		which event to remove
      * @return the day which is supposed to be removed. NULL is returned
      * if no matchin Day is contained in the model
      */
@@ -42,8 +42,5 @@ public class MyCalendarModel {
         return dayMap.remove(date);
     }
 
-   
-    public Object getValueAt(Calendar date) {
-        return dayMap.get(date);
-    }
+
 }

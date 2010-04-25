@@ -34,5 +34,9 @@ public abstract class AbstractModel
         propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
     }
 
+    public void synchornize(){
+        propertyChangeSupport.firePropertyChange("synchronize", null, this);
+    }
+
 
 }

@@ -39,6 +39,13 @@ public abstract class AbstractController implements PropertyChangeListener {
         model.removePropertyChangeListener(this);
     }
 
+    public void removeAllModels(){
+        for(AbstractModel model : registeredModels){
+            model.removePropertyChangeListener(this);
+        }
+        registeredModels.clear();
+    }
+
     public void addView(AbstractViewPanel view) {
         registeredViews.add(view);
     }
@@ -47,13 +54,15 @@ public abstract class AbstractController implements PropertyChangeListener {
         registeredViews.remove(view);
     }
 
+        public void removeAllViews(){
+        registeredViews.clear();
+    }
 
     //  Use this to observe property changes from registered models
     //  and propagate them on to all the views.
 
 
     public void propertyChange(PropertyChangeEvent evt) {
-        
         for (AbstractViewPanel view: registeredViews) {
             view.modelPropertyChange(evt);
         }
