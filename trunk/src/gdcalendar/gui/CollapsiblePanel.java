@@ -291,7 +291,7 @@ public class CollapsiblePanel extends JPanel implements MouseListener {
      * constraints.
      * @param comp The component to be added
      * @param constraints An object expressing layout contraints for this component
-     * @param  the position in the container's list at which to insert the component;
+     * @param index the position in the container's list at which to insert the component;
      * -1 means insert at the end component
      */
     @Override

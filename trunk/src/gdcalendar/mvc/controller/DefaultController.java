@@ -22,11 +22,12 @@ public class DefaultController extends AbstractController
     
     public static final String ADD_EVENT_PROPERTY = "addEvent";
     public static final String REMOVE_EVENT_PROPERTY = "removeEvent";
+    public static final String SYNCHRONIZE_DAY = "synchronize";
     
     
     /**
      * 
-     * @param 
+     * @param event The event to add
      */
     public void addEvent(DayEvent event) {
         setModelProperty(ADD_EVENT_PROPERTY, event);
@@ -34,10 +35,11 @@ public class DefaultController extends AbstractController
     
     /**
      * 
-     * @param 
+     * @param event The event to remove
      */
     public void removeEvent(DayEvent event) {
         setModelProperty(REMOVE_EVENT_PROPERTY, event);
     }
+
     
 }

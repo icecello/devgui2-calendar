@@ -16,12 +16,13 @@ import java.util.*;
 import javax.swing.*;
 
 import commandmanager.CommandManager;
-
+import gdcalendar.gui.calendar.daycard.MonthDayCard.CardView;
+import java.util.ArrayList;
 
 /**
  * Container for the calendar.
  * @author Tomas
- * @author H�kan
+ * @author Håkan
  * @author James
  */
 @SuppressWarnings("serial")
@@ -65,11 +66,14 @@ public class CalendarContainer extends JPanel {
     //|_#_|_#_|_#_|_#_|_#_|_#_|_#_|
     //|_#_|_#_|_#_|_#_|_#_|_#_|_#_|
     //|_#_|_#_|_#_|_#_|_#_|_#_|_#_|
-
     private Calendar cal;
     private CommandManager undoManager;
+    private CardView dayViews = CardView.SIMPLE;
     private MainWindow parent;
-    
+    private ArrayList<DefaultController> controllers = new ArrayList<DefaultController>();
+    private ArrayList<Day> models = new ArrayList<Day>();
+    private ArrayList<MonthDayCard> views = new ArrayList<MonthDayCard>();
+
     /**
      * Construct the calendar, with all it's child components and data it needs.
      * 
@@ -77,9 +81,9 @@ public class CalendarContainer extends JPanel {
      * @param undoManager		command manager to use for this calendar for handling all commands
      */
     public CalendarContainer(CommandManager undoManager, MainWindow parent) {
-    	this.undoManager = undoManager;
-    	this.parent = parent;
-    	
+        this.undoManager = undoManager;
+        this.parent = parent;
+
         setLayout(new BorderLayout());
         topPanel = new JPanel(new BorderLayout());
 
@@ -91,7 +95,7 @@ public class CalendarContainer extends JPanel {
         monthTitle.add(monthTitleLabel);
         monthTitle.setBackground(new Color(220, 220, 220));
         monthTitle.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        
+
         previousMonthButton = new JButton("<<");
         nextMonthButton = new JButton(">>");
 
@@ -115,91 +119,103 @@ public class CalendarContainer extends JPanel {
         topPanel.add(dayTitle, BorderLayout.CENTER);
 
         monthView = new JPanel(new GridLayout(6, 7));
-        displayMonth();
+        initMVC();
 
         add(topPanel, BorderLayout.PAGE_START);
         add(monthView, BorderLayout.CENTER);
-
         initListeners();
     }
 
-    /*
-     * utility function used to construct and arrange everything so that
-     * the currently specified month is displayed properly
-     * 
-     * called by: constructor, nextMonthMouseClicked, previousMonthMouseClicked
+    /**
+     * Initialize the calendar view for the current month
      */
-    private void displayMonth() {
-        // Clear month view
-        monthView.removeAll();
+    private void initMVC() {
+        //Fill the whole grid with MonthDayCards
+        for (int i = 1; i <= 42; i++) {
+            final DefaultController controller = new DefaultController();
+            final MonthDayCard daycard = new MonthDayCard(dayViews, controller);
+            daycard.setBorder(BorderFactory.createLineBorder(Color.lightGray));
+            /*
+             * as mentioned in MonthDayCard previously, this is a temporary way of adding new events
+             * we would like a method for the user to specify his data...
+             */
+            daycard.addAddEventListener(new MouseAdapter() {
 
-        // Display the month title
-        monthTitleLabel.setText(cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH)
-                + " " + cal.get(Calendar.YEAR));
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    DayEvent newEvent = new DayEvent("New Event", new TimeStamp(10, 00), new TimeStamp(12, 30));
+                    undoManager.execute(new AddEventCommand(controller, newEvent));
+                }
+            });
+            daycard.addRemoveEventListener(new MouseAdapter() {
 
-        // The number of days in the current month.
-        int numDays = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    try {
+                        //undoManager.execute(new RemoveEventCommand(controller))
+                        undoManager.removeLast();
+                    } catch (Exception e1) {
+                    }
+                }
+            });
+
+
+            controller.addView(daycard);
+            views.add(daycard);
+            controllers.add(controller);
+            monthView.add(daycard);
+        }
+        //Call switchToMonth to attach the correct days (models) to the newly created MonthCards
+        switchToMonth(cal);
+    }
+
+    /*
+     * Update the calendar view to show another month
+     */
+    private void switchToMonth(final Calendar calendar) {
+        Calendar tempCal = (Calendar) calendar.clone();
+        monthTitleLabel.setText(tempCal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH)
+                + " " + tempCal.get(Calendar.YEAR));
+
+        //Detach all models
+        for (DefaultController controller : controllers) {
+            controller.removeAllModels();
+        }
+        //Event for debugging, here we should fetch the correct days
+        DayEvent event = new DayEvent("changed month");
+        ArrayList<DayEvent> events = new ArrayList<DayEvent>();
+        events.add(event);
+
+        int numDays = tempCal.getActualMaximum(Calendar.DAY_OF_MONTH);
         // The start day of the month in integer form, so we know where to
         // start placing numbers in the grid.
-        cal.set(Calendar.DAY_OF_MONTH, 1);
-        int startDay = cal.get(Calendar.DAY_OF_WEEK);
-
+        tempCal.set(Calendar.DAY_OF_MONTH, 1);
+        int startDay = tempCal.get(Calendar.DAY_OF_WEEK);
         for (int i = 1; i <= 42; i++) {
-
+            final CardView currentView;     //variable to keep track what apperence the daycard should have
+            final int index = i - 1;
             if (i >= (startDay) && i < (startDay + numDays)) {
+                currentView = dayViews;
+                tempCal.set(Calendar.DAY_OF_MONTH, i - startDay + 1);
+                Day day = new Day(tempCal, events);
+                controllers.get(index).addModel(day);
+                day.synchornize();
+            } else {
+                currentView = CardView.NONE;
+            }
+            if (!SwingUtilities.isEventDispatchThread()) {
+                SwingUtilities.invokeLater(new Runnable() {
 
-                Calendar date = new GregorianCalendar(2010, 4, i - startDay + 1);
-                final DefaultController controller = new DefaultController();
-                //Create a event shared by all DayCards
-                Collection <DayEvent> dayEvents = new ArrayList<DayEvent>();
-                dayEvents.add(new DayEvent("Event 1"));
-                Day day = new Day(date, dayEvents);
-                MonthDayCard daycard = new MonthDayCard(day, MonthDayCard.CardView.SIMPLE, controller);
-                /*
-                 * as mentioned in MonthDayCard previously, this is a temporary way of adding new events
-                 * we would like a method for the user to specify his data...
-                 */
-                daycard.addAddEventListener(new MouseAdapter() {
-					@Override
-					public void mouseClicked(MouseEvent e) {
-						DayEvent newEvent = new DayEvent("New Event",new TimeStamp(10, 00), new TimeStamp(12, 30));
-			            
-						parent.setUndoEnabled(true);
-						undoManager.execute(new AddEventCommand(controller, newEvent));
-						
-					}
-				});
-                
-                daycard.addRemoveEventListener(new MouseAdapter() {
-					@Override
-					public void mouseClicked(MouseEvent e) {
-						try {
-							//undoManager.execute(new RemoveEventCommand(controller))
-							undoManager.removeLast();
-						} catch (Exception e1) {
-							
-						}
-						
-					}
-				});
-                
-                //Create a controller for each dayCard, and attach the view and model together
-
-                controller.addView(daycard);
-                controller.addModel(day);
-                daycard.setBorder(BorderFactory.createLineBorder(Color.lightGray));
-                //temporary code to make every other day card show
-                //more events
-                if (i % 2 == 1) {
-                    day.addEvent(new DayEvent("School", new TimeStamp(11, 15), new TimeStamp(15, 00)));
-                    day.addEvent(new DayEvent("Sleep", new TimeStamp(17, 15), new TimeStamp(21, 00)));
-                }
-                monthView.add(daycard);
-                
+                    public void run() {
+                        views.get(index).changeView(currentView);
+                    }
+                });
 
             } else {
-                monthView.add(new MonthDayCard());
+                views.get(index).changeView(currentView);
             }
+            views.get(index).revalidate();
+            views.get(index).repaint();
         }
     }
 
@@ -222,14 +238,15 @@ public class CalendarContainer extends JPanel {
     }
 
     private void nextMonthMouseClicked(MouseEvent e) {
+
         cal.set(Calendar.MONTH, cal.get(Calendar.MONTH) + 1);
-        displayMonth();
+        switchToMonth(cal);
     }
 
     private void previousMonthMouseClicked(MouseEvent e) {
+
         cal.set(Calendar.MONTH, cal.get(Calendar.MONTH) - 1);
-        displayMonth();
+        switchToMonth(cal);
     }
 }
-
 

@@ -11,7 +11,6 @@ import gdcalendar.mvc.view.AbstractViewPanel;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -24,7 +23,7 @@ import javax.swing.BoxLayout;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
+import javax.swing.SwingConstants;
 
 /**
  * @author Håkan
@@ -44,15 +43,31 @@ import javax.swing.SwingUtilities;
 @SuppressWarnings("serial")
 public class MonthDayCard extends AbstractViewPanel implements IDayCard {
 
+    /**
+     * A collection of constant used for defining how a MonthDayCard should
+     * visually represent it's data
+     */
     public enum CardView {
 
+        /**
+         * The contained data should not be shown at all
+         */
+        NONE,
+        /**
+         * The contained data should be shown in a simplistic way. Only textual
+         * information will be shown
+         */
         SIMPLE,
+        /**
+         * The contained data should be shown in a sophisticated way. Graphical components,
+         * such as images texts will be shown
+         */
         DETAILED
     }
     /*
      * member variables
      */
-    private Calendar calendar;
+    private Calendar calendar = Calendar.getInstance();
     private CardView view = CardView.SIMPLE;
     private JPanel simpleView = new JPanel();   //The simple visual representation of the day
     private JPanel detailedView = new JPanel(); //The advanced visual representation of the day
@@ -61,75 +76,85 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
     private JLabel addEventLabel;       //Label, used for adding new events
     private JLabel removeEventLabel;    //Label, used for removing events
     private DefaultController controller;   //The controller, responsible for updating the
-                                            //connected models
+    //connected models
     private ArrayList<JLabel> eventLabels;  //The visual representation of the day events
     private ArrayList<DayEvent> events;     //The events of the day
+
     /**
      * Default constructor, creating an empty MonthDayCard
      */
-    public MonthDayCard() {
+    private MonthDayCard() {
         setLayout(new BorderLayout());
         titleLabel = new JLabel();
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         eventLabels = new ArrayList<JLabel>();
         events = new ArrayList<DayEvent>();
-
-        //Make the day of the month appear in the top center position of the card
-        JPanel titleContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        titleContainer.add(titleLabel);
         add(titleLabel, BorderLayout.PAGE_START);
-
     }
 
     /**
-     * Create a MonthDayCard showing the day of the month formated for the given view
+     * Create an empty MonthDayCard. It's visual apperence is decided by
+     * the view.
      *
-     * @param day	the day of month to display in this day card
-     * @param newView	which layout to use for the drawing of the component
+     * @param view	which layout to use for the drawing of the component
      */
-    public MonthDayCard(Calendar calendar, CardView view) {
+    public MonthDayCard(CardView view, DefaultController controller) {
         //Call MonthDayCard() for basic set up code
         this();
         this.view = view;
-        this.calendar = calendar;
 
         addEventLabel = new JLabel("+");
         addEventLabel.setFont(new Font("Arial", Font.PLAIN, 18));
         removeEventLabel = new JLabel("-");
         removeEventLabel.setFont(new Font("Arial", Font.PLAIN, 18));
+        //If the view is set to none we don't wanna show the add and remove
+        //event labels
+        if (view == CardView.NONE) {
+            addEventLabel.setVisible(false);
+            removeEventLabel.setVisible(false);
+        }
 
         JPanel eventModifyContainer = new JPanel(new BorderLayout());
+        eventModifyContainer.add(removeEventLabel, BorderLayout.LINE_START);
+        eventModifyContainer.add(addEventLabel, BorderLayout.LINE_END);
+        add(eventModifyContainer, BorderLayout.PAGE_END);
+
         simpleView.setLayout(new BoxLayout(simpleView, BoxLayout.PAGE_AXIS));
         detailedView.setLayout(new BoxLayout(detailedView, BoxLayout.PAGE_AXIS));
-        //The title is set to the current day of the month
-        String title = Integer.toString(calendar.get(Calendar.DAY_OF_MONTH));
-        titleLabel.setText(title);
-
-        //initListners();
-
         //Make the monthcard show the correct view
         if (view == CardView.SIMPLE) {
             add(simpleView, BorderLayout.CENTER);
         } else {
             add(detailedView, BorderLayout.CENTER);
         }
-        eventModifyContainer.add(removeEventLabel, BorderLayout.LINE_START);
-        eventModifyContainer.add(addEventLabel, BorderLayout.LINE_END);
-        add(eventModifyContainer, BorderLayout.PAGE_END);
-
-
     }
 
+    /**
+     * Create a MonthCard showing a visual representation of a given day. The day
+     * is connected to a contoller, which is responsible to updating connected models
+     *
+     * @param day   The day to visually represent
+     * @param view  The visual representation of the day depend on which view
+     *              that is connected to it
+     * @param controller    The controller which is responsible for connecting the
+     *                      MonthCardDay to corresponing models
+     */
     public MonthDayCard(Day day, CardView view, DefaultController controller) {
         /*
          * Call MonthDayCard with current date and the given view
          */
-        this(Calendar.getInstance(), view);
+        this(view, controller);
         //Make the necessary adjustments, so that the monthcard reflectes
         //the data in the given day
         this.controller = controller;
         calendar.setTime(day.getDate());
+
         titleLabel.setText("" + calendar.get(Calendar.DAY_OF_MONTH));
 
+        if (view == CardView.NONE) {
+            titleLabel.setVisible(false);
+        }
         for (DayEvent event : day.getEvents()) {
             JLabel eventLabel = new JLabel(event.toString());
             eventLabels.add(eventLabel);
@@ -148,41 +173,52 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
         return calendar;
     }
 
+    public void setDate(Calendar date) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
     public CardView getView() {
         return view;
     }
 
-    public void setView(CardView newView) {
-        this.view = newView;
-        SwingUtilities.invokeLater(new Runnable() {
-
-            public void run() {
-                if (view == CardView.SIMPLE) {
-                    add(simpleView, BorderLayout.PAGE_END);
-                } else {
-                    add(detailedView, BorderLayout.PAGE_END);
-                }
-            }
-        });
-        revalidate();
-        repaint();
-    }
-
     /**
-     *
-     * @see gdcalendar.gui.calendar.daycard.IDayCard#setDate()
+     * Change the visual apperence of the MonthDayCard. See
+     * CardView for more details
+     * @see gdcalendar.gui.calendar.daycard.MonthDayCard#view
+     * @param newView the new view to show
      */
-    @Override
-    public void setDate(Calendar date) {
-        this.calendar = date;
+    public void changeView(CardView newView) {
+        this.view = newView;
+        remove(simpleView);
+        remove(detailedView);
+        if (view == CardView.SIMPLE) {
+            add(simpleView, BorderLayout.CENTER);
+            titleLabel.setVisible(true);
+            addEventLabel.setVisible(true);
+            removeEventLabel.setVisible(true);
+        } else if (view == CardView.DETAILED) {
+            add(detailedView, BorderLayout.CENTER);
+            titleLabel.setVisible(true);
+            addEventLabel.setVisible(true);
+            removeEventLabel.setVisible(true);
+        } else {
+            titleLabel.setVisible(false);
+            addEventLabel.setVisible(false);
+            removeEventLabel.setVisible(false);
+
+        }
     }
 
     public boolean displayImage() {
         throw new UnsupportedOperationException("Not supported yet.");
+
+
     }
 
     public void hideImage() {
         throw new UnsupportedOperationException("Not supported yet.");
+
+
     }
 
     /**
@@ -194,20 +230,25 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        super.paintChildren(g);
+
+
 
         switch (view) {
             case SIMPLE:
                 paintSimple(g);
+
+
                 break;
+
+
             case DETAILED:
                 paintDetailed(g);
-                break;
-        }
 
-    }
-    @Override
-    protected void paintChildren(Graphics g){
+
+                break;
+
+
+        }
 
     }
 
@@ -229,6 +270,8 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
                 getWidth(),
                 getWidth()
             };
+
+
             int y[] = {
                 getHeight(),
                 (int) (getHeight() * 0.8),
@@ -249,8 +292,12 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
             //very crude, needs refinement
             //probably easier to switch to a label for this...
             String str = "Events: " + Integer.toString(eventLabels.size());
+
+
             int stringY = Math.max(getHeight() - g2.getFontMetrics().getHeight(), getHeight() - 10);
             g2.drawString(str, 10, stringY);
+
+
         }
 
     }
@@ -271,40 +318,54 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
     @Override
     public void modelPropertyChange(final PropertyChangeEvent evt) {
         String evtName = evt.getPropertyName();
+
+
         if (evt.getNewValue() != null) {
             newEventName = evt.getNewValue().toString();
+
+
         }
 
         //Add an event label to the DayCard, invoked in EDT
         if (evtName.equals(DefaultController.ADD_EVENT_PROPERTY)) {
-            SwingUtilities.invokeLater(new Runnable() {
 
-                String name = newEventName; //Store a local copy of the event name
-                                            //Since we don't know when it's called
+            String name = newEventName;
+            JLabel event = new JLabel(name);
+            simpleView.add(event);
+            eventLabels.add(event);
+            events.add(new DayEvent(name));
 
-                public void run() {
-                    JLabel event = new JLabel(name);
+            //Remove an event (the one at the bottom) from the DayCard, invoked in EDT
 
-                    simpleView.add(event);
-                    eventLabels.add(event);
-                    events.add(new DayEvent(name));
-                }
-            });
 
-        //Remove an event (the one at the bottom) from the DayCard, invoked in EDT
         } else if (evtName.equals(DefaultController.REMOVE_EVENT_PROPERTY)) {
-            SwingUtilities.invokeLater(new Runnable() {
 
-                public void run() {
-                    simpleView.remove(eventLabels.get(eventLabels.size()-1));
-                    eventLabels.remove(eventLabels.size()-1);
-                    events.remove(events.get(events.size()-1));
-                }
-            });
+            simpleView.remove(eventLabels.get(eventLabels.size() - 1));
+            eventLabels.remove(eventLabels.size() - 1);
+            events.remove(events.get(events.size() - 1));
 
+
+
+        } else if (evtName.equals(DefaultController.SYNCHRONIZE_DAY)) {
+            simpleView.removeAll();
+            eventLabels.clear();
+            events.clear();
+            final Day synchronizedDay = (Day) evt.getNewValue();
+
+            titleLabel.setText("" + synchronizedDay.getDayOfMonth());
+            for (DayEvent event : synchronizedDay.getEvents()) {
+                events.add(event);
+                JLabel eventLabel = new JLabel(event.getEventName());
+                simpleView.add(eventLabel);
+                eventLabels.add(eventLabel);
+
+
+            }
         }
         revalidate();
         repaint();
+
+
     }
 
     /**
@@ -313,16 +374,26 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
      * @param l
      */
     public void addAddEventListener(MouseListener l) {
-    	addEventLabel.addMouseListener(l);
+        if (addEventLabel == null) {
+            //don't add listners if empty card
+        } else {
+            addEventLabel.addMouseListener(l);
+
+
+        }
     }
-    
+
     /**
      * Add a listener for the remove event component
      * Note that this is still internal within the CalendarContainer.
      * @param l
      */
     public void addRemoveEventListener(MouseListener l) {
-    	removeEventLabel.addMouseListener(l);
+        if (removeEventLabel == null) {
+            //don't add listners if empty card
+        } else {
+            removeEventLabel.addMouseListener(l);
+
+        }
     }
-    
 }
