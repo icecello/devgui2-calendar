@@ -38,4 +38,8 @@ public class RemoveEventCommand implements ICommand {
 		controller.addEvent(event);
 	}
 
+	@Override
+	public void redo() {
+		execute();
+	}
 }

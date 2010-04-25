@@ -1,8 +1,7 @@
 package commandmanager;
 
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * This is the Invoker class from the Command pattern. It's a general purpose command
@@ -12,11 +11,6 @@ import java.util.List;
  * Note: the idea here is that we associate one CommandManager with one calendar, that way
  * if we allow adding multiple calendars they have their own CommandManagers.
  * 
- * Important: for some reason I can't figure out atm, any undo/redo operation is not updated
- * immediately, instead it seems the previously done operation will be refreshed on the GUI 
- * if you do a sequence of undo/redo's. I'm talking about the view only here if that's not clear,
- * the labels showing events for the days... if you have any ideas feel free to let me know or
- * adjust it and explain what the problem was :) 
  * 
  * @author Håkan
  *
@@ -24,7 +18,7 @@ import java.util.List;
 public class CommandManager {
 
 	private int commandLimit;
-	private List<ICommand> commandQueue;
+	private ArrayList<ICommand> commandQueue;
 	/*
 	 * Integer keeping track of which command in in the queue
 	 * is the latest active one.
@@ -40,7 +34,7 @@ public class CommandManager {
 	 */
 	public CommandManager(int limit) {
 		commandLimit = limit;
-		commandQueue = new LinkedList<ICommand>();
+		commandQueue = new ArrayList<ICommand>();
 		lastCommand = 0;
 		
 	}
@@ -76,13 +70,16 @@ public class CommandManager {
 			commandQueue.remove(0);
 		
 		/* 
-		 * If the commandIterator is not equal to the current last element
-		 * of the commandQueue, we have undone commands and should thus
-		 * overwrite those. We do this by first removing all undone commands
-		 * from the queue and then adding the new command.
+		 * If lastCommand is not equal to the current size of commandQueue
+		 * we have undone commands and should thus overwrite those. 
+		 * We do this by first removing all undone commands from the queue 
+		 * and then adding the new command.
 		 * 
 		 */
-		//TODO: add the code for the above comment so this works properly
+		if (lastCommand < commandQueue.size()) {
+			for (int i = (lastCommand-1); i < commandQueue.size(); i++)
+				commandQueue.remove(i);
+		}
 		
 		commandQueue.add(command);
 		command.execute();
@@ -162,7 +159,7 @@ public class CommandManager {
 		
 		ICommand command = commandQueue.get(lastCommand);
 		while (levels > 0) {	
-			command.execute();
+			command.redo();
 			levels--;
 			
 			/*

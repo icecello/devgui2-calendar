@@ -22,4 +22,10 @@ public interface ICommand {
 	 * 
 	 */
 	public void undo();
+	
+	/**
+	 * special method handling redoing this commands operations
+	 * could be same as execute() if it's simple enough
+	 */
+	public void redo();
 }

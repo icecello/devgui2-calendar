@@ -40,5 +40,10 @@ public class AddEventCommand implements ICommand {
 		// so we can redo it
 		controller.removeEvent(event);
 	}
+	
+	@Override
+	public void redo() {
+		execute();
+	}
 
 }
