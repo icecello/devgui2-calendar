@@ -33,9 +33,9 @@ public class Dayview extends JPanel {
         scroll.setMinimumSize(new Dimension(100, 500));
         initTimeLabels();
         //Add some events, used for debugging
-        for (int i = 0; i < 24; i++) {
-            if (i % 2 == 0) {
-                DayEvent event = new DayEvent("Event", new TimeStamp(i, 0), new TimeStamp(i, 30));
+        for (int i = 0; i < 24*60; i++) {
+            if (i % 60 == 0) {
+                DayEvent event = new DayEvent("Event", new TimeStamp(i/60, 0), new TimeStamp(i/60, 30));
                 addEvent(event);
             }
         }
@@ -55,18 +55,18 @@ public class Dayview extends JPanel {
         c.fill = GridBagConstraints.BOTH;
         c.anchor = GridBagConstraints.NORTH;
 
-        for (int i = 0; i < 48; i++) {
+        for (int i = 0; i < 24*60; i++) {
             //Even hours
             c.gridy = i;
-            if (i % 2 == 0) {
-                JLabel timeLabel = new JLabel((i / 2 <= 9 ? "0" + i / 2 : i / 2) + ":00  ");
+            if (i % 60 == 0) {
+                JLabel timeLabel = new JLabel((i / 60 <= 9 ? "0" + i / 60 : i / 60) + ":00  ");
                 timeLabel.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.lightGray));
                 view.add(timeLabel, c);
                 //Half hours
             } else {
                 //Add an empty box, making the half hours take place as well
                 Box box = Box.createVerticalBox();
-                box.add(Box.createVerticalStrut(10));
+                box.add(Box.createVerticalStrut(1));
                 box.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.lightGray));
                 view.add(box, c);
             }
@@ -86,8 +86,8 @@ public class Dayview extends JPanel {
         newEvent.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 0, Color.lightGray));
 
         int[] timeSpan = event.timeSpan();
-        int labelSize = 2 * timeSpan[0];
-        labelSize += timeSpan[1] / 30;  //Every hour = 2 gridheight
+        int labelSize = 60 * timeSpan[0];   //1 hour = 60 height
+        labelSize += timeSpan[1];           //1 min = 1 height
 
         for (EventCard eventCard : eventCards) {
             if (event.isActive(eventCard.event.getStartTime())
@@ -107,7 +107,7 @@ public class Dayview extends JPanel {
         }
         final GridBagConstraints cLocal = new GridBagConstraints();
         //Determine where to put the new event
-        cLocal.gridy = 2 * event.getStartTime().getHour() + event.getStartTime().getMin() / 30;
+        cLocal.gridy = 60 * event.getStartTime().getHour() + event.getStartTime().getMin();
         cLocal.gridheight = labelSize;  cLocal.fill = GridBagConstraints.BOTH;
         cLocal.gridx = 1; cLocal.weightx = 1; cLocal.weighty = 1;
         SwingUtilities.invokeLater(new Runnable() {
@@ -144,7 +144,7 @@ public class Dayview extends JPanel {
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.add(d);
         d.addEvent(new DayEvent("Innebandy", new TimeStamp(21, 0), new TimeStamp(22, 00)));
-        d.addEvent(new DayEvent("Städa", new TimeStamp(10, 00), new TimeStamp(15, 00)));
+        d.addEvent(new DayEvent("Städa", new TimeStamp(10, 00), new TimeStamp(14, 25)));
         frame.pack();
         frame.setVisible(true);
 

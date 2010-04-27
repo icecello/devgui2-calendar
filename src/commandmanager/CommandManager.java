@@ -77,7 +77,7 @@ public class CommandManager {
 		 * 
 		 */
 		if (lastCommand < commandQueue.size()) {
-			for (int i = (lastCommand-1); i < commandQueue.size(); i++)
+			for (int i = (lastCommand); i < commandQueue.size(); i++)
 				commandQueue.remove(i);
 		}
 		
