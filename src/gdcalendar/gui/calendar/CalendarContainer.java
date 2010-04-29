@@ -1,6 +1,5 @@
 package gdcalendar.gui.calendar;
 
-import gdcalendar.gui.MainWindow;
 import gdcalendar.gui.calendar.daycard.MonthDayCard;
 import gdcalendar.gui.calendar.undoredo.AddEventCommand;
 //this import will be used later as we sort out the details of how
@@ -69,20 +68,20 @@ public class CalendarContainer extends JPanel {
     private Calendar cal;
     private CommandManager undoManager;
     private CardView dayViews = CardView.SIMPLE;
-    private MainWindow parent;
     private ArrayList<DefaultController> controllers = new ArrayList<DefaultController>();
     private ArrayList<Day> models = new ArrayList<Day>();
     private ArrayList<MonthDayCard> views = new ArrayList<MonthDayCard>();
-
+    private ArrayList<CalendarDataChangedListener> dataChangedListeners = new ArrayList<CalendarDataChangedListener>();
     /**
      * Construct the calendar, with all it's child components and data it needs.
-     * 
+     * For now, we still need to pass the command manager into the calendar, I'm
+     * not sure if that is really necessary, but at least it works, and we don't
+     * need the main window in the CalendarContainer anymore. That's a good thing.
      * 
      * @param undoManager		command manager to use for this calendar for handling all commands
      */
-    public CalendarContainer(CommandManager undoManager, MainWindow parent) {
+    public CalendarContainer(CommandManager undoManager) {
         this.undoManager = undoManager;
-        this.parent = parent;
 
         setLayout(new BorderLayout());
         topPanel = new JPanel(new BorderLayout());
@@ -144,9 +143,10 @@ public class CalendarContainer extends JPanel {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     DayEvent newEvent = new DayEvent("New Event", new TimeStamp(10, 00), new TimeStamp(12, 30));
-                    parent.setUndoEnabled(true);
-                    parent.setRedoEnabled(false);
+                    CalendarChangeEvent changeEvent = new CalendarChangeEvent(newEvent, 0, CalendarChangeEvent.EventAdd, 0);
+                    
                     undoManager.execute(new AddEventCommand(controller, newEvent));
+                    fireDataChangedEvent(changeEvent);
                 }
             });
             daycard.addRemoveEventListener(new MouseAdapter() {
@@ -155,7 +155,10 @@ public class CalendarContainer extends JPanel {
                 public void mouseClicked(MouseEvent e) {
                     try {
                         //undoManager.execute(new RemoveEventCommand(controller))
+                    	CalendarChangeEvent changeEvent = new CalendarChangeEvent(null, 0, CalendarChangeEvent.EventRemove, 0);
+                    	
                         undoManager.removeLast();
+                        fireDataChangedEvent(changeEvent);
                     } catch (Exception e1) {
                     }
                 }
@@ -249,6 +252,33 @@ public class CalendarContainer extends JPanel {
 
         cal.set(Calendar.MONTH, cal.get(Calendar.MONTH) - 1);
         switchToMonth(cal);
+    }
+    
+    /**
+     * Add a listener that will be invoked whenever the data of this
+     * calendar has changed in some way.
+     * 
+     * Changes that will trigger this event are:
+     * - Adding new data
+     * - Removing data
+     * - Editing data (TODO)
+     * 
+     * @param listener
+     */
+    public void addDataChangeListener(CalendarDataChangedListener listener) {
+    	dataChangedListeners.add(listener);
+    }
+    
+    /*
+     * Internal method that handles firing of data changed events.
+     */
+    private void fireDataChangedEvent(CalendarChangeEvent e) {
+    	Iterator<CalendarDataChangedListener> it = dataChangedListeners.iterator();
+    	
+    	while (it.hasNext()) {
+    		CalendarDataChangedListener listener = it.next();
+    		listener.dataChanged(e);
+    	}
     }
 }
 

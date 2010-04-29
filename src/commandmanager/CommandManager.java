@@ -53,12 +53,8 @@ public class CommandManager {
 	}
 	
 	/**
-	 * Execute and store specified command in the manager
-	 * TODO: fix so that the queue is handled correctly after an undo
-	 * operation has been performed. Currently, if you add a command
-	 * after undoing a bunch of them previously, it will "redo" all of
-	 * them, in that the queue still contains them and the new command
-	 * is added in the end...
+	 * Execute and store specified command in the manager.
+	 * 
 	 * @param command
 	 */
 	public void execute(ICommand command) {
@@ -88,6 +84,10 @@ public class CommandManager {
 		System.out.println("size: " + commandQueue.size());
 	}
 	
+	public void add(ICommand command) {
+	commandQueue.add(command);
+	lastCommand++;
+	}
 	/**
 	 * Remove specified command from the manager
 	 * Throws an exception if the removal fails.

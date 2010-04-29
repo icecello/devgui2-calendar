@@ -1,6 +1,9 @@
 package gdcalendar.gui;
 
+import gdcalendar.gui.calendar.CalendarChangeEvent;
 import gdcalendar.gui.calendar.CalendarContainer;
+import gdcalendar.gui.calendar.CalendarDataChangedListener;
+
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 
@@ -82,7 +85,25 @@ public class MainWindow extends JFrame {
         collapsiblePanel.add(new LeftItemPanel(), BorderLayout.PAGE_START, -1);
         collapsiblePanel.add(new TransparencyPanel(this), BorderLayout.PAGE_END, -1);
 
-        add(new CalendarContainer(cm, this), BorderLayout.CENTER);
+        CalendarContainer cc = new CalendarContainer(cm);
+        /*
+         * Add listener for data change events from the calendar
+         * to set undo/redo properly
+         * 
+         * Not much else is done currently but it's possible
+         * to see what kind of change was made if we need that
+         * for anything...
+         */
+        cc.addDataChangeListener(new CalendarDataChangedListener() {
+			
+			@Override
+			public void dataChanged(CalendarChangeEvent e) {
+				setUndoEnabled(cm.canUndo());
+				setRedoEnabled(cm.canRedo());
+			}
+		});
+        
+        add(cc, BorderLayout.CENTER);
         
         add(collapsiblePanel, BorderLayout.LINE_START);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
