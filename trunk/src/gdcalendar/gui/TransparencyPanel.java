@@ -9,7 +9,6 @@ import javax.swing.JSlider;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.JFrame;
 
 /**
  * 
@@ -21,16 +20,16 @@ public class TransparencyPanel extends JPanel {
     private JSlider opacitySlider;
     private JLabel percentLabel;
 
-    public TransparencyPanel(JFrame transparencyFrame) {
+    public TransparencyPanel(Window transparencyFrame) {
         setLayout(new BorderLayout());
         this.transparencyFrame = transparencyFrame;
         opacitySlider = new JSlider(SwingConstants.VERTICAL, 20, 100, 100);
-        percentLabel = new JLabel(Integer.toString(opacitySlider.getValue()) + "%");
+        percentLabel = new JLabel(Integer.toString(opacitySlider.getValue()) + "%", JLabel.CENTER);
 
-        add(new JLabel("Opacity"), BorderLayout.PAGE_START);
+        add(new JLabel("Opacity", JLabel.CENTER), BorderLayout.PAGE_START);
         add(opacitySlider, BorderLayout.CENTER);
         add(percentLabel, BorderLayout.PAGE_END);
-
+        
         initListeners();
     }
 
