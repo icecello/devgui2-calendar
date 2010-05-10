@@ -20,17 +20,22 @@ import commandmanager.CommandManager;
  *
  * @author Tomas
  * @author Håkan
+ * @author James
  */
 @SuppressWarnings("serial")
 public class MainWindow extends JFrame {
 
 	private JMenuItem undoItem;
 	private JMenuItem redoItem;
+        private JMenuItem preferencesItem;
+
+        // Reference to this so we can pass it to the Preferences Window.
+        protected JFrame mainWindow;
 	
     public MainWindow() {
         setLayout(new BorderLayout());
         final CommandManager cm = new CommandManager(10);
-
+        mainWindow = this;
         
         /*
          * construct a simple menu, this is temporary since we
@@ -71,11 +76,20 @@ public class MainWindow extends JFrame {
 					}
 			}
 		});
+
+        preferencesItem = new JMenuItem(new AbstractAction("Preferences") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new PreferencesWindow(mainWindow);
+            }
+        });
         
         menu.add(undoItem);
         menu.add(redoItem);
+        menu.add(preferencesItem);
         undoItem.setEnabled(false);
         redoItem.setEnabled(false);
+        preferencesItem.setEnabled(true);
         mb.add(menu);
         this.setJMenuBar(mb);
         
@@ -83,7 +97,6 @@ public class MainWindow extends JFrame {
         collapsiblePanel.setLayout(new BorderLayout());
         collapsiblePanel.setCollapsButtonSize(5);
         collapsiblePanel.add(new LeftItemPanel(), BorderLayout.PAGE_START, -1);
-        collapsiblePanel.add(new TransparencyPanel(this), BorderLayout.PAGE_END, -1);
 
         CalendarContainer cc = new CalendarContainer(cm);
         /*
