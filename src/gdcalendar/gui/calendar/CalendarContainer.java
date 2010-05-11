@@ -149,6 +149,7 @@ public class CalendarContainer extends JPanel {
                     fireDataChangedEvent(changeEvent);
                 }
             });
+            
             daycard.addRemoveEventListener(new MouseAdapter() {
 
                 @Override
