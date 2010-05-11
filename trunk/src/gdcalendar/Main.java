@@ -1,5 +1,6 @@
 package gdcalendar;
 
+
 import gdcalendar.gui.MainWindow;
 
 /**
@@ -13,9 +14,15 @@ public class Main {
      */
     public static void main(String[] args) {
 
+    	
 
-
-        MainWindow mainWindow = new MainWindow();
+        MainWindow mainWindow = null;
+		try {
+			mainWindow = new MainWindow();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         mainWindow.setVisible(true);
     }
 

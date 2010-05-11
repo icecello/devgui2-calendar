@@ -34,9 +34,9 @@ public class TransparencyPanel extends JPanel {
     }
 
     private void initListeners() {
-
+    
         opacitySlider.addChangeListener(new ChangeListener() {
-
+        	
             public void stateChanged(ChangeEvent e) {
                 TransparencyPanel.this.sliderChanged(e);
             }

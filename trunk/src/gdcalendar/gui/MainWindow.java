@@ -5,13 +5,16 @@ import gdcalendar.gui.calendar.CalendarContainer;
 import gdcalendar.gui.calendar.CalendarDataChangedListener;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
+import java.util.ResourceBundle;
 
-import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+
+import actionmanager.Action;
+import actionmanager.ActionManager;
 
 import commandmanager.CommandManager;
 
@@ -25,71 +28,45 @@ import commandmanager.CommandManager;
 @SuppressWarnings("serial")
 public class MainWindow extends JFrame {
 
+	private ActionManager actionManager;
+	private ResourceBundle resource;
 	private JMenuItem undoItem;
 	private JMenuItem redoItem;
-        private JMenuItem preferencesItem;
 
-        // Reference to this so we can pass it to the Preferences Window.
-        protected JFrame mainWindow;
+	/*
+	 * note that we would want an array here if we need more undo managers
+	 * for multiple calendars or whatever...
+	 */
+	private final CommandManager cm = new CommandManager(10);
 	
-    public MainWindow() {
+    public MainWindow() throws Exception {
         setLayout(new BorderLayout());
-        final CommandManager cm = new CommandManager(10);
-        mainWindow = this;
+
+        //load the resource file
+        resource = ResourceBundle.getBundle("gdcalendar.resource_en_US");
+        actionManager = new ActionManager(this, resource);
+        
         
         /*
          * construct a simple menu, this is temporary since we
          * may want to change how we use actions for instance
          */
         JMenuBar mb = new JMenuBar();
-        JMenu menu = new JMenu("Edit");
-        undoItem = new JMenuItem(new AbstractAction("Undo") {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				
-				try {
-					cm.undo(1);
-					setUndoEnabled(cm.canUndo());
-					setRedoEnabled(cm.canRedo());
-				} catch (Exception e1) {
-					// TODO add proper exception handling, stack trace
-					// is good for debugging only
-					e1.printStackTrace();
-				}
-			}
-		});
-        
-        redoItem = new JMenuItem(new AbstractAction("Redo") {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-					
-					try {
-						cm.redo(1);
-						setUndoEnabled(cm.canUndo());
-						setRedoEnabled(cm.canRedo());
-					} catch (Exception e1) {
-						// TODO add proper exception handling, stack trace
-						// is good for debugging only
-						e1.printStackTrace();
-					}
-			}
-		});
+        JMenu menu = new JMenu(resource.getString("menu.edit.text"));
+        undoItem = new JMenuItem(actionManager.getAction("doUndo"));
+        //undoItem.setAction(a);
+        redoItem = new JMenuItem(actionManager.getAction("doRedo"));
+        //redoItem.setAction(a);
 
-        preferencesItem = new JMenuItem(new AbstractAction("Preferences") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new PreferencesWindow(mainWindow);
-            }
-        });
+        JMenuItem preferencesItem = new JMenuItem();
+        preferencesItem.setAction(actionManager.getAction("showPreferences"));
         
         menu.add(undoItem);
         menu.add(redoItem);
         menu.add(preferencesItem);
         undoItem.setEnabled(false);
         redoItem.setEnabled(false);
-        preferencesItem.setEnabled(true);
+
         mb.add(menu);
         this.setJMenuBar(mb);
         
@@ -108,11 +85,10 @@ public class MainWindow extends JFrame {
          * for anything...
          */
         cc.addDataChangeListener(new CalendarDataChangedListener() {
-			
 			@Override
 			public void dataChanged(CalendarChangeEvent e) {
-				setUndoEnabled(cm.canUndo());
-				setRedoEnabled(cm.canRedo());
+				undoItem.setEnabled(cm.canUndo());
+				redoItem.setEnabled(cm.canRedo());
 			}
 		});
         
@@ -121,27 +97,50 @@ public class MainWindow extends JFrame {
         add(collapsiblePanel, BorderLayout.LINE_START);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         pack();
-
-   
-        
-        pack();
     }
     
     /**
-     * set the undo menu item's enabled state
-     * 
-     * @param state		true for enabled
+     * Create and show a preferences window that
+     * currently only supports changing the main
+     * windows opacity.
      */
-    public void setUndoEnabled(boolean state) {
-    	undoItem.setEnabled(state);
+    @Action
+    public void showPreferences() {
+    	new PreferencesWindow(this);
+    }
+    /**
+     * This action is performed whenever an event executed on the calendar
+     * is to be undone. This also updates the menu entries for undo/redo
+     * so their enabled state is correct.
+     */
+    @Action
+    public void doUndo() {
+    	try {
+			cm.undo(1);
+			undoItem.setEnabled(cm.canUndo());
+			redoItem.setEnabled(cm.canRedo());
+		} catch (Exception e1) {
+			// TODO add proper exception handling, stack trace
+			// is good for debugging only
+			e1.printStackTrace();
+		}
     }
     
     /**
-     * set the redo menu item's enabled state
-     * 
-     * @param state		true for enabled
+     * Action performed when an event previously executed on the calendar
+     * is to be redone. This also updates the menu entries for undo/redo
+     * so their enabled state is correct.
      */
-    public void setRedoEnabled(boolean state) {
-    	redoItem.setEnabled(state);
+    @Action
+    public void doRedo() {
+    	try {
+			cm.redo(1);
+			undoItem.setEnabled(cm.canUndo());
+			redoItem.setEnabled(cm.canRedo());
+		} catch (Exception e1) {
+			// TODO add proper exception handling, stack trace
+			// is good for debugging only
+			e1.printStackTrace();
+		}
     }
 }
