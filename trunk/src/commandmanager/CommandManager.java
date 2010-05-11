@@ -61,9 +61,13 @@ public class CommandManager {
 		/*
 		 * If we have reached the command limit, we must remove the
 		 * first element of the queue before we can add a new one.
+		 * This automatically shifts all other elements of the queue
+		 * one step to the left.
 		 */
-		if (commandQueue.size() >= commandLimit)
+		if ((commandQueue.size() >= commandLimit) && (commandLimit > 0)) {
 			commandQueue.remove(0);
+			lastCommand--;
+		}
 		
 		/* 
 		 * If lastCommand is not equal to the current size of commandQueue
@@ -84,10 +88,29 @@ public class CommandManager {
 		System.out.println("size: " + commandQueue.size());
 	}
 	
+	/**
+	 * Add specified command to the command manager, bypassing
+	 * immediate execution. Use this if you want to store 
+	 * a sequence of commands for later execution. 
+	 * 
+	 * @param command		command to add to the manager
+	 */
 	public void add(ICommand command) {
-	commandQueue.add(command);
-	lastCommand++;
+		/*
+		 * If we have reached the command limit, we must remove the
+		 * first element of the queue before we can add a new one.
+		 * This automatically shifts all other elements of the queue
+		 * one step to the left.
+		 */
+		if ((commandQueue.size() >= commandLimit) && (commandLimit > 0)) {
+			commandQueue.remove(0);
+			lastCommand--;
+		}
+		
+		commandQueue.add(command);
+		lastCommand++;
 	}
+	
 	/**
 	 * Remove specified command from the manager
 	 * Throws an exception if the removal fails.
@@ -101,8 +124,7 @@ public class CommandManager {
 	
 	/**
 	 * Remove the last command entered into the manager
-	 * Throws an exception if this fails.
-	 * 
+	 * Purely convenience function...
 	 */
 	public void removeLast() {
 		ICommand command = commandQueue.get(commandQueue.size());
@@ -174,7 +196,8 @@ public class CommandManager {
 	}
 	
 	/**
-	 * 
+	 * Check whether the command manager contains any
+	 * commands or not.
 	 * @return	true if the command queue is empty
 	 */
 	public boolean isEmpty() {
@@ -182,6 +205,11 @@ public class CommandManager {
 	}
 	
 	/**
+	 * Check whether the command manager has any commands
+	 * that can be undone.
+	 * 
+	 * This is only a simple check against a counter of
+	 * commands, nothing fancy.
 	 * 
 	 * @return		true if it is possible to undo commands
 	 */
@@ -190,6 +218,9 @@ public class CommandManager {
 	}
 	
 	/**
+	 * Check if the command manager can redo any commands.
+	 * This is only possible if at least one undo() operation
+	 * has previously been performed.
 	 * 
 	 * @return		true if it is possible to redo any commands
 	 */

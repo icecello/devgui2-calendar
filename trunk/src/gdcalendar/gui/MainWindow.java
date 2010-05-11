@@ -37,7 +37,7 @@ public class MainWindow extends JFrame {
 	 * note that we would want an array here if we need more undo managers
 	 * for multiple calendars or whatever...
 	 */
-	private final CommandManager cm = new CommandManager(10);
+	private final CommandManager cm = new CommandManager(0);
 	
     public MainWindow() throws Exception {
         setLayout(new BorderLayout());
@@ -48,18 +48,15 @@ public class MainWindow extends JFrame {
         
         
         /*
-         * construct a simple menu, this is temporary since we
-         * may want to change how we use actions for instance
+         * construct a simple menu
+         * currently uses the ActionManager class to construct
+         * AbstractAction objects...
          */
         JMenuBar mb = new JMenuBar();
         JMenu menu = new JMenu(resource.getString("menu.edit.text"));
         undoItem = new JMenuItem(actionManager.getAction("doUndo"));
-        //undoItem.setAction(a);
         redoItem = new JMenuItem(actionManager.getAction("doRedo"));
-        //redoItem.setAction(a);
-
-        JMenuItem preferencesItem = new JMenuItem();
-        preferencesItem.setAction(actionManager.getAction("showPreferences"));
+        JMenuItem preferencesItem = new JMenuItem(actionManager.getAction("showPreferences"));
         
         menu.add(undoItem);
         menu.add(redoItem);

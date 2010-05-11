@@ -7,6 +7,7 @@ import java.lang.reflect.Method;
 import java.util.ResourceBundle;
 
 import javax.swing.AbstractAction;
+import javax.swing.KeyStroke;
 
 /**
  * This class manages actions for an owner object class. The owner class has to
@@ -22,11 +23,11 @@ import javax.swing.AbstractAction;
  * <i>full classname</i>.<i>method name</i>.<i>property</i>
  * where property refers to one of the following:
  * text				text to display as name for the associated component
- * tooltip			hovering popup description
- * desc				something else ??
+ * mnemonic			single character that can be used to quickly invoke associated component
+ * accelerator		shortcut key to use
+ * shortdesc		hovering popup description, aka tooltip text
  * 
- * Note: only the property <i>text</i> is actually supported in this current version of
- * ActionManager
+ * New note: all the above properties are now supported!
  * 
  * @author Håkan
  *
@@ -92,7 +93,22 @@ public class ActionManager {
 					}
 				};
 				String prefix = ownerClass.getName() + "." + actionName + ".";
+				//always load name from resources, this forces the existence of this entry
 				newAction.putValue(AbstractAction.NAME, resource.getString(prefix + "text"));
+				//load mnemonic for this action if it exists in the resources
+				if (resource.containsKey(prefix + "mnemonic")) {
+					String stringMnemonic = resource.getString(prefix + "mnemonic");
+					int integerMnemonic = new Integer(stringMnemonic.charAt(0));
+					newAction.putValue(AbstractAction.MNEMONIC_KEY, integerMnemonic);
+				}
+				//load accelerator for this action if it exists in the resources
+				if (resource.containsKey(prefix + "accelerator")) {
+					newAction.putValue(AbstractAction.ACCELERATOR_KEY, KeyStroke.getKeyStroke(resource.getString(prefix + "accelerator")));
+				}
+				//load short description (aka tooltip) from resources, if it exists
+				if (resource.containsKey(prefix + "shortdesc")) {
+					newAction.putValue(AbstractAction.SHORT_DESCRIPTION, resource.getString(prefix + "shortdesc"));
+				}
 			}
 		}
 		
