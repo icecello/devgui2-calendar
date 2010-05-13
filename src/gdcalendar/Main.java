@@ -2,6 +2,7 @@ package gdcalendar;
 
 
 import gdcalendar.gui.MainWindow;
+import gdcalendar.logic.AnimationDriver;
 
 /**
  *
@@ -24,6 +25,8 @@ public class Main {
 			e.printStackTrace();
 		}
         mainWindow.setVisible(true);
+        
+        
     }
 
 }
