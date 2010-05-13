@@ -16,34 +16,67 @@ public class AnimationDriver {
 
     //Singleton instance of the driver
     private static AnimationDriver _instance = new AnimationDriver();
-    private ArrayList<IAnimatedComponent> animatedComponents;   //Hold all animation components
-    private Timer timer = new Timer("animation driver", true);  //Single timer, responsible for updating
-    //the animatedComponents at the correct pace
-    private TimerTask animations;                               //The set of all animation tasks is gathered
-                                                                //into this TimerTask
-
-    private boolean isRunning = false;                          //Indicate if the driver is running
-    //Private constructor, making the AnimationDriver a singleton
-    private AnimationDriver() {
-    }
+    //Hold all animation components
+    private ArrayList<IAnimatedComponent> animatedComponents = new ArrayList<IAnimatedComponent>();
+    //Single timer, responsible for updating the animatedComponents at the correct pace
+    private Timer timer = new Timer("animation driver", true);  
+    //The set of all animation tasks is gathered into this TimerTask
+    private ArrayList<TimerTask> animations = new ArrayList<TimerTask>(); 
+                                                                
+    //Indicate if the driver is running
+    private boolean isRunning = false;
+    //Private constructor, making the AnimationDriver a singleton (impossible to instantiate)
+    private AnimationDriver() {}
 
     /**
      * Get the single instance of the AnimationDriver
      * @return An instace of the AnimationDriver
      */
-    public AnimationDriver getInstance() {
+    public static AnimationDriver getInstance() {
         return _instance;
     }
 
     /**
      * Add a component that is suposed to be animated to the AnimationDriver.
      * This method should not be called while the AnimationDriver is running.
-     * @param component The component which is suposed to be animated
+     * @param component The component which is supposed to be animated
      */
-    public void addAnimatedComponent(IAnimatedComponent component) {
+    public void add(IAnimatedComponent component) {
         animatedComponents.add(component);
     }
 
+    /**
+     * Add a component that is suposed to be animated to the AnimationDriver.
+     * This method should not be called while the AnimationDriver is running.
+     * 
+     * @param component The component which is supposed to be animated
+     */
+    /*public void addAndRun(final IAnimatedComponent component) {
+    	animatedComponents.add(component);
+    	
+    	TimerTask t = new TimerTask() {
+    		
+            @Override
+            public void run() {
+                if (!component.animationFinished()) {
+                	component.computeAnimatation();
+
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        public void run() {
+                        	component.displayAnimatation();
+                        }
+                    });
+                } else {
+                	this.cancel();
+                }
+            }
+        };
+        animations.add(t);
+        timer.scheduleAtFixedRate(t, 10,(long)1000/(component.preferredFPS()) );
+        
+    }*/
+    
     /**
      * Remove a specific component from the AnimationDriver. The removed component
      * will no longer be updated by the driver.
@@ -53,31 +86,26 @@ public class AnimationDriver {
      *          false if the component couldn't be removed. I.e.
      *          the component was not loaded into the driver in the first place.
      */
-    public boolean removeAnimatedComponent(IAnimatedComponent component) {
+    public boolean remove(IAnimatedComponent component) {
         return animatedComponents.remove(component);
-
     }
 
     /**
      * Run all animations loaded into the AnimationDriver. Each component is
-     * updated and repainted at it's own specified rate
+     * run in it's own thread, getting updated and repainted at it's specified
+     * rate. 
      */
     public void runAnimations() {
-        final int updateInterval = 10;
-        animations = new TimerTask() {
+        
+        for (int i = 0; i < animatedComponents.size(); i++) {
+        	final int ii = i;
+	        TimerTask t = new TimerTask() {
+	
+	            @Override
+	            public void run() {
+                    final IAnimatedComponent comp = animatedComponents.get(ii);
 
-            boolean render = false;
-            int currentRenderTime = 100;
-            int maxRenderTime = 0;
-
-            @Override
-            public void run() {
-                for (int i = 0; i < animatedComponents.size(); i++) {
-                    //Perhaps not final should be used
-                    final IAnimatedComponent comp = animatedComponents.get(i);
-
-                    render = (currentRenderTime % 100 / comp.preferredFPS() == 0) ? true : false;
-                    if (render|| !comp.animationFinished()) {
+                    if (!comp.animationFinished()) {
                         comp.computeAnimatation();
 
                         SwingUtilities.invokeLater(new Runnable() {
@@ -86,15 +114,16 @@ public class AnimationDriver {
                                 comp.displayAnimatation();
                             }
                         });
+                    } else {
+                    	this.cancel();
                     }
-                }
-                currentRenderTime++;
-                if (currentRenderTime >= maxRenderTime) {
-                    currentRenderTime = 0;
-                }
-            }
-        };
-        timer.schedule(animations, updateInterval);
+	            }
+	        };
+	        animations.add(t);
+	        timer.scheduleAtFixedRate(animations.get(i), 10,(long)1000/(animatedComponents.get(i).preferredFPS()) );
+	        
+        }
+        
         isRunning = true;
     }
 

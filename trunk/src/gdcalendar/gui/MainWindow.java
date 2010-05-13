@@ -3,8 +3,13 @@ package gdcalendar.gui;
 import gdcalendar.gui.calendar.CalendarChangeEvent;
 import gdcalendar.gui.calendar.CalendarContainer;
 import gdcalendar.gui.calendar.CalendarDataChangedListener;
+import gdcalendar.logic.AnimationDriver;
+import gdcalendar.logic.IAnimatedComponent;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ResourceBundle;
 
 import javax.swing.JFrame;
@@ -12,6 +17,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 import actionmanager.Action;
 import actionmanager.ActionManager;
@@ -28,7 +34,7 @@ import commandmanager.CommandManager;
 @SuppressWarnings("serial")
 public class MainWindow extends JFrame {
 
-	private ActionManager actionManager;
+	
 	private ResourceBundle resource;
 	private JMenuItem undoItem;
 	private JMenuItem redoItem;
@@ -38,6 +44,34 @@ public class MainWindow extends JFrame {
 	 * for multiple calendars or whatever...
 	 */
 	private final CommandManager cm = new CommandManager(0);
+	private ActionManager actionManager;
+	
+	class animateColor extends JPanel implements IAnimatedComponent {
+		int r = 0, g = 200, b = 50;
+		boolean val = false;
+		@Override
+		public boolean animationFinished() {
+			return false;
+		}
+
+		@Override
+		public void computeAnimatation() {
+			r = (r + 1) % 255;
+			g = (g + 1) % 255;
+			b = (b + 1) % 255;
+		}
+
+		@Override
+		public void displayAnimatation() {
+			this.setBackground(new Color(r, g, b));
+		}
+
+		@Override
+		public int preferredFPS() {
+			return 60;
+		}
+		
+	}
 	
     public MainWindow() throws Exception {
         setLayout(new BorderLayout());
@@ -47,6 +81,10 @@ public class MainWindow extends JFrame {
         actionManager = new ActionManager(this, resource);
         
         
+        AnimationDriver ad = AnimationDriver.getInstance();
+        //add dummy animation to animation driver
+        animateColor jp = new animateColor();
+        ad.add(jp);
         /*
          * construct a simple menu
          * currently uses the ActionManager class to construct
@@ -92,14 +130,25 @@ public class MainWindow extends JFrame {
         add(cc, BorderLayout.CENTER);
         
         add(collapsiblePanel, BorderLayout.LINE_START);
+        add(jp, BorderLayout.AFTER_LAST_LINE);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         pack();
+        
+        //start animation driver
+        ad.runAnimations();
+        
+        this.addWindowListener(new WindowAdapter() {
+			public void windowClosed(WindowEvent e) {
+        		AnimationDriver.getInstance().stopAnimations();
+        	}
+		});
     }
-    
+
+
     /**
      * Create and show a preferences window that
      * currently only supports changing the main
-     * windows opacity.
+     * window's opacity.
      */
     @Action
     public void showPreferences() {
