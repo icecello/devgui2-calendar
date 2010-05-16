@@ -4,7 +4,6 @@
 package gdcalendar.gui.calendar.daycard;
 
 import gdcalendar.mvc.controller.CalendarController;
-import gdcalendar.mvc.model.Day;
 import gdcalendar.mvc.model.DayEvent;
 import gdcalendar.mvc.view.AbstractViewPanel;
 
@@ -25,6 +24,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
 /**
  * @author Håkan
@@ -208,21 +208,15 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
 
     public boolean displayImage() {
         throw new UnsupportedOperationException("Not supported yet.");
-
-
     }
 
     public void hideImage() {
         throw new UnsupportedOperationException("Not supported yet.");
-
-
     }
 
     /**
      * handle drawing of the day card, delegating the different ways
      * of drawing based on active view to private methods
-     *
-     *
      */
     @Override
     protected void paintChildren(Graphics g) {
@@ -299,8 +293,6 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
     @Override
     public void modelPropertyChange(final PropertyChangeEvent evt) {
         String evtName = evt.getPropertyName();
-
-
         if (evt.getNewValue() != null) {
             newEventName = evt.getNewValue().toString();
         }
@@ -308,7 +300,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
         //Add an event label to the DayCard, invoked in EDT
         if (evtName.equals(CalendarController.ADD_EVENT)) {
             System.out.println("In monthCard: add event");
-            DayEvent newEvent = (DayEvent)evt.getNewValue();
+            DayEvent newEvent = (DayEvent) evt.getNewValue();
             String name = newEventName;
             JLabel event = new JLabel(newEvent.getEventName());
             simpleView.add(event);
@@ -329,18 +321,19 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
             titleLabel.setText("" + calendar.get(Calendar.DAY_OF_MONTH));
 
         } else if (evtName.equals(CalendarController.FILTERED_EVENTS)) {
+
             simpleView.removeAll();
             eventLabels.clear();
             events.clear();
             DayEvent[] filteredEvents = (DayEvent[]) evt.getNewValue();
-            System.out.println("In monthCard: filtered events");
+            System.out.println("In monthCard: filtered events " + filteredEvents.length);
             for (int i = 0; i < filteredEvents.length; i++) {
-//                System.out.println("Event name: " + filteredEvents[i].getEventName());
                 events.add(filteredEvents[i]);
                 JLabel eventLabel = new JLabel(filteredEvents[i].getEventName());
                 simpleView.add(eventLabel);
                 eventLabels.add(eventLabel);
             }
+
         }
         revalidate();
         repaint();

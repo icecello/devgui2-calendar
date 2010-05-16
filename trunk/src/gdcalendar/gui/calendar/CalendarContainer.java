@@ -6,7 +6,7 @@ import gdcalendar.gui.calendar.undoredo.AddEventCommand;
 //to deal with removing events
 //see adding of events for functioning undo/redo operations
 //import gdcalendar.gui.calendar.undoredo.RemoveEventCommand;
-import gdcalendar.mvc.controller.DefaultController;
+import gdcalendar.mvc.controller.CalendarController;
 import gdcalendar.mvc.model.*;
 
 import java.awt.*;
@@ -68,10 +68,12 @@ public class CalendarContainer extends JPanel {
     private Calendar cal;
     private CommandManager undoManager;
     private CardView dayViews = CardView.SIMPLE;
-    private ArrayList<DefaultController> controllers = new ArrayList<DefaultController>();
+    private ArrayList<CalendarController> controllers = new ArrayList<CalendarController>();
     private ArrayList<Day> models = new ArrayList<Day>();
     private ArrayList<MonthDayCard> views = new ArrayList<MonthDayCard>();
     private ArrayList<CalendarDataChangedListener> dataChangedListeners = new ArrayList<CalendarDataChangedListener>();
+    private CalendarModel calendarModel = new CalendarModel();
+
     /**
      * Construct the calendar, with all it's child components and data it needs.
      * For now, we still need to pass the command manager into the calendar, I'm
@@ -82,7 +84,7 @@ public class CalendarContainer extends JPanel {
      */
     public CalendarContainer(CommandManager undoManager) {
         this.undoManager = undoManager;
-
+        calendarModel.addDayEvent(new DayEvent("test", new Date(110, 4, 10, 11, 0), new Date(110, 4, 10, 12, 30)));
         setLayout(new BorderLayout());
         topPanel = new JPanel(new BorderLayout());
 
@@ -131,8 +133,9 @@ public class CalendarContainer extends JPanel {
     private void initMVC() {
         //Fill the whole grid with MonthDayCards
         for (int i = 1; i <= 42; i++) {
-            final DefaultController controller = new DefaultController();
+            final CalendarController controller = new CalendarController();
             final MonthDayCard daycard = new MonthDayCard(dayViews, controller);
+            DayFilteredCalendarModel model = new DayFilteredCalendarModel();
             daycard.setBorder(BorderFactory.createLineBorder(Color.lightGray));
             /*
              * as mentioned in MonthDayCard previously, this is a temporary way of adding new events
@@ -142,22 +145,22 @@ public class CalendarContainer extends JPanel {
 
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    DayEvent newEvent = new DayEvent("New Event", new TimeStamp(10, 00), new TimeStamp(12, 30));
+                    DayEvent newEvent = new DayEvent("New Event", new Date(110,4,13,0,0), new Date(110,4,16,0,0));
+                    calendarModel.addDayEvent(newEvent);
                     CalendarChangeEvent changeEvent = new CalendarChangeEvent(newEvent, 0, CalendarChangeEvent.EventAdd, 0);
-                    
-                    undoManager.execute(new AddEventCommand(controller, newEvent));
+//                    undoManager.execute(new AddEventCommand(controller, newEvent));
                     fireDataChangedEvent(changeEvent);
                 }
             });
-            
+
             daycard.addRemoveEventListener(new MouseAdapter() {
 
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     try {
                         //undoManager.execute(new RemoveEventCommand(controller))
-                    	CalendarChangeEvent changeEvent = new CalendarChangeEvent(null, 0, CalendarChangeEvent.EventRemove, 0);
-                    	
+                        CalendarChangeEvent changeEvent = new CalendarChangeEvent(null, 0, CalendarChangeEvent.EventRemove, 0);
+
                         undoManager.removeLast();
                         fireDataChangedEvent(changeEvent);
                     } catch (Exception e1) {
@@ -166,10 +169,15 @@ public class CalendarContainer extends JPanel {
             });
 
 
+
             controller.addView(daycard);
+            controller.addModel(model);
             views.add(daycard);
             controllers.add(controller);
             monthView.add(daycard);
+
+
+            model.setRealCalendarModel(calendarModel);
         }
         //Call switchToMonth to attach the correct days (models) to the newly created MonthCards
         switchToMonth(cal);
@@ -183,31 +191,24 @@ public class CalendarContainer extends JPanel {
         monthTitleLabel.setText(tempCal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH)
                 + " " + tempCal.get(Calendar.YEAR));
 
-        //Detach all models
-        for (DefaultController controller : controllers) {
-            controller.removeAllModels();
-        }
-        //Event for debugging, here we should fetch the correct days
-        DayEvent event = new DayEvent("changed month");
-        ArrayList<DayEvent> events = new ArrayList<DayEvent>();
-        events.add(event);
-
         int numDays = tempCal.getActualMaximum(Calendar.DAY_OF_MONTH);
         // The start day of the month in integer form, so we know where to
         // start placing numbers in the grid.
         tempCal.set(Calendar.DAY_OF_MONTH, 1);
         int startDay = tempCal.get(Calendar.DAY_OF_WEEK);
+
+
         for (int i = 1; i <= 42; i++) {
             final CardView currentView;     //variable to keep track what apperence the daycard should have
             final int index = i - 1;
+            Date filter = tempCal.getTime();
             if (i >= (startDay) && i < (startDay + numDays)) {
                 currentView = dayViews;
                 tempCal.set(Calendar.DAY_OF_MONTH, i - startDay + 1);
-                Day day = new Day(tempCal, events);
-                controllers.get(index).addModel(day);
-                day.synchornize();
+                controllers.get(index).setFilter(filter);
             } else {
                 currentView = CardView.NONE;
+                controllers.get(index).setFilter(new Date());
             }
             if (!SwingUtilities.isEventDispatchThread()) {
                 SwingUtilities.invokeLater(new Runnable() {
@@ -254,7 +255,7 @@ public class CalendarContainer extends JPanel {
         cal.set(Calendar.MONTH, cal.get(Calendar.MONTH) - 1);
         switchToMonth(cal);
     }
-    
+
     /**
      * Add a listener that will be invoked whenever the data of this
      * calendar has changed in some way.
@@ -267,19 +268,19 @@ public class CalendarContainer extends JPanel {
      * @param listener
      */
     public void addDataChangeListener(CalendarDataChangedListener listener) {
-    	dataChangedListeners.add(listener);
+        dataChangedListeners.add(listener);
     }
-    
+
     /*
      * Internal method that handles firing of data changed events.
      */
     private void fireDataChangedEvent(CalendarChangeEvent e) {
-    	Iterator<CalendarDataChangedListener> it = dataChangedListeners.iterator();
-    	
-    	while (it.hasNext()) {
-    		CalendarDataChangedListener listener = it.next();
-    		listener.dataChanged(e);
-    	}
+        Iterator<CalendarDataChangedListener> it = dataChangedListeners.iterator();
+
+        while (it.hasNext()) {
+            CalendarDataChangedListener listener = it.next();
+            listener.dataChanged(e);
+        }
     }
 }
 

@@ -4,6 +4,7 @@ import commandmanager.ICommand;
 
 import gdcalendar.mvc.controller.CalendarController;
 import gdcalendar.mvc.model.DayEvent;
+import java.util.UUID;
 
 /**
  * This class implements the remove event command.
@@ -16,7 +17,7 @@ import gdcalendar.mvc.model.DayEvent;
  */
 public class RemoveEventCommand implements ICommand {
 	private CalendarController controller;
-	private DayEvent event;
+	private UUID eventID;
 	
 	/**
 	 * 
@@ -24,18 +25,18 @@ public class RemoveEventCommand implements ICommand {
 	 */
 	public RemoveEventCommand(CalendarController controller) {
 		this.controller = controller;
-		this.event = null;
+		this.eventID = null;
 	}
 
 	@Override
 	public void execute() {
-		controller.removeEvent(event);
+		controller.removeEvent(eventID);
 
 	}
 
 	@Override
 	public void undo() {
-		controller.addDayEvent(event);
+		controller.addDayEvent(new DayEvent());
 	}
 
 	@Override

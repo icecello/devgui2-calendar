@@ -2,6 +2,7 @@ package gdcalendar.mvc.controller;
 
 import gdcalendar.mvc.model.DayEvent;
 import java.util.Date;
+import java.util.UUID;
 
 
 /**
@@ -28,21 +29,26 @@ public class CalendarController extends AbstractController
     
     
     /**
-     * 
-     * @param event The event to add
+     * Add a DayEvent to all models connected to the controller
+     * @param event The DayEvent to add
      */
     public void addDayEvent(DayEvent event) {
         setModelProperty(ADD_EVENT, event);
     }
     
     /**
-     * 
-     * @param event The event to remove
+     * Remove the DayEvent uniquely specified by the eventID from the
+     * connected models
+     * @param eventID The ID that uniquely determines a DayEvent
      */
-    public void removeEvent(DayEvent event) {
-        setModelProperty(REMOVE_EVENT, event);
+    public void removeEvent(UUID eventID) {
+        setModelProperty(REMOVE_EVENT, eventID);
     }
 
+    /**
+     * Set a filter for all the connected models
+     * @param filter The new filter
+     */
     public void setFilter(Date filter){
         setModelProperty(FILTER, filter);
     }
