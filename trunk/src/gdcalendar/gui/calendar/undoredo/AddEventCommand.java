@@ -2,7 +2,7 @@ package gdcalendar.gui.calendar.undoredo;
 
 import commandmanager.ICommand;
 
-import gdcalendar.mvc.controller.DefaultController;
+import gdcalendar.mvc.controller.CalendarController;
 import gdcalendar.mvc.model.DayEvent;
 
 /**
@@ -15,7 +15,7 @@ import gdcalendar.mvc.model.DayEvent;
  */
 public class AddEventCommand implements ICommand {
 	
-	private DefaultController controller;
+	private CalendarController controller;
 	private DayEvent event;
 	
 	/**
@@ -23,7 +23,7 @@ public class AddEventCommand implements ICommand {
 	 * @param controller
 	 * @param event
 	 */
-	public AddEventCommand(DefaultController controller, DayEvent event) {
+	public AddEventCommand(CalendarController controller, DayEvent event) {
 		this.controller = controller;
 		this.event = event;
 	}
@@ -31,7 +31,7 @@ public class AddEventCommand implements ICommand {
 	@Override
 	public void execute() {
 		// add this command
-        controller.addEvent(event);
+        controller.addDayEvent(event);
 	}
 
 	@Override

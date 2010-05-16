@@ -121,7 +121,7 @@ public abstract class AbstractController implements PropertyChangeListener {
 
     public static void main(String[] args){
         Day d = new Day(Calendar.getInstance());
-        DefaultController def = new DefaultController();
+        CalendarController def = new CalendarController();
         def.addModel(d);
     }
 

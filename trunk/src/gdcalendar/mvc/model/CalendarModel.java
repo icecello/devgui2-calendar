@@ -1,11 +1,8 @@
 package gdcalendar.mvc.model;
 
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.Collection;
 import java.util.HashMap;
-
+import java.util.UUID;
 
 /**
  * This is a model that should contain all DayEvents associated with a CalendarContainer.
@@ -17,12 +14,11 @@ import java.util.HashMap;
  * @author Håkan, Tomas
  *
  */
-public class CalendarModel {
+public class CalendarModel extends AbstractModel {
 
-    private ArrayList<DayEvent> dayMap = new ArrayList<DayEvent>();
+    private HashMap<UUID, DayEvent> dayMap = new HashMap<UUID, DayEvent>();
 
     public CalendarModel() {
-    	
     }
 
     /**
@@ -31,7 +27,8 @@ public class CalendarModel {
      * @param newDay		a new event
      */
     public void addDayEvent(DayEvent event) {
-        dayMap.add(event);
+        firePropertyChange("realModelChanged", null, null);
+        dayMap.put(event.getID(), event);
     }
 
     /**
@@ -41,8 +38,9 @@ public class CalendarModel {
      * @param day		which event to remove
      * @return 		boolean, if list contained this event
      */
-    public boolean removeDayEvent(DayEvent event) {
-        return dayMap.remove(event);
+    public DayEvent removeDayEvent(UUID eventID) {
+        firePropertyChange("realModelChanged", null, null);
+        return dayMap.remove(eventID);
     }
 
     /**
@@ -51,8 +49,14 @@ public class CalendarModel {
      * @param i		indexed DayEvent to get from this model
      * @return		the DayEvent found at position i
      */
-    public DayEvent getDayEvent(int i) {
-    	return dayMap.get(i);
+    public DayEvent getDayEvent(UUID eventID) {
+        return dayMap.get(eventID);
     }
 
+    public DayEvent[] getEvents() {
+       Collection<DayEvent> events = dayMap.values();
+       DayEvent[] ev = new DayEvent[events.size()];
+       events.toArray(ev);
+       return  ev;
+    }
 }
