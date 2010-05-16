@@ -1,6 +1,5 @@
 package gdcalendar.mvc.model;
 
-import gdcalendar.gui.calendar.CalendarContainer;
 import gdcalendar.mvc.controller.CalendarController;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -19,42 +18,60 @@ import java.util.UUID;
  */
 public class DayFilteredCalendarModel extends AbstractModel {
 
+    //The backbone model
     private CalendarModel realModel;
     private Date filter;
+    //Responsible for sending notifications to the controller, when
+    //when the model has changed
     protected transient PropertyChangeSupport propertyChange;
+    //PropertyChangeLister that is connected to the backbone model.
+    //This listner notifies the filteredModel when the backbone model has changed
+    //The filtered model will then take appropriate actions, and thus the illusion of
+    // the controller will only see the filtered model sending notfications
     private PropertyChangeListener pcl;
 
     public DayFilteredCalendarModel() {
     }
 
     /**
-     * Add a new event to the specified date.
+     * Add a new DayEvent to the model. The backbone model
+     * will also be updated
      *
-     * @param newDay		a new event
+     * @param event	The event to be added
      */
     public void addDayEvent(DayEvent event) {
+        //Notify all controllers connected to the model that a DayEvent has been added
         firePropertyChange(CalendarController.ADD_EVENT, null, event);
         realModel.addDayEvent(event);
     }
 
     /**
-     * Remove specified event from a certain day.
+     * Remove specified event from a certain day. The backbone model will
+     * also be updated
      *
-     * @param date		which date to remove the event from
-     * @param day		which event to remove
-     * @return 		boolean, if list contained this event
+     * @param eventID	The ID that uniquely determines a DayEvent
+     * @return 		The DayEvent corresponding to the given eventID
      */
     public DayEvent removeDayEvent(UUID eventID) {
+        //Notify all controllers connected to the model that a DayEvent has been added
         firePropertyChange(CalendarController.REMOVE_EVENT, realModel.getDayEvent(eventID), null);
         return realModel.removeDayEvent(eventID);
     }
 
     /**
-     * @param i		indexed DayEvent to get from this model
-     * @return		the DayEvent found at position i
+     * Get the DayEvent connected to the given eventID. If no DayEvent
+     * matches the eventID, null is returned
+     * @param eventID	The ID that uniquely determines a DayEvent
+     * @return		The DayEvent corresponding to the given eventID
      */
-    public DayEvent getDayEvent(int index) {
-        return getFilteredEvents()[index];
+    public DayEvent getDayEvent(UUID eventID) {
+        DayEvent[] events = getFilteredEvents();
+        for (int i = 0; i < events.length; i++) {
+            if (events[i].getID().equals(eventID)) {
+                return events[i];
+            }
+        }
+        return null;
     }
 
     /**
@@ -65,16 +82,26 @@ public class DayFilteredCalendarModel extends AbstractModel {
     public void setDayFilter(Date filter) {
         Date oldVaule = this.filter;
         this.filter = filter;
-
+        //Notify the connected controllers that the filter has been updated, and
+        //also send the events matching the new filter
         firePropertyChange(CalendarController.FILTER, oldVaule, filter);
         firePropertyChange(CalendarController.FILTERED_EVENTS, null, getFilteredEvents());
 
     }
 
+    /**
+     * Get the filter connected to the model
+     * @return the filter
+     */
     public Date getFilter() {
         return filter;
     }
 
+    /**
+     * Attach a backbone model to the filteredCalendarModel. Changes to the filtered Model
+     * and vice versa will be reflected to the corresponing models
+     * @param realModel the backbone model
+     */
     public void setRealCalendarModel(final CalendarModel realModel) {
         final CalendarModel oldValue = this.realModel;
         // if we used to have a value, remove the
@@ -82,37 +109,44 @@ public class DayFilteredCalendarModel extends AbstractModel {
         if (oldValue != null) {
             oldValue.removePropertyChangeListener(pcl);
         }
-
-        // set the property value
         this.realModel = realModel;
 
         // set up listener to delegate events
         if (pcl == null) {
+            //If the backbone model has been updated and the changes effect
+            //the filtered model, the filtered model should send a notification
+            //to the connected controllers
             pcl = new PropertyChangeListener() {
 
                 public void propertyChange(PropertyChangeEvent e) {
+
                     boolean updated = false;
-                    DayEvent[] oldData = oldValue.getEvents();
-                    DayEvent[] newData = realModel.getEvents();
-                    //Filter the DayEvents that fullfills the filter
-                    Collection<DayEvent> filteredData = new ArrayList<DayEvent>();
-                    for (int i = 0; i < oldData.length; i++) {
-                        if (oldData[i].isActiveDuringDay(filter)) {
-                            filteredData.add(oldData[i]);
-                        }
-                    }
-                    newData = getFilteredEvents();
-                    if (newData.length != oldData.length) {
+                    DayEvent[] oldData = null, newData = null;
+                    if (oldValue == null && realModel != null) {
                         updated = true;
                     } else {
+                        oldData = oldValue.getEvents();
+                        //Filter the DayEvents that fullfills the filter
+                        Collection<DayEvent> filteredData = new ArrayList<DayEvent>();
                         for (int i = 0; i < oldData.length; i++) {
-                            if (!oldData[i].equals(newData[i])) {
-                                updated = true;
-                                break;
+                            if (oldData[i].isActiveDuringDay(filter)) {
+                                filteredData.add(oldData[i]);
+                            }
+                        }
+
+                        newData = getFilteredEvents();
+                        if (newData.length != oldData.length) {
+                            updated = true;
+                        } else {
+                            for (int i = 0; i < oldData.length; i++) {
+                                if (!oldData[i].equals(newData[i])) {
+                                    updated = true;
+                                    break;
+                                }
                             }
                         }
                     }
-
+                    System.out.println("Im supposed to be updated ");
                     if (updated) {
                         firePropertyChange(CalendarController.FILTERED_EVENTS, null,
                                 getFilteredEvents());
@@ -124,6 +158,7 @@ public class DayFilteredCalendarModel extends AbstractModel {
         if (!realModel.propertyChangeSupport.hasListeners(null)) {
             realModel.addPropertyChangeListener(pcl);
         }
+
         firePropertyChange(CalendarController.FILTERED_EVENTS, null, getFilteredEvents());
     }
 
@@ -151,7 +186,6 @@ public class DayFilteredCalendarModel extends AbstractModel {
                 filteredData[j++] = data[i];
             }
         }
-//        System.out.println(filteredData.get(0));
         return filteredData;
     }
 }
