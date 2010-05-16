@@ -3,7 +3,7 @@
  */
 package gdcalendar.gui.calendar.daycard;
 
-import gdcalendar.mvc.controller.DefaultController;
+import gdcalendar.mvc.controller.CalendarController;
 import gdcalendar.mvc.model.Day;
 import gdcalendar.mvc.model.DayEvent;
 import gdcalendar.mvc.view.AbstractViewPanel;
@@ -19,6 +19,7 @@ import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import javax.swing.BoxLayout;
 
 import javax.swing.JLabel;
@@ -68,6 +69,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
      * member variables
      */
     private Calendar calendar = Calendar.getInstance();
+    private Date filter;
     private CardView view = CardView.SIMPLE;
     private JPanel simpleView = new JPanel();   //The simple visual representation of the day
     private JPanel detailedView = new JPanel(); //The advanced visual representation of the day
@@ -75,7 +77,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
     private JLabel titleLabel;          //Title label, showing the day of the month
     private JLabel addEventLabel;       //Label, used for adding new events
     private JLabel removeEventLabel;    //Label, used for removing events
-    private DefaultController controller;   //The controller, responsible for updating the
+    private CalendarController controller;   //The controller, responsible for updating the
     //connected models
     private ArrayList<JLabel> eventLabels;  //The visual representation of the day events
     private ArrayList<DayEvent> events;     //The events of the day
@@ -99,7 +101,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
      *
      * @param view	which layout to use for the drawing of the component
      */
-    public MonthDayCard(CardView view, DefaultController controller) {
+    public MonthDayCard(CardView view, CalendarController controller) {
         //Call MonthDayCard() for basic set up code
         this();
         this.view = view;
@@ -140,28 +142,23 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
      * @param controller    The controller which is responsible for connecting the
      *                      MonthCardDay to corresponing models
      */
-    public MonthDayCard(Day day, CardView view, DefaultController controller) {
+    public MonthDayCard(Date filter, CardView view, CalendarController controller) {
         /*
          * Call MonthDayCard with current date and the given view
          */
+
         this(view, controller);
         //Make the necessary adjustments, so that the monthcard reflectes
         //the data in the given day
         this.controller = controller;
-        calendar.setTime(day.getDate());
+        calendar.setTime(filter);
 
         titleLabel.setText("" + calendar.get(Calendar.DAY_OF_MONTH));
 
         if (view == CardView.NONE) {
             titleLabel.setVisible(false);
         }
-        for (DayEvent event : day.getEvents()) {
-            JLabel eventLabel = new JLabel(event.toString());
-            eventLabels.add(eventLabel);
-            this.events.add(event);
-            simpleView.add(eventLabel);
-        }
-
+        controller.setFilter(filter);
     }
 
     /**
@@ -306,44 +303,42 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
 
         if (evt.getNewValue() != null) {
             newEventName = evt.getNewValue().toString();
-
-
         }
 
         //Add an event label to the DayCard, invoked in EDT
-        if (evtName.equals(DefaultController.ADD_EVENT_PROPERTY)) {
+        if (evtName.equals(CalendarController.ADD_EVENT)) {
 
+            DayEvent newEvent = (DayEvent)evt.getNewValue();
             String name = newEventName;
-            JLabel event = new JLabel(name);
+            JLabel event = new JLabel(newEvent.getEventName());
             simpleView.add(event);
             eventLabels.add(event);
             events.add(new DayEvent(name));
 
             //Remove an event (the one at the bottom) from the DayCard, invoked in EDT
-
-
-        } else if (evtName.equals(DefaultController.REMOVE_EVENT_PROPERTY)) {
+        } else if (evtName.equals(CalendarController.REMOVE_EVENT)) {
 
             simpleView.remove(eventLabels.get(eventLabels.size() - 1));
             eventLabels.remove(eventLabels.size() - 1);
             events.remove(events.get(events.size() - 1));
 
+        } else if (evtName.equals(CalendarController.FILTER)) {
+            filter = (Date) evt.getNewValue();
+            calendar.setTime(filter);
+            System.out.println(filter);
+            titleLabel.setText("" + calendar.get(Calendar.DAY_OF_MONTH));
 
-
-        } else if (evtName.equals(DefaultController.SYNCHRONIZE_DAY)) {
+        } else if (evtName.equals(CalendarController.FILTERED_EVENTS)) {
             simpleView.removeAll();
             eventLabels.clear();
             events.clear();
-            final Day synchronizedDay = (Day) evt.getNewValue();
+            DayEvent[] filteredEvents = (DayEvent[]) evt.getNewValue();
 
-            titleLabel.setText("" + synchronizedDay.getDayOfMonth());
-            for (DayEvent event : synchronizedDay.getEvents()) {
-                events.add(event);
-                JLabel eventLabel = new JLabel(event.getEventName());
+            for (int i = 0; i < filteredEvents.length; i++) {
+                events.add(filteredEvents[i]);
+                JLabel eventLabel = new JLabel(filteredEvents[i].getEventName());
                 simpleView.add(eventLabel);
                 eventLabels.add(eventLabel);
-
-
             }
         }
         revalidate();
@@ -362,8 +357,6 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
             //don't add listners if empty card
         } else {
             addEventLabel.addMouseListener(l);
-
-
         }
     }
 

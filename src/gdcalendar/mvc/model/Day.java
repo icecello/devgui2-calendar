@@ -1,6 +1,6 @@
 package gdcalendar.mvc.model;
 
-import gdcalendar.mvc.controller.DefaultController;
+import gdcalendar.mvc.controller.CalendarController;
 import java.util.ArrayList;
 
 import java.util.Calendar;
@@ -43,7 +43,7 @@ public class Day extends AbstractModel {
      */
     public void addEvent(DayEvent event) {
         events.add(event);
-        firePropertyChange(DefaultController.ADD_EVENT_PROPERTY, null, event);
+        firePropertyChange(CalendarController.ADD_EVENT, null, event);
     }
     
 
@@ -55,7 +55,7 @@ public class Day extends AbstractModel {
      * contained in the Day
      */
     public boolean removeEvent(DayEvent event) {
-        firePropertyChange(DefaultController.REMOVE_EVENT_PROPERTY, event, null);
+        firePropertyChange(CalendarController.REMOVE_EVENT, event, null);
         System.out.println(event);
         return events.remove(event);
     }
@@ -104,7 +104,7 @@ public class Day extends AbstractModel {
         DayEvent event1 = new DayEvent("Event1");
         DayEvent event2 = new DayEvent("Event2");
         DayEvent event3 = new DayEvent("Event3");
-        DayEvent event4 = new DayEvent("Event4", new TimeStamp(12, 00), new TimeStamp(13, 45));
+        DayEvent event4 = new DayEvent("Event4", new Date(), new Date());
         d.addEvent(event1);
         d.addEvent(event2);
         d.addEvent(event3);

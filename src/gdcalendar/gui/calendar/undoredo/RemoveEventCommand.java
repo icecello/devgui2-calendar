@@ -2,7 +2,7 @@ package gdcalendar.gui.calendar.undoredo;
 
 import commandmanager.ICommand;
 
-import gdcalendar.mvc.controller.DefaultController;
+import gdcalendar.mvc.controller.CalendarController;
 import gdcalendar.mvc.model.DayEvent;
 
 /**
@@ -15,14 +15,14 @@ import gdcalendar.mvc.model.DayEvent;
  *
  */
 public class RemoveEventCommand implements ICommand {
-	private DefaultController controller;
+	private CalendarController controller;
 	private DayEvent event;
 	
 	/**
 	 * 
 	 * @param controller
 	 */
-	public RemoveEventCommand(DefaultController controller) {
+	public RemoveEventCommand(CalendarController controller) {
 		this.controller = controller;
 		this.event = null;
 	}
@@ -35,7 +35,7 @@ public class RemoveEventCommand implements ICommand {
 
 	@Override
 	public void undo() {
-		controller.addEvent(event);
+		controller.addDayEvent(event);
 	}
 
 	@Override
