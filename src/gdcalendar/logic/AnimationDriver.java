@@ -10,7 +10,8 @@ import javax.swing.SwingUtilities;
  * into the driver at their desired pace.
  * Note that the AnimationDriver is a singleton, and hence only one instance of the driver
  * can be present in a running program.
- * @author Tomas
+ * 
+ * @author Tomas, Håkan
  */
 public class AnimationDriver {
 
@@ -46,8 +47,11 @@ public class AnimationDriver {
     }
 
     /**
-     * Add a component that is suposed to be animated to the AnimationDriver.
-     * This method should not be called while the AnimationDriver is running.
+     * Add a component that is supposed to be added and animated right away
+     * to the AnimationDriver. This is not in use currently, we need to
+     * modify the driver a bit to allow dynamically adding new animations
+     * while it is active, or change something anyway, perhaps removing this
+     * entirely if we deem it useless.
      * 
      * @param component The component which is supposed to be animated
      */
