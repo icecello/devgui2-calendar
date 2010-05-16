@@ -1,5 +1,6 @@
 package gdcalendar.mvc.model;
 
+import gdcalendar.mvc.controller.CalendarController;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
@@ -34,9 +35,7 @@ public abstract class AbstractModel
         propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
     }
 
-    public void synchornize(){
-        propertyChangeSupport.firePropertyChange("synchronize", null, this);
-    }
+
 
 
 }
