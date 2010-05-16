@@ -54,7 +54,7 @@ public class DayFilteredCalendarModel extends AbstractModel {
      * @return		the DayEvent found at position i
      */
     public DayEvent getDayEvent(int index) {
-        return getEvents()[index];
+        return getFilteredEvents()[index];
     }
 
     /**
@@ -65,8 +65,10 @@ public class DayFilteredCalendarModel extends AbstractModel {
     public void setDayFilter(Date filter) {
         Date oldVaule = this.filter;
         this.filter = filter;
+
         firePropertyChange(CalendarController.FILTER, oldVaule, filter);
-        firePropertyChange(CalendarController.FILTERED_EVENTS, null, getEvents());
+        firePropertyChange(CalendarController.FILTERED_EVENTS, null, getFilteredEvents());
+
     }
 
     public Date getFilter() {
@@ -99,7 +101,7 @@ public class DayFilteredCalendarModel extends AbstractModel {
                             filteredData.add(oldData[i]);
                         }
                     }
-                    newData = getEvents();
+                    newData = getFilteredEvents();
                     if (newData.length != oldData.length) {
                         updated = true;
                     } else {
@@ -113,7 +115,7 @@ public class DayFilteredCalendarModel extends AbstractModel {
 
                     if (updated) {
                         firePropertyChange(CalendarController.FILTERED_EVENTS, null,
-                                getEvents());
+                                getFilteredEvents());
                     }
                 }
             };
@@ -122,29 +124,34 @@ public class DayFilteredCalendarModel extends AbstractModel {
         if (!realModel.propertyChangeSupport.hasListeners(null)) {
             realModel.addPropertyChangeListener(pcl);
         }
-        firePropertyChange(CalendarController.FILTERED_EVENTS, null, getEvents());
+        firePropertyChange(CalendarController.FILTERED_EVENTS, null, getFilteredEvents());
     }
 
     /**
      * Retrieve all DayEvents passing through the filter
      * @return the complete set of DayEvents passing through the filter
      */
-    public DayEvent[] getEvents() {
+    public DayEvent[] getFilteredEvents() {
         DayEvent[] data = realModel.getEvents();
         //If no filter, just return the data
         if (filter == null) {
             return data;
         }
 
-
         //Filter the DayEvents that fullfills the filter
-        Collection<DayEvent> filteredData = new ArrayList<DayEvent>();
+        int filteredSize = 0;
         for (int i = 0; i < data.length; i++) {
             if (data[i].isActiveDuringDay(filter)) {
-                filteredData.add(data[i]);
+                filteredSize++;
             }
         }
-
-        return (DayEvent[]) filteredData.toArray();
+        DayEvent[] filteredData = new DayEvent[filteredSize];
+        for (int i = 0, j = 0; i < data.length; i++) {
+            if (data[i].isActiveDuringDay(filter)) {
+                filteredData[j++] = data[i];
+            }
+        }
+//        System.out.println(filteredData.get(0));
+        return filteredData;
     }
 }

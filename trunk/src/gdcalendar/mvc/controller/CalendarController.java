@@ -23,7 +23,7 @@ public class CalendarController extends AbstractController
     
     public static final String ADD_EVENT = "addDayEvent";
     public static final String REMOVE_EVENT = "removeDayEvent";
-    public static final String FILTERED_EVENTS = "getEvents";
+    public static final String FILTERED_EVENTS = "getFilteredEvents";
     public static final String FILTER= "setDayFilter";
     
     

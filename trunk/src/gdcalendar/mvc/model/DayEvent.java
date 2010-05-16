@@ -183,15 +183,13 @@ public class DayEvent extends AbstractModel{
         Date d1 = cal.getTime();
         cal.set(Calendar.HOUR_OF_DAY, 15);
         Date d2 = cal.getTime();
-        DayEvent e = new DayEvent("event",d1,d2);
+        DayEvent e1 = new DayEvent("event",d1,d2);
         DayEvent e2 = new DayEvent("event",d1,d2);
 
-        cal.set(Calendar.HOUR_OF_DAY, 10);
+        cal.set(Calendar.DAY_OF_MONTH, 13);
         d1 = cal.getTime();
-        System.out.println(e.isActiveDuringTimeStamp(d1));
-        System.out.println(e.isActiveDuringDay(d1));
-        System.out.println(e);
-        System.out.println(e2);
-        System.out.println(d1);
+        System.out.println(e1.isActiveDuringDay(d1));
+        System.out.println("First dayEvent: " + e1);
+        System.out.println("Second dayEvent: " + e2);
     }
 }
