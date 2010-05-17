@@ -11,7 +11,11 @@ import javax.swing.SwingUtilities;
  * Note that the AnimationDriver is a singleton, and hence only one instance of the driver
  * can be present in a running program.
  * 
- * @author Tomas, Håkan
+ * Note (Håkan): I removed array of TimerTask's since a cancelled TimerTask is useless, so there's
+ * little point in keeping them stored.
+ * 
+ * @author Tomas
+ * @author Håkan
  */
 public class AnimationDriver {
 
@@ -21,8 +25,6 @@ public class AnimationDriver {
     private ArrayList<IAnimatedComponent> animatedComponents = new ArrayList<IAnimatedComponent>();
     //Single timer, responsible for updating the animatedComponents at the correct pace
     private Timer timer = new Timer("animation driver", true);  
-    //The set of all animation tasks is gathered into this TimerTask
-    private ArrayList<TimerTask> animations = new ArrayList<TimerTask>(); 
                                                                 
     //Indicate if the driver is running
     private boolean isRunning = false;
@@ -42,7 +44,7 @@ public class AnimationDriver {
      * This method should not be called while the AnimationDriver is running.
      * @param component The component which is supposed to be animated
      */
-    public void add(IAnimatedComponent component) {
+    public void add(final IAnimatedComponent component) {
         animatedComponents.add(component);
     }
 
@@ -95,37 +97,72 @@ public class AnimationDriver {
     }
 
     /**
+     * Run the animation for the specified component
+     * This component can exist in the AnimationDriver's internal list
+     * of animations, but it is not required. It can just as well be
+     * invoked on a separate component that implements this interface.
+     * 
+     * @param component
+     */
+    public void run(final IAnimatedComponent component) {
+    	timer.purge();
+    	
+    	if (animatedComponents.contains(component)) {
+    		TimerTask t = new TimerTask() {
+        		
+                @Override
+                public void run() {
+                    if (component.animationFinished()) {
+                    	this.cancel();
+                    } else {
+                    	component.computeAnimatation();
+                        SwingUtilities.invokeLater(new Runnable() {
+
+                            public void run() {
+                            	component.displayAnimatation();
+                            }
+                        });
+                    }
+                }
+            };
+  
+    		timer.scheduleAtFixedRate(t, 10, (long)1000/(component.preferredFPS()) );
+    		
+    	} else {
+    		//component doesn't already exist, we need something different
+    	}
+    }
+    /**
      * Run all animations loaded into the AnimationDriver. Each component is
      * run in it's own thread, getting updated and repainted at it's specified
      * rate. 
      */
-    public void runAnimations() {
-        
+    public void runAll() {
+        timer.purge();
         for (int i = 0; i < animatedComponents.size(); i++) {
-        	final int ii = i;
-	        TimerTask t = new TimerTask() {
-	
-	            @Override
-	            public void run() {
-                    final IAnimatedComponent comp = animatedComponents.get(ii);
+        	final IAnimatedComponent component = animatedComponents.get(i); 
+        	
+        	if (!component.animationFinished() ) {
+                TimerTask t = new TimerTask() {
+            		
+                    @Override
+                    public void run() {
+                        if (component.animationFinished()) {
+                        	this.cancel();
+                        } else {
+                        	component.computeAnimatation();
+                            SwingUtilities.invokeLater(new Runnable() {
 
-                    if (!comp.animationFinished()) {
-                        comp.computeAnimatation();
-
-                        SwingUtilities.invokeLater(new Runnable() {
-
-                            public void run() {
-                                comp.displayAnimatation();
-                            }
-                        });
-                    } else {
-                    	this.cancel();
+                                public void run() {
+                                	component.displayAnimatation();
+                                }
+                            });
+                        }
                     }
-	            }
-	        };
-	        animations.add(t);
-	        timer.scheduleAtFixedRate(animations.get(i), 10,(long)1000/(animatedComponents.get(i).preferredFPS()) );
-	        
+                };
+                
+		        timer.scheduleAtFixedRate(t, 10, (long)1000/(animatedComponents.get(i).preferredFPS()) );
+        	}
         }
         
         isRunning = true;

@@ -6,8 +6,10 @@ import gdcalendar.gui.calendar.undoredo.AddEventCommand;
 //to deal with removing events
 //see adding of events for functioning undo/redo operations
 //import gdcalendar.gui.calendar.undoredo.RemoveEventCommand;
+import gdcalendar.logic.AnimationDriver;
 import gdcalendar.mvc.controller.CalendarController;
 import gdcalendar.mvc.model.*;
+import gdcalendar.mvc.model.DayEvent.Priority;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -16,6 +18,8 @@ import javax.swing.*;
 
 import commandmanager.CommandManager;
 import gdcalendar.gui.calendar.daycard.MonthDayCard.CardView;
+import gdcalendar.gui.calendar.daycard.MonthDayCard.Marker;
+
 import java.util.ArrayList;
 
 /**
@@ -97,13 +101,14 @@ public class CalendarContainer extends JPanel {
         monthTitle.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
         previousMonthButton = new JButton("<<");
-        nextMonthButton = new JButton(">>");
-
+        nextMonthButton = new JButton(">>");     
+        
         monthNavPanel = new JPanel(new BorderLayout());
         monthNavPanel.add(previousMonthButton, BorderLayout.LINE_START);
         monthNavPanel.add(monthTitle, BorderLayout.CENTER);
         monthNavPanel.add(nextMonthButton, BorderLayout.LINE_END);
         monthNavPanel.setBackground(new Color(220, 220, 220));
+
 
         dayTitle = new JPanel(new GridLayout(1, 7));
         dayTitle.setBackground(new Color(220, 220, 220));
@@ -127,6 +132,39 @@ public class CalendarContainer extends JPanel {
     }
 
     /**
+     * 
+     * @param marker
+     */
+    public void setMarker(Marker marker) {
+    	for (int i = 0; i < views.size(); i++) {
+    		views.get(i).setMarker(marker);
+    	}
+    }
+    /**
+     * Use some means of highlighting all items that belong to 
+     * specified category
+     * 
+     * @param category		name of category to match against
+     */
+    public void highlight(String category) {
+    	for (int i = 0; i < views.size(); i++) {
+    		views.get(i).highlight(category);
+    	}
+    }
+    
+    /**
+     * Use some means of highlighting all items that have the
+     * specified priority.
+     * 
+     * @param prio			priority to match against
+     */
+    public void highlight(Priority prio) {
+    	for (int i = 0; i < views.size(); i++) {
+    		views.get(i).highlight(prio);
+    	}
+    }
+    
+    /**
      * Initialize the calendar view for the current month
      */
     private void initMVC() {
@@ -134,6 +172,8 @@ public class CalendarContainer extends JPanel {
         for (int i = 1; i <= 42; i++) {
             final CalendarController controller = new CalendarController();
             final MonthDayCard daycard = new MonthDayCard(dayViews, controller);
+            AnimationDriver.getInstance().add(daycard);
+            
             DayFilteredCalendarModel model = new DayFilteredCalendarModel();
             daycard.setBorder(BorderFactory.createLineBorder(Color.lightGray));
             /*

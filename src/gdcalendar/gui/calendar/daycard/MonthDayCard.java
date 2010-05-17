@@ -3,8 +3,11 @@
  */
 package gdcalendar.gui.calendar.daycard;
 
+import gdcalendar.logic.AnimationDriver;
+import gdcalendar.logic.IAnimatedComponent;
 import gdcalendar.mvc.controller.CalendarController;
 import gdcalendar.mvc.model.DayEvent;
+import gdcalendar.mvc.model.DayEvent.Priority;
 import gdcalendar.mvc.view.AbstractViewPanel;
 
 import java.awt.BasicStroke;
@@ -19,12 +22,12 @@ import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+
 import javax.swing.BoxLayout;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 
 /**
  * @author Håkan
@@ -42,13 +45,13 @@ import javax.swing.SwingUtilities;
  * 
  */
 @SuppressWarnings("serial")
-public class MonthDayCard extends AbstractViewPanel implements IDayCard {
+public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimatedComponent {
 
     /**
      * A collection of constant used for defining how a MonthDayCard should
      * visually represent it's data
      */
-    public enum CardView {
+    public static enum CardView {
 
         /**
          * The contained data should not be shown at all
@@ -64,6 +67,10 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
          * such as images texts will be shown
          */
         DETAILED
+    }
+    
+    public static enum Marker {
+    	NONE, TRIANGLE_GRADIENT, SPARKLE /* this one doesn't yet exist */
     }
     /*
      * member variables
@@ -82,6 +89,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
     private ArrayList<JLabel> eventLabels;  //The visual representation of the day events
     private ArrayList<DayEvent> events;     //The events of the day
 
+    private Marker highlightMarker = Marker.NONE;
     /**
      * Default constructor, creating an empty MonthDayCard
      */
@@ -162,6 +170,57 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
     }
 
     /**
+     * Set which marker to use during highlighting of
+     * priorities or categories.
+     * There is no support for using different markers
+     * for categories and priorites as of yet.
+     * 
+     * @param marker	which marker to use
+     */
+    public void setMarker(Marker marker) {
+    	highlightMarker = marker;
+    }
+    
+    /**
+     * highlight this daycard if contained events match the
+     * specified category
+     * 
+     * @param category	name of category to match against
+     */
+    public void highlight(String category) {
+    	boolean foundMatch = false;
+    	for (int i = 0; i < events.size(); i++) {
+    		if (events.get(i).getCategory() == category) {
+    			foundMatch = true;
+    		}
+    	}
+    	
+    	if (foundMatch && highlightMarker != Marker.NONE)
+    		isAnimationFinished = false;
+    		AnimationDriver.getInstance().run(this);
+    }
+    
+    /**
+     * highlight this daycard if contained events match the
+     * specified category
+     * 
+     * @param prio    priority to match against
+     */
+    public void highlight(Priority prio) {
+    	boolean foundMatch = false;
+    	for (int i = 0; i < events.size(); i++) {
+    		if (events.get(i).getPriority() == prio) {
+    			foundMatch = true;
+    		}
+    	}
+    	
+    	if (foundMatch && hasMarker) {
+    		isAnimationFinished = false;
+    		AnimationDriver.getInstance().run(this);
+    	}
+    }
+    
+    /**
      *
      * @see gdcalendar.gui.calendar.daycard.IDayCard#getDate()
      */
@@ -174,6 +233,15 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    /**
+     * Get the currenty active view of this day card.
+     * This is one of:
+     * - NONE
+     * - SIMPLE
+     * - DETAILED
+     * 
+     * @return	currently active view
+     */
     public CardView getView() {
         return view;
     }
@@ -260,7 +328,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
             Polygon triangle = new Polygon(x, y, 3);
 
             Graphics2D g2 = (Graphics2D) g;
-            g2.setColor(new Color(100, 230, 100));
+            g2.setColor(triangleColor);
             g2.fillPolygon(triangle);
             g2.setColor(new Color(30, 30, 100));
             g2.setStroke(new BasicStroke(1));
@@ -352,7 +420,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
      */
     public void addAddEventListener(MouseListener l) {
         if (addEventLabel == null) {
-            //don't add listners if empty card
+            //don't add listeners if empty card
         } else {
             addEventLabel.addMouseListener(l);
         }
@@ -365,10 +433,60 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
      */
     public void addRemoveEventListener(MouseListener l) {
         if (removeEventLabel == null) {
-            //don't add listners if empty card
+            //don't add listeners if empty card
         } else {
             removeEventLabel.addMouseListener(l);
 
         }
     }
+
+    
+    private Color startColor = new Color(0,100,0);
+    private Color endColor = new Color(0,200,200);
+    private Color triangleColor = startColor;
+    private float step = 0.0f;
+    private boolean isAnimationFinished = false;
+    private boolean hasMarker = true;
+    
+	@Override
+	public boolean animationFinished() {
+		//cancel the animation if it has finished or if this daycard has no marker
+		//to animate
+		if (isAnimationFinished || highlightMarker == Marker.NONE)
+			return true;
+		return false;
+	}
+
+	/*
+	 * perform a simple animation that smoothly changes between two colors
+	 * in the triangle, any other animation is not yet supported
+	 */
+	@Override
+	public void computeAnimatation() {
+		
+		switch (highlightMarker) {
+		
+		case TRIANGLE_GRADIENT:
+			int r = (int) ((1 - step) * startColor.getRed() + step * endColor.getRed());
+			int g = (int) ((1 - step) * startColor.getGreen() + step * endColor.getGreen());
+			int b = (int) ((1 - step) * startColor.getBlue() + step * endColor.getBlue());
+			step+=0.05;
+			if (step >= 1) {
+				step = 0;
+				isAnimationFinished = true;
+				triangleColor = startColor;
+			} else
+				triangleColor = new Color(r, g, b);
+			}
+	}
+
+	@Override
+	public void displayAnimatation() {
+		this.repaint();
+	}
+
+	@Override
+	public int preferredFPS() {
+		return 20;
+	}
 }

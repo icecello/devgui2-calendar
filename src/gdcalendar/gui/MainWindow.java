@@ -3,11 +3,11 @@ package gdcalendar.gui;
 import gdcalendar.gui.calendar.CalendarChangeEvent;
 import gdcalendar.gui.calendar.CalendarContainer;
 import gdcalendar.gui.calendar.CalendarDataChangedListener;
+import gdcalendar.gui.calendar.daycard.MonthDayCard.Marker;
 import gdcalendar.logic.AnimationDriver;
-import gdcalendar.logic.IAnimatedComponent;
+import gdcalendar.mvc.model.DayEvent.Priority;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ResourceBundle;
@@ -16,8 +16,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
+import javax.swing.JSeparator;
 
 import actionmanager.Action;
 import actionmanager.ActionManager;
@@ -45,33 +44,7 @@ public class MainWindow extends JFrame {
 	 */
 	private final CommandManager cm = new CommandManager(0);
 	private ActionManager actionManager;
-	
-	class animateColor extends JPanel implements IAnimatedComponent {
-		int r = 0, g = 200, b = 50;
-		boolean val = false;
-		@Override
-		public boolean animationFinished() {
-			return false;
-		}
-
-		@Override
-		public void computeAnimatation() {
-			r = (r + 1) % 255;
-			g = (g + 1) % 255;
-			b = (b + 1) % 255;
-		}
-
-		@Override
-		public void displayAnimatation() {
-			this.setBackground(new Color(r, g, b));
-		}
-
-		@Override
-		public int preferredFPS() {
-			return 60;
-		}
-		
-	}
+	private CalendarContainer calendarContainer;
 	
     public MainWindow() throws Exception {
         setLayout(new BorderLayout());
@@ -80,11 +53,6 @@ public class MainWindow extends JFrame {
         resource = ResourceBundle.getBundle("gdcalendar.resource_en_US");
         actionManager = new ActionManager(this, resource);
         
-        
-        AnimationDriver ad = AnimationDriver.getInstance();
-        //add dummy animation to animation driver
-        animateColor jp = new animateColor();
-        ad.add(jp);
         /*
          * construct a simple menu
          * currently uses the ActionManager class to construct
@@ -95,10 +63,13 @@ public class MainWindow extends JFrame {
         undoItem = new JMenuItem(actionManager.getAction("doUndo"));
         redoItem = new JMenuItem(actionManager.getAction("doRedo"));
         JMenuItem preferencesItem = new JMenuItem(actionManager.getAction("showPreferences"));
+        JMenuItem showPrioItem = new JMenuItem(actionManager.getAction("showPrio"));
         
         menu.add(undoItem);
         menu.add(redoItem);
+        menu.add(new JSeparator());
         menu.add(preferencesItem);
+        menu.add(showPrioItem);
         undoItem.setEnabled(false);
         redoItem.setEnabled(false);
 
@@ -110,7 +81,7 @@ public class MainWindow extends JFrame {
         collapsiblePanel.setCollapsButtonSize(5);
         collapsiblePanel.add(new LeftItemPanel(), BorderLayout.PAGE_START, -1);
 
-        CalendarContainer cc = new CalendarContainer(cm);
+        calendarContainer = new CalendarContainer(cm);
         /*
          * Add listener for data change events from the calendar
          * to set undo/redo properly
@@ -119,7 +90,7 @@ public class MainWindow extends JFrame {
          * to see what kind of change was made if we need that
          * for anything...
          */
-        cc.addDataChangeListener(new CalendarDataChangedListener() {
+        calendarContainer.addDataChangeListener(new CalendarDataChangedListener() {
 			@Override
 			public void dataChanged(CalendarChangeEvent e) {
 				undoItem.setEnabled(cm.canUndo());
@@ -127,16 +98,12 @@ public class MainWindow extends JFrame {
 			}
 		});
         
-        add(cc, BorderLayout.CENTER);
+        add(calendarContainer, BorderLayout.CENTER);
         
         add(collapsiblePanel, BorderLayout.LINE_START);
-        add(jp, BorderLayout.AFTER_LAST_LINE);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         pack();
-        
-        //start animation driver
-        ad.runAnimations();
-        
+
         this.addWindowListener(new WindowAdapter() {
 			public void windowClosed(WindowEvent e) {
         		AnimationDriver.getInstance().stopAnimations();
@@ -144,6 +111,25 @@ public class MainWindow extends JFrame {
 		});
     }
 
+    /**
+     * Change which marker the CalendarContainer uses
+     * for animations when highlight() is invoked.
+     * 
+     * @param marker	marker to change to
+     */
+    public void changeMarker(Marker marker) {
+    	calendarContainer.setMarker(marker);
+    }
+    
+    /**
+     * Action that invokes the highlight() method of the
+     * CalendarContainer to animate any daycards that
+     * contain events matching the specified priority.
+     */
+    @Action
+    public void showPrio() {
+    	calendarContainer.highlight(Priority.LOW);
+    }
 
     /**
      * Create and show a preferences window that
