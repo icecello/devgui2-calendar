@@ -39,6 +39,7 @@ public class AddEventCommand implements ICommand {
 		// remove this command again, but keep it's state
 		// so we can redo it
 		controller.removeEvent(event.getID());
+
 	}
 	
 	@Override

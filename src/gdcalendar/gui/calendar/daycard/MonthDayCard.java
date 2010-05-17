@@ -298,14 +298,18 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
         }
 
         //Add an event label to the DayCard, invoked in EDT
-        if (evtName.equals(CalendarController.ADD_EVENT)) {
-            System.out.println("In monthCard: add event");
-            DayEvent newEvent = (DayEvent) evt.getNewValue();
-            String name = newEventName;
-            JLabel event = new JLabel(newEvent.getEventName());
-            simpleView.add(event);
-            eventLabels.add(event);
-            events.add(new DayEvent(name));
+        if (evtName.equals(CalendarController.ADD_EVENT)|| evtName.equals(CalendarController.REMOVE_EVENT)) {
+            simpleView.removeAll();
+            eventLabels.clear();
+            events.clear();
+            DayEvent[] filteredEvents = (DayEvent[]) evt.getNewValue();
+//            System.out.println("In monthCard: filtered events " + filteredEvents.length);
+            for (int i = 0; i < filteredEvents.length; i++) {
+                events.add(filteredEvents[i]);
+                JLabel eventLabel = new JLabel(filteredEvents[i].getEventName());
+                simpleView.add(eventLabel);
+                eventLabels.add(eventLabel);
+            }
 
             //Remove an event (the one at the bottom) from the DayCard, invoked in EDT
         } else if (evtName.equals(CalendarController.REMOVE_EVENT)) {
@@ -326,7 +330,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard {
             eventLabels.clear();
             events.clear();
             DayEvent[] filteredEvents = (DayEvent[]) evt.getNewValue();
-            System.out.println("In monthCard: filtered events " + filteredEvents.length);
+//            System.out.println("In monthCard: filtered events " + filteredEvents.length);
             for (int i = 0; i < filteredEvents.length; i++) {
                 events.add(filteredEvents[i]);
                 JLabel eventLabel = new JLabel(filteredEvents[i].getEventName());
