@@ -69,7 +69,6 @@ public class CalendarContainer extends JPanel {
     private CommandManager undoManager;
     private CardView dayViews = CardView.SIMPLE;
     private ArrayList<CalendarController> controllers = new ArrayList<CalendarController>();
-    private ArrayList<Day> models = new ArrayList<Day>();
     private ArrayList<MonthDayCard> views = new ArrayList<MonthDayCard>();
     private ArrayList<CalendarDataChangedListener> dataChangedListeners = new ArrayList<CalendarDataChangedListener>();
     private CalendarModel calendarModel = new CalendarModel();
@@ -146,9 +145,8 @@ public class CalendarContainer extends JPanel {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     DayEvent newEvent = new DayEvent("New Event", new Date(110,4,13,0,0), new Date(110,4,16,0,0));
-                    calendarModel.addDayEvent(newEvent);
                     CalendarChangeEvent changeEvent = new CalendarChangeEvent(newEvent, 0, CalendarChangeEvent.EventAdd, 0);
-//                    undoManager.execute(new AddEventCommand(controller, newEvent));
+                    undoManager.execute(new AddEventCommand(controller, newEvent));
                     fireDataChangedEvent(changeEvent);
                 }
             });
@@ -169,6 +167,7 @@ public class CalendarContainer extends JPanel {
             });
 
 
+            model.setRealCalendarModel(calendarModel);
 
             controller.addView(daycard);
             controller.addModel(model);
@@ -177,7 +176,6 @@ public class CalendarContainer extends JPanel {
             monthView.add(daycard);
 
 
-            model.setRealCalendarModel(calendarModel);
         }
         //Call switchToMonth to attach the correct days (models) to the newly created MonthCards
         switchToMonth(cal);
@@ -201,14 +199,15 @@ public class CalendarContainer extends JPanel {
         for (int i = 1; i <= 42; i++) {
             final CardView currentView;     //variable to keep track what apperence the daycard should have
             final int index = i - 1;
-            Date filter = tempCal.getTime();
+
             if (i >= (startDay) && i < (startDay + numDays)) {
                 currentView = dayViews;
-                tempCal.set(Calendar.DAY_OF_MONTH, i - startDay + 1);
+                tempCal.set(Calendar.DAY_OF_MONTH, i - startDay +1);
+                Date filter = tempCal.getTime();
                 controllers.get(index).setFilter(filter);
             } else {
                 currentView = CardView.NONE;
-                controllers.get(index).setFilter(new Date());
+                controllers.get(index).setFilter(new Date(0,0,0));
             }
             if (!SwingUtilities.isEventDispatchThread()) {
                 SwingUtilities.invokeLater(new Runnable() {

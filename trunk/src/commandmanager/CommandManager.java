@@ -139,7 +139,7 @@ public class CommandManager {
 	
 	/**
 	 * Undo a specified level of commands. This calls the undo()
-	 * method of each command from the end of the queue and
+    	 * method of each command from the end of the queue and
 	 * 'levels' amount of commands back, reverting anything they
 	 * have previously done. They are all still kept in the
 	 * manager so they can be redone. Adding new commands to the

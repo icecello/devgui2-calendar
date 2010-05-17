@@ -17,7 +17,7 @@ import java.util.UUID;
  */
 public class RemoveEventCommand implements ICommand {
 	private CalendarController controller;
-	private UUID eventID;
+	private DayEvent event;
 	
 	/**
 	 * 
@@ -25,18 +25,18 @@ public class RemoveEventCommand implements ICommand {
 	 */
 	public RemoveEventCommand(CalendarController controller) {
 		this.controller = controller;
-		this.eventID = null;
+		this.event = null;
 	}
 
 	@Override
 	public void execute() {
-		controller.removeEvent(eventID);
+		controller.removeEvent(event.getID());
 
 	}
 
 	@Override
 	public void undo() {
-		controller.addDayEvent(new DayEvent());
+		controller.addDayEvent(event);
 	}
 
 	@Override

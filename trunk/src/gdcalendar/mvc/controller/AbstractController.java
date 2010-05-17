@@ -1,14 +1,12 @@
 package gdcalendar.mvc.controller;
 
 import gdcalendar.mvc.model.AbstractModel;
-import gdcalendar.mvc.model.Day;
 import gdcalendar.mvc.view.AbstractViewPanel;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 /**
  * abstract controller
@@ -120,11 +118,6 @@ public abstract class AbstractController implements PropertyChangeListener {
 //        }
 //    }
 
-    public static void main(String[] args){
-        Day d = new Day(Calendar.getInstance());
-        CalendarController def = new CalendarController();
-        def.addModel(d);
-    }
 
 
 }

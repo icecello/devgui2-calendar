@@ -41,7 +41,7 @@ public class DayFilteredCalendarModel extends AbstractModel {
      */
     public void addDayEvent(DayEvent event) {
         //Notify all controllers connected to the model that a DayEvent has been added
-        firePropertyChange(CalendarController.ADD_EVENT, null, event);
+//        firePropertyChange(CalendarController.ADD_EVENT, null, event);
         realModel.addDayEvent(event);
     }
 
@@ -54,8 +54,9 @@ public class DayFilteredCalendarModel extends AbstractModel {
      */
     public DayEvent removeDayEvent(UUID eventID) {
         //Notify all controllers connected to the model that a DayEvent has been added
-        firePropertyChange(CalendarController.REMOVE_EVENT, realModel.getDayEvent(eventID), null);
-        return realModel.removeDayEvent(eventID);
+//        firePropertyChange(CalendarController.REMOVE_EVENT, realModel.getDayEvent(eventID), null);
+        DayEvent toReturn = realModel.removeDayEvent(eventID);
+        return toReturn;
     }
 
     /**
@@ -118,48 +119,34 @@ public class DayFilteredCalendarModel extends AbstractModel {
             //to the connected controllers
             pcl = new PropertyChangeListener() {
 
-                public void propertyChange(PropertyChangeEvent e) {
+                public void propertyChange(PropertyChangeEvent evt) {
 
                     boolean updated = false;
-                    DayEvent[] oldData = null, newData = null;
-                    if (oldValue == null && realModel != null) {
-                        updated = true;
-                    } else {
-                        oldData = oldValue.getEvents();
-                        //Filter the DayEvents that fullfills the filter
-                        Collection<DayEvent> filteredData = new ArrayList<DayEvent>();
-                        for (int i = 0; i < oldData.length; i++) {
-                            if (oldData[i].isActiveDuringDay(filter)) {
-                                filteredData.add(oldData[i]);
-                            }
-                        }
-
-                        newData = getFilteredEvents();
-                        if (newData.length != oldData.length) {
+                    DayEvent updatedValue = (DayEvent) evt.getNewValue();
+                    System.out.println(evt.getPropertyName());
+                    System.out.println(filter);
+                    if (updatedValue != null) {
+                        if (updatedValue.isActiveDuringDay(filter)) {
                             updated = true;
-                        } else {
-                            for (int i = 0; i < oldData.length; i++) {
-                                if (!oldData[i].equals(newData[i])) {
-                                    updated = true;
-                                    break;
-                                }
-                            }
                         }
                     }
-                    System.out.println("Im supposed to be updated ");
+
+
+//                    //If the filtered data has changed, notify the connected controllers
                     if (updated) {
-                        firePropertyChange(CalendarController.FILTERED_EVENTS, null,
-                                getFilteredEvents());
+                        if (evt.getPropertyName().equals(CalendarModel.EVENT_REMOVED)) {
+                            firePropertyChange(CalendarController.REMOVE_EVENT, null,
+                                    getFilteredEvents());
+                        } else {
+                            System.out.println(CalendarModel.EVENT_ADDED);
+                            firePropertyChange(CalendarController.ADD_EVENT, null,
+                                    getFilteredEvents());
+                        }
                     }
                 }
             };
         }
-
-        if (!realModel.propertyChangeSupport.hasListeners(null)) {
-            realModel.addPropertyChangeListener(pcl);
-        }
-
-        firePropertyChange(CalendarController.FILTERED_EVENTS, null, getFilteredEvents());
+        realModel.addPropertyChangeListener(pcl);
     }
 
     /**
