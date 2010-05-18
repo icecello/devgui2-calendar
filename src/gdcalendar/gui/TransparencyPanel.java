@@ -23,7 +23,7 @@ public class TransparencyPanel extends JPanel {
     public TransparencyPanel(Window transparencyFrame) {
         setLayout(new BorderLayout());
         this.transparencyFrame = transparencyFrame;
-        opacitySlider = new JSlider(SwingConstants.VERTICAL, 20, 100, 100);
+        opacitySlider = new JSlider(SwingConstants.HORIZONTAL, 20, 100, 100);
         percentLabel = new JLabel(Integer.toString(opacitySlider.getValue()) + "%", JLabel.CENTER);
 
         add(new JLabel("Opacity", JLabel.CENTER), BorderLayout.PAGE_START);

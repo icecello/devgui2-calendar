@@ -3,7 +3,6 @@ package gdcalendar.gui;
 import gdcalendar.gui.calendar.daycard.MonthDayCard.Marker;
 
 import java.awt.BorderLayout;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
@@ -26,6 +25,8 @@ public class PreferencesWindow extends JFrame {
     private TransparencyPanel transparencyPanel;
 
     public PreferencesWindow(final MainWindow mainWindow) {
+        super("Preferences");
+
         setLayout(new BorderLayout());
         JTabbedPane tabbedPane = new JTabbedPane();
                 
