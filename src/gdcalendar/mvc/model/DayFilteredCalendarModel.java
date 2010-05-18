@@ -4,8 +4,6 @@ import gdcalendar.mvc.controller.CalendarController;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.UUID;
 
@@ -123,8 +121,6 @@ public class DayFilteredCalendarModel extends AbstractModel {
 
                     boolean updated = false;
                     DayEvent updatedValue = (DayEvent) evt.getNewValue();
-                    System.out.println(evt.getPropertyName());
-                    System.out.println(filter);
                     if (updatedValue != null) {
                         if (updatedValue.isActiveDuringDay(filter)) {
                             updated = true;
@@ -138,7 +134,6 @@ public class DayFilteredCalendarModel extends AbstractModel {
                             firePropertyChange(CalendarController.REMOVE_EVENT, null,
                                     getFilteredEvents());
                         } else {
-                            System.out.println(CalendarModel.EVENT_ADDED);
                             firePropertyChange(CalendarController.ADD_EVENT, null,
                                     getFilteredEvents());
                         }

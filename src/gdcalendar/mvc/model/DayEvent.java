@@ -31,7 +31,7 @@ public class DayEvent extends AbstractModel{
     private Date startTime, endTime;
 
     //Default values for category and priority
-    private String category = "None";
+    private Category category = new Category("none");
     private Priority priority = Priority.LOW;
     private UUID id;
 
@@ -56,7 +56,7 @@ public class DayEvent extends AbstractModel{
         this.endTime = endTime;
     }
 
-    public DayEvent(String eventName, Date startTime, Date endTime, String category, Priority priority) {
+    public DayEvent(String eventName, Date startTime, Date endTime, Category category, Priority priority) {
         this(eventName,startTime,endTime);
         this.category = category;
         this.priority = priority;
@@ -149,11 +149,11 @@ public class DayEvent extends AbstractModel{
         this.startTime = startTime;
     }
 
-    public String getCategory() {
+    public Category getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(Category category) {
         this.category = category;
     }
 

@@ -1,4 +1,4 @@
-package gdcalendar.gui;
+    package gdcalendar.gui;
 
 import gdcalendar.gui.calendar.CalendarChangeEvent;
 import gdcalendar.gui.calendar.CalendarContainer;
