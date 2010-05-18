@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package gdcalendar.gui.popup;
+package gdcalendar.gui.calendar.daycard;
 
 import actionmanager.Action;
 import actionmanager.ActionManager;

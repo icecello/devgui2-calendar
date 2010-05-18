@@ -3,7 +3,6 @@
  */
 package gdcalendar.gui.calendar.daycard;
 
-import gdcalendar.gui.popup.DayPopupMenu;
 import gdcalendar.logic.AnimationDriver;
 import gdcalendar.logic.IAnimatedComponent;
 import gdcalendar.mvc.controller.CalendarController;
