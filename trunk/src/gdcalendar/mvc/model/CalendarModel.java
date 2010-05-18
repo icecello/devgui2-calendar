@@ -21,8 +21,10 @@ public class CalendarModel extends AbstractModel {
     public CalendarModel() {
     }
 
-    public CalendarModel(DayEvent[] events){
-
+    public CalendarModel(ArrayList<DayEvent> events){
+        for(DayEvent event: events){
+            dayMap.put(event.getID(), event);
+        }
     }
 
     /**

@@ -85,9 +85,9 @@ public class CalendarContainer extends JPanel {
      * 
      * @param undoManager		command manager to use for this calendar for handling all commands
      */
-    public CalendarContainer(CommandManager undoManager) {
+    public CalendarContainer(CommandManager undoManager, CalendarModel calendarModel) {
         this.undoManager = undoManager;
-        calendarModel.addDayEvent(new DayEvent("test", new Date(110, 4, 10, 11, 0), new Date(110, 4, 10, 12, 30)));
+        this.calendarModel = calendarModel;
         setLayout(new BorderLayout());
         topPanel = new JPanel(new BorderLayout());
 
