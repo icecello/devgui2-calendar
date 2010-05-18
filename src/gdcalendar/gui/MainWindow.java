@@ -39,6 +39,7 @@ public class MainWindow extends JFrame {
 	private JMenuItem quitItem;
         private JMenuItem undoItem;
 	private JMenuItem redoItem;
+        private JMenuItem aboutItem;
 
 	/*
 	 * note that we would want an array here if we need more undo managers
@@ -88,8 +89,14 @@ public class MainWindow extends JFrame {
         undoItem.setEnabled(false);
         redoItem.setEnabled(false);
 
+        JMenu helpMenu = new JMenu(resource.getString("menu.help.text"));
+        aboutItem = new JMenuItem(actionManager.getAction("about"));
+
+        helpMenu.add(aboutItem);
+
         mb.add(fileMenu);
         mb.add(editMenu);
+        mb.add(helpMenu);
         this.setJMenuBar(mb);
         
         CollapsiblePanel collapsiblePanel = new CollapsiblePanel(CollapsiblePanel.EAST);
@@ -198,5 +205,13 @@ public class MainWindow extends JFrame {
 			// is good for debugging only
 			e1.printStackTrace();
 		}
+    }
+
+    /**
+     * Shows About window.
+     */
+    @Action
+    public void about() {
+    	new AboutWindow(this).setVisible(true);
     }
 }
