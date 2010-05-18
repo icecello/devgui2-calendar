@@ -296,6 +296,26 @@ public class CalendarContainer extends JPanel {
     }
 
     /**
+     * 
+     * @param l
+     */
+    public void addDayMouseListener(MouseListener l) {
+    	for (int i = 0; i < views.size(); i++) {
+    		views.get(i).addMouseListener(l);
+    	}
+    }
+    
+    /**
+     * 
+     * @param l	
+     */
+    public void addEventMouseListener(MouseListener l) {
+    	for (int i = 0; i < views.size(); i++) {
+    		views.get(i).addEventMouseListener(l);
+    	}
+    }
+    
+    /**
      * Add a listener that will be invoked whenever the data of this
      * calendar has changed in some way.
      * 
