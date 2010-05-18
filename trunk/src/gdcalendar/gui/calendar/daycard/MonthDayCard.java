@@ -92,15 +92,11 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     private ArrayList<JLabel> eventLabels;  //The visual representation of the day events
     private ArrayList<DayEvent> events;     //The events of the day
 
-    private DayPopupMenu popup;
-
     private Marker highlightMarker = Marker.NONE;
     /**
      * Default constructor, creating an empty MonthDayCard
      */
     private MonthDayCard() {
-        popup = new DayPopupMenu();
-        this.addMouseListener(new PopupListener());
 
         setLayout(new BorderLayout());
         titleLabel = new JLabel();
@@ -121,9 +117,6 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
         //Call MonthDayCard() for basic set up code
         this();
         this.view = view;
-
-        popup = new DayPopupMenu();
-        this.addMouseListener(new PopupListener());
 
         addEventLabel = new JLabel("+");
         addEventLabel.setFont(new Font("Arial", Font.PLAIN, 18));
@@ -171,9 +164,6 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
         //the data in the given day
         this.controller = controller;
         calendar.setTime(filter);
-
-        popup = new DayPopupMenu();
-        this.addMouseListener(new PopupListener());
 
         titleLabel.setText("" + calendar.get(Calendar.DAY_OF_MONTH));
 
@@ -454,6 +444,17 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
         }
     }
 
+    /**
+     * Add a MouseListener that will be fired whenever
+     * a mouse event occurs on events.
+     *     
+     * @param l
+     */
+    public void addEventMouseListener(MouseListener l) {
+    	for (int i = 0; i < eventLabels.size(); i++) {
+    		eventLabels.get(i).addMouseListener(l);
+    	}
+    }
     
     private Color startColor = new Color(0,100,0);
     private Color endColor = new Color(0,210,0);
@@ -462,6 +463,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     private boolean isAnimationFinished = false;
     private boolean hasMarker = true;
     private float inc = 0.1f;
+    
 	@Override
 	public boolean animationFinished() {
 		//cancel the animation if it has finished or if this daycard has no marker
@@ -504,20 +506,4 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
 		return 10;
 	}
 
-        class PopupListener extends MouseAdapter {
-            public void mousePressed(MouseEvent e) {
-                maybeShowPopup(e);
-            }
-
-            public void mouseReleased(MouseEvent e) {
-                maybeShowPopup(e);
-            }
-
-            private void maybeShowPopup(MouseEvent e) {
-                if (e.isPopupTrigger()) {
-                    popup.show(e.getComponent(),
-                               e.getX(), e.getY());
-                }
-            }
-        }
 }

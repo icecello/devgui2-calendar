@@ -1,7 +1,6 @@
 package gdcalendar;
 
 import gdcalendar.gui.MainWindow;
-import gdcalendar.logic.AnimationDriver;
 import gdcalendar.xml.Configuration;
 import gdcalendar.xml.XMLUtils;
 
