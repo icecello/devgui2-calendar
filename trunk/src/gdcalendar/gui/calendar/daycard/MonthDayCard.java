@@ -6,6 +6,7 @@ package gdcalendar.gui.calendar.daycard;
 import gdcalendar.logic.AnimationDriver;
 import gdcalendar.logic.IAnimatedComponent;
 import gdcalendar.mvc.controller.CalendarController;
+import gdcalendar.mvc.model.Category;
 import gdcalendar.mvc.model.DayEvent;
 import gdcalendar.mvc.model.DayEvent.Priority;
 import gdcalendar.mvc.view.AbstractViewPanel;
@@ -200,10 +201,10 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
      * 
      * @param category	name of category to match against
      */
-    public void highlight(String category) {
+    public void highlight(Category category) {
     	boolean foundMatch = false;
     	for (int i = 0; i < events.size(); i++) {
-    		if (events.get(i).getCategory() == category) {
+    		if (events.get(i).getCategory().getName().equals(category.getName())) {
     			foundMatch = true;
     		}
     	}

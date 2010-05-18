@@ -146,7 +146,7 @@ public class CalendarContainer extends JPanel {
      * 
      * @param category		name of category to match against
      */
-    public void highlight(String category) {
+    public void highlight(Category category) {
     	for (int i = 0; i < views.size(); i++) {
     		views.get(i).highlight(category);
     	}

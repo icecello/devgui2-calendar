@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!ELEMENT calendar (dayEvent)*>
+<!ELEMENT dayEvent (name, startDate, endDate, category, priority)>
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT startDate (#PCDATA)>
+<!ELEMENT endDate (#PCDATA)>
+<!ELEMENT category (#PCDATA)>
+<!ELEMENT priority (#PCDATA)>

@@ -1,5 +1,6 @@
 package gdcalendar.mvc.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.UUID;
@@ -18,6 +19,10 @@ public class CalendarModel extends AbstractModel {
     private HashMap<UUID, DayEvent> dayMap = new HashMap<UUID, DayEvent>();
 
     public CalendarModel() {
+    }
+
+    public CalendarModel(DayEvent[] events){
+
     }
 
     /**
