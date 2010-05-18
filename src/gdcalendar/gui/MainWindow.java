@@ -129,7 +129,7 @@ public class MainWindow extends JFrame {
 
         this.addWindowListener(new WindowAdapter() {
 			public void windowClosed(WindowEvent e) {
-        		AnimationDriver.getInstance().stopAnimations();
+        		AnimationDriver.getInstance().stopAll();
         	}
 		});
     }

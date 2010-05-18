@@ -211,7 +211,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     	
     	if (foundMatch && highlightMarker != Marker.NONE)
     		isAnimationFinished = false;
-    		AnimationDriver.getInstance().run(this);
+    		AnimationDriver.getInstance().run(this, "priority highlight");
     }
     
     /**
@@ -230,7 +230,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     	
     	if (foundMatch && hasMarker) {
     		isAnimationFinished = false;
-    		AnimationDriver.getInstance().run(this);
+    		AnimationDriver.getInstance().run(this, "priority highlight");
     	}
     }
     
@@ -456,12 +456,12 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
 
     
     private Color startColor = new Color(0,100,0);
-    private Color endColor = new Color(0,200,200);
+    private Color endColor = new Color(0,210,0);
     private Color triangleColor = startColor;
     private float step = 0.0f;
     private boolean isAnimationFinished = false;
     private boolean hasMarker = true;
-    
+    private float inc = 0.1f;
 	@Override
 	public boolean animationFinished() {
 		//cancel the animation if it has finished or if this daycard has no marker
@@ -484,14 +484,14 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
 			int r = (int) ((1 - step) * startColor.getRed() + step * endColor.getRed());
 			int g = (int) ((1 - step) * startColor.getGreen() + step * endColor.getGreen());
 			int b = (int) ((1 - step) * startColor.getBlue() + step * endColor.getBlue());
-			step+=0.05;
+			step += inc;
 			if (step >= 1) {
-				step = 0;
-				isAnimationFinished = true;
-				triangleColor = startColor;
-			} else
-				triangleColor = new Color(r, g, b);
+				inc = -0.1f;
+			} else if (step <= 0.1f) {
+				inc = 0.1f;
 			}
+			triangleColor = new Color(r, g, b);
+		}
 	}
 
 	@Override
@@ -501,7 +501,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
 
 	@Override
 	public int preferredFPS() {
-		return 20;
+		return 10;
 	}
 
         class PopupListener extends MouseAdapter {

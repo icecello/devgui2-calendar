@@ -172,7 +172,7 @@ public class CalendarContainer extends JPanel {
         for (int i = 1; i <= 42; i++) {
             final CalendarController controller = new CalendarController();
             final MonthDayCard daycard = new MonthDayCard(dayViews, controller);
-            AnimationDriver.getInstance().add(daycard);
+            AnimationDriver.getInstance().add(daycard,"calendarcontainer");
             
             DayFilteredCalendarModel model = new DayFilteredCalendarModel();
             daycard.setBorder(BorderFactory.createLineBorder(Color.lightGray));
