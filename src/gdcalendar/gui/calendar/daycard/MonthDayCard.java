@@ -3,6 +3,7 @@
  */
 package gdcalendar.gui.calendar.daycard;
 
+import gdcalendar.gui.popup.DayPopupMenu;
 import gdcalendar.logic.AnimationDriver;
 import gdcalendar.logic.IAnimatedComponent;
 import gdcalendar.mvc.controller.CalendarController;
@@ -17,6 +18,8 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
@@ -89,11 +92,16 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     private ArrayList<JLabel> eventLabels;  //The visual representation of the day events
     private ArrayList<DayEvent> events;     //The events of the day
 
+    private DayPopupMenu popup;
+
     private Marker highlightMarker = Marker.NONE;
     /**
      * Default constructor, creating an empty MonthDayCard
      */
     private MonthDayCard() {
+        popup = new DayPopupMenu();
+        this.addMouseListener(new PopupListener());
+
         setLayout(new BorderLayout());
         titleLabel = new JLabel();
         titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
@@ -113,6 +121,9 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
         //Call MonthDayCard() for basic set up code
         this();
         this.view = view;
+
+        popup = new DayPopupMenu();
+        this.addMouseListener(new PopupListener());
 
         addEventLabel = new JLabel("+");
         addEventLabel.setFont(new Font("Arial", Font.PLAIN, 18));
@@ -160,6 +171,9 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
         //the data in the given day
         this.controller = controller;
         calendar.setTime(filter);
+
+        popup = new DayPopupMenu();
+        this.addMouseListener(new PopupListener());
 
         titleLabel.setText("" + calendar.get(Calendar.DAY_OF_MONTH));
 
@@ -489,4 +503,21 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
 	public int preferredFPS() {
 		return 20;
 	}
+
+        class PopupListener extends MouseAdapter {
+            public void mousePressed(MouseEvent e) {
+                maybeShowPopup(e);
+            }
+
+            public void mouseReleased(MouseEvent e) {
+                maybeShowPopup(e);
+            }
+
+            private void maybeShowPopup(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    popup.show(e.getComponent(),
+                               e.getX(), e.getY());
+                }
+            }
+        }
 }
