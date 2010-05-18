@@ -1,8 +1,9 @@
 package gdcalendar;
 
-
 import gdcalendar.gui.MainWindow;
 import gdcalendar.logic.AnimationDriver;
+import gdcalendar.xml.Configuration;
+import gdcalendar.xml.XMLUtils;
 
 /**
  *
@@ -15,18 +16,17 @@ public class Main {
      */
     public static void main(String[] args) {
 
-    	
+
 
         MainWindow mainWindow = null;
-		try {
-			mainWindow = new MainWindow();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        try {
+            mainWindow = new MainWindow();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         mainWindow.setVisible(true);
-        
-        
-    }
 
+
+    }
 }
