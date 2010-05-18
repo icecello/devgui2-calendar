@@ -35,7 +35,8 @@ public class MainWindow extends JFrame {
 
 	
 	private ResourceBundle resource;
-	private JMenuItem undoItem;
+	private JMenuItem quitItem;
+        private JMenuItem undoItem;
 	private JMenuItem redoItem;
 
 	/*
@@ -59,21 +60,28 @@ public class MainWindow extends JFrame {
          * AbstractAction objects...
          */
         JMenuBar mb = new JMenuBar();
-        JMenu menu = new JMenu(resource.getString("menu.edit.text"));
+
+        JMenu fileMenu = new JMenu(resource.getString("menu.file.text"));
+        quitItem = new JMenuItem(actionManager.getAction("quit"));
+
+        fileMenu.add(quitItem);
+
+        JMenu editMenu = new JMenu(resource.getString("menu.edit.text"));
         undoItem = new JMenuItem(actionManager.getAction("doUndo"));
         redoItem = new JMenuItem(actionManager.getAction("doRedo"));
         JMenuItem preferencesItem = new JMenuItem(actionManager.getAction("showPreferences"));
         JMenuItem showPrioItem = new JMenuItem(actionManager.getAction("showPrio"));
         
-        menu.add(undoItem);
-        menu.add(redoItem);
-        menu.add(new JSeparator());
-        menu.add(preferencesItem);
-        menu.add(showPrioItem);
+        editMenu.add(undoItem);
+        editMenu.add(redoItem);
+        editMenu.add(new JSeparator());
+        editMenu.add(preferencesItem);
+        editMenu.add(showPrioItem);
         undoItem.setEnabled(false);
         redoItem.setEnabled(false);
 
-        mb.add(menu);
+        mb.add(fileMenu);
+        mb.add(editMenu);
         this.setJMenuBar(mb);
         
         CollapsiblePanel collapsiblePanel = new CollapsiblePanel(CollapsiblePanel.EAST);
@@ -121,6 +129,14 @@ public class MainWindow extends JFrame {
     	calendarContainer.setMarker(marker);
     }
     
+    /**
+     * Quits the program.
+     */
+    @Action
+    public void quit() {
+    	System.exit(0);
+    }
+
     /**
      * Action that invokes the highlight() method of the
      * CalendarContainer to animate any daycards that
