@@ -51,8 +51,10 @@ public class MainWindow extends JFrame {
     public MainWindow() throws Exception {
         super("GDCalendar");
 
-        UIManager.setLookAndFeel(
-	    "com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+        if (System.getProperties().get("os.name").toString().contains("Windows")) {
+            UIManager.setLookAndFeel(
+                "com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+        }
 
         setLayout(new BorderLayout());
 
