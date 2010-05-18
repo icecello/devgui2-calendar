@@ -22,6 +22,7 @@ import actionmanager.Action;
 import actionmanager.ActionManager;
 
 import commandmanager.CommandManager;
+import javax.swing.UIManager;
 
 
 /**
@@ -48,6 +49,11 @@ public class MainWindow extends JFrame {
 	private CalendarContainer calendarContainer;
 	
     public MainWindow() throws Exception {
+        super("GDCalendar");
+
+        UIManager.setLookAndFeel(
+	    "com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+
         setLayout(new BorderLayout());
 
         //load the resource file
