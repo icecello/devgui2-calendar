@@ -42,11 +42,11 @@ public class PreferencesWindow extends JFrame {
 				mainWindow.changeMarker(Marker.NONE);
 			}
 		});
-        JRadioButton b2 = new JRadioButton(new AbstractAction("Triangle gradient") {
+        JRadioButton b2 = new JRadioButton(new AbstractAction("Triangle fading") {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				mainWindow.changeMarker(Marker.TRIANGLE_GRADIENT);
+				mainWindow.changeMarker(Marker.TRIANGLE_FADING);
 			}
         });
         buttonGroup.add(b1);

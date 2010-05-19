@@ -18,8 +18,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.SystemColor;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
@@ -31,6 +30,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 
 /**
  * @author Håkan
@@ -73,7 +73,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     }
     
     public static enum Marker {
-    	NONE, TRIANGLE_GRADIENT, SPARKLE /* this one doesn't yet exist */
+    	NONE, TRIANGLE_FADING, SPARKLE /* this one doesn't yet exist */
     }
     /*
      * member variables
@@ -94,15 +94,24 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
 
     private Marker highlightMarker = Marker.NONE;
     /**
-     * Default constructor, creating an empty MonthDayCard
+     * internal method to handle basic setup of the daycard
      */
-    private MonthDayCard() {
+    private void Init() {
         setLayout(new BorderLayout());
         titleLabel = new JLabel();
         titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        titleLabel.setBackground(new Color(100, 100, 100));
+        
+        /*
+         * setup colors for the calendar based on system colors, so
+         * the user's choices are respected
+         */
+        titleLabel.setBackground(SystemColor.window);
         titleLabel.setOpaque(true);
+        this.setBackground(SystemColor.text);
+        simpleView.setBackground(SystemColor.text);
+        detailedView.setBackground(SystemColor.text);
+        
         eventLabels = new ArrayList<JLabel>();
         events = new ArrayList<DayEvent>();
         add(titleLabel, BorderLayout.PAGE_START);
@@ -115,8 +124,10 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
      * @param view	which layout to use for the drawing of the component
      */
     public MonthDayCard(CardView view, CalendarController controller) {
-        //Call MonthDayCard() for basic set up code
-        this();
+        //Call Init() to handle basic setup
+    	//just changed name to make more sense
+        Init();
+        
         this.view = view;
         addEventLabel = new JLabel("+");
         addEventLabel.setFont(new Font("Arial", Font.PLAIN, 18));
@@ -130,6 +141,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
         }
 
         JPanel eventModifyContainer = new JPanel(new BorderLayout());
+        eventModifyContainer.setBackground(SystemColor.text);
         eventModifyContainer.add(removeEventLabel, BorderLayout.LINE_START);
         eventModifyContainer.add(addEventLabel, BorderLayout.LINE_END);
         add(eventModifyContainer, BorderLayout.PAGE_END);
@@ -154,12 +166,13 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
      * @param controller    The controller which is responsible for connecting the
      *                      MonthCardDay to corresponing models
      */
-    public MonthDayCard(Date filter, CardView view, CalendarController controller) {
+    private  MonthDayCard(Date filter, CardView view, CalendarController controller) {
         /*
          * Call MonthDayCard with current date and the given view
          */
-
-        this(view, controller);
+    	this(view, controller);
+    	Init();
+    	
         //Make the necessary adjustments, so that the monthcard reflectes
         //the data in the given day
         this.controller = controller;
@@ -310,27 +323,20 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
      * This should never be called from outside the component.
      *
      */
+    
+    
+    
     private void paintSimple(Graphics g) {
         //only draw if there are any events for this day card
         if (eventLabels.size() > 0) {
             /*
              * we may want to move these calculations into a resize event instead of paint
              */
-            int x[] = {
-                (int) (getWidth() *0.8),
-                getWidth(),
-                getWidth()
-            };
+        	int triangleX[] = { (getWidth() - (titleLabel.getHeight()*2)), getWidth(), getWidth() };
+            int triangleY[] = {0, titleLabel.getHeight(), 0 };
 
 
-            int y[] = {
-                1,
-                (int) (20),
-                1
-            };
-
-
-            Polygon triangle = new Polygon(x, y, 3);
+            Polygon triangle = new Polygon(triangleX, triangleY, 3);
 
             Graphics2D g2 = (Graphics2D) g;
             g2.setColor(triangleColor);
@@ -394,7 +400,8 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
             filter = (Date) evt.getNewValue();
             calendar.setTime(filter);
             titleLabel.setText("" + calendar.get(Calendar.DAY_OF_MONTH));
-
+            checkAndHighlightHoliday();
+            
         } else if (evtName.equals(CalendarController.FILTERED_EVENTS)) {
 
             simpleView.removeAll();
@@ -415,6 +422,14 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
 
     }
 
+    private void checkAndHighlightHoliday() {
+    	
+    	if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
+        	titleLabel.setForeground(SystemColor.red);
+        } else {
+        	titleLabel.setForeground(SystemColor.textText);
+        }
+    }
     /**
      * Add a listener for the add new event component
      * Note that this is still internal within the CalendarContainer.
@@ -454,6 +469,11 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     	}
     }
     
+    /*
+     * these variables are placed down here for the sole reason that it's much
+     * easier to keep them close to the actual code that uses them, it makes sense
+     * to have them nearby
+     */
     private Color startColor = new Color(0,100,0);
     private Color endColor = new Color(0,210,0);
     private Color triangleColor = startColor;
@@ -480,7 +500,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
 		
 		switch (highlightMarker) {
 		
-		case TRIANGLE_GRADIENT:
+		case TRIANGLE_FADING:
 			int r = (int) ((1 - step) * startColor.getRed() + step * endColor.getRed());
 			int g = (int) ((1 - step) * startColor.getGreen() + step * endColor.getGreen());
 			int b = (int) ((1 - step) * startColor.getBlue() + step * endColor.getBlue());

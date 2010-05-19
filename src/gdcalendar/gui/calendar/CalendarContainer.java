@@ -24,7 +24,13 @@ import gdcalendar.gui.calendar.daycard.MonthDayCard.Marker;
 import java.util.ArrayList;
 
 /**
- * Container for the calendar.
+ * Container for the calendar. This is a stand-alone component that could
+ * be used anywhere.
+ * 
+ * Right now it demands sending a CommandManager in at construction to support
+ * undo/redo when pressing the +/- "buttons", but this should be possible to
+ * move outside by adding listeners for add/remove events or something.
+ * 
  * @author Tomas
  * @author Håkan
  * @author James
@@ -97,8 +103,10 @@ public class CalendarContainer extends JPanel {
         monthTitle = new JPanel(new FlowLayout(FlowLayout.CENTER));
         monthTitleLabel = new JLabel();
         monthTitle.add(monthTitleLabel);
-        monthTitle.setBackground(new Color(220, 220, 220));
-        monthTitle.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        	
+        monthTitle.setFont(monthTitle.getFont().deriveFont(Font.BOLD));
+        monthTitle.setBackground(SystemColor.window);
+        //monthTitle.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
         previousMonthButton = new JButton("<<");
         nextMonthButton = new JButton(">>");
@@ -107,17 +115,19 @@ public class CalendarContainer extends JPanel {
         monthNavPanel.add(previousMonthButton, BorderLayout.LINE_START);
         monthNavPanel.add(monthTitle, BorderLayout.CENTER);
         monthNavPanel.add(nextMonthButton, BorderLayout.LINE_END);
-        monthNavPanel.setBackground(new Color(220, 220, 220));
+        monthNavPanel.setBackground(SystemColor.window);
 
 
         dayTitle = new JPanel(new GridLayout(1, 7));
-        dayTitle.setBackground(new Color(220, 220, 220));
-        dayTitle.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        dayTitle.setBackground(SystemColor.window);
+        //dayTitle.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
         Calendar tempCalendar = GregorianCalendar.getInstance();
         for (int i = 1; i <= 7; i++) {
             tempCalendar.set(Calendar.DAY_OF_WEEK, i);
-            dayTitle.add(new JLabel(tempCalendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH)));
+            JLabel newLabel = new JLabel(tempCalendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH));
+            newLabel.setHorizontalAlignment(JLabel.CENTER);
+            dayTitle.add(newLabel);
         }
 
         topPanel.add(monthNavPanel, BorderLayout.PAGE_START);
@@ -176,7 +186,8 @@ public class CalendarContainer extends JPanel {
             AnimationDriver.getInstance().add(daycard, "calendarcontainer");
 
             DayFilteredCalendarModel model = new DayFilteredCalendarModel();
-            daycard.setBorder(BorderFactory.createLineBorder(Color.lightGray));
+            daycard.setBorder(BorderFactory.createLineBorder(new Color(240,240,240)));
+            
             /*
              * as mentioned in MonthDayCard previously, this is a temporary way of adding new events
              * we would like a method for the user to specify his data...
@@ -209,24 +220,6 @@ public class CalendarContainer extends JPanel {
 
 
             model.setRealCalendarModel(calendarModel);
-
-            daycard.addMouseListener(new MouseAdapter() {
-                DayPopupMenu popup = new DayPopupMenu();
-                public void mousePressed(MouseEvent e) {
-                    maybeShowPopup(e);
-                }
-
-                public void mouseReleased(MouseEvent e) {
-                    maybeShowPopup(e);
-                }
-
-                private void maybeShowPopup(MouseEvent e) {
-                    if (e.isPopupTrigger()) {
-                        popup.show(e.getComponent(),
-                                e.getX(), e.getY());
-                    }
-                }
-            });
 
             controller.addView(daycard);
             controller.addModel(model);
