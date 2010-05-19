@@ -101,6 +101,8 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
         titleLabel = new JLabel();
         titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        titleLabel.setBackground(new Color(100, 100, 100));
+        titleLabel.setOpaque(true);
         eventLabels = new ArrayList<JLabel>();
         events = new ArrayList<DayEvent>();
         add(titleLabel, BorderLayout.PAGE_START);
@@ -315,16 +317,16 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
              * we may want to move these calculations into a resize event instead of paint
              */
             int x[] = {
-                (int) (getWidth() * 0.8),
+                (int) (getWidth() *0.8),
                 getWidth(),
                 getWidth()
             };
 
 
             int y[] = {
-                0,
-                (int) (getHeight() * 0.2),
-                0
+                1,
+                (int) (20),
+                1
             };
 
 

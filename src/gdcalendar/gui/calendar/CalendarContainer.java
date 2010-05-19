@@ -185,7 +185,7 @@ public class CalendarContainer extends JPanel {
 
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    DayEvent newEvent = new DayEvent("New Event", new Date(110, 4, 13, 0, 0), new Date(110, 4, 16, 0, 0));
+                    DayEvent newEvent = new DayEvent("New Event", new Date(110, 4, 13, 10, 0), new Date(110, 4, 16, 11, 0));
                     CalendarChangeEvent changeEvent = new CalendarChangeEvent(newEvent, 0, CalendarChangeEvent.EventAdd, 0);
                     undoManager.execute(new AddEventCommand(controller, newEvent));
                     fireDataChangedEvent(changeEvent);

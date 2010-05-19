@@ -33,7 +33,7 @@ public class Configuration {
         defaultProperties.setProperty("window.width", Integer.toString(width));
         defaultProperties.setProperty("window.height", Integer.toString(height));
         defaultProperties.setProperty("calendar", "./src/XML/calendar.xml");
-        defaultProperties.setProperty("categoryList", "./src/XML/CategoryList.xml");
+        defaultProperties.setProperty("categories", "./src/XML/categories.xml");
         properties = new Properties(defaultProperties);
     }
 

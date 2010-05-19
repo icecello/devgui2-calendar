@@ -18,12 +18,21 @@ public class DayEvent extends AbstractModel{
      * Priority for a given DayEvent
      */
     public static enum Priority{
-        VERY_LOW("Very Low"), LOW("Low"), MEDIUM("Medium"),
-        HIGH("High"), VERY_HIGH("Very high");
+        VERY_LOW, LOW, MEDIUM,
+        HIGH, VERY_HIGH;
 
-        private final String name;
-        private Priority(String name) {
-            this.name = name;
+        @Override
+        public String toString(){
+            if(this.name().equals("VERY_LOW"))
+                return "Very low";
+            else if(this.name().equals("LOW"))
+                return "Low";
+            else if(this.name().equals("MEDIUM"))
+                return "Medium";
+            else if(this.name().equals("HIGH"))
+                return "High";
+            else
+                return "Very high";
         }
     }
 
