@@ -4,15 +4,15 @@
 <calendar>
   <dayEvent>
     <name>First event</name>
-    <startDate>2010-mar-26 10:27:20</startDate>
-    <endDate>2010-mar-26 11:27:20</endDate>
+    <startDate>2010-05-24 10:27</startDate>
+    <endDate>2010-05-24 11:27</endDate>
     <category>Home</category>
     <priority>LOW</priority>
   </dayEvent>
   <dayEvent>
     <name>Second Event</name>
-    <startDate>2010-mar-27 10:27:20</startDate>
-    <endDate>2010-mar-27 11:27:20</endDate>
+    <startDate>2010-05-28 10:27</startDate>
+    <endDate>2010-05-30 11:27</endDate>
     <category>Home</category>
     <priority>LOW</priority>
   </dayEvent>

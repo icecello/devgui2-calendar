@@ -17,6 +17,7 @@ import java.util.*;
 import javax.swing.*;
 
 import commandmanager.CommandManager;
+import gdcalendar.gui.calendar.daycard.DayPopupMenu;
 import gdcalendar.gui.calendar.daycard.MonthDayCard.CardView;
 import gdcalendar.gui.calendar.daycard.MonthDayCard.Marker;
 
@@ -90,7 +91,6 @@ public class CalendarContainer extends JPanel {
         this.calendarModel = calendarModel;
         setLayout(new BorderLayout());
         topPanel = new JPanel(new BorderLayout());
-
         // Create a calendar for current day
         cal = GregorianCalendar.getInstance();
 
@@ -101,8 +101,8 @@ public class CalendarContainer extends JPanel {
         monthTitle.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
         previousMonthButton = new JButton("<<");
-        nextMonthButton = new JButton(">>");     
-        
+        nextMonthButton = new JButton(">>");
+
         monthNavPanel = new JPanel(new BorderLayout());
         monthNavPanel.add(previousMonthButton, BorderLayout.LINE_START);
         monthNavPanel.add(monthTitle, BorderLayout.CENTER);
@@ -136,10 +136,11 @@ public class CalendarContainer extends JPanel {
      * @param marker
      */
     public void setMarker(Marker marker) {
-    	for (int i = 0; i < views.size(); i++) {
-    		views.get(i).setMarker(marker);
-    	}
+        for (int i = 0; i < views.size(); i++) {
+            views.get(i).setMarker(marker);
+        }
     }
+
     /**
      * Use some means of highlighting all items that belong to 
      * specified category
@@ -147,11 +148,11 @@ public class CalendarContainer extends JPanel {
      * @param category		name of category to match against
      */
     public void highlight(Category category) {
-    	for (int i = 0; i < views.size(); i++) {
-    		views.get(i).highlight(category);
-    	}
+        for (int i = 0; i < views.size(); i++) {
+            views.get(i).highlight(category);
+        }
     }
-    
+
     /**
      * Use some means of highlighting all items that have the
      * specified priority.
@@ -159,11 +160,11 @@ public class CalendarContainer extends JPanel {
      * @param prio			priority to match against
      */
     public void highlight(Priority prio) {
-    	for (int i = 0; i < views.size(); i++) {
-    		views.get(i).highlight(prio);
-    	}
+        for (int i = 0; i < views.size(); i++) {
+            views.get(i).highlight(prio);
+        }
     }
-    
+
     /**
      * Initialize the calendar view for the current month
      */
@@ -172,8 +173,8 @@ public class CalendarContainer extends JPanel {
         for (int i = 1; i <= 42; i++) {
             final CalendarController controller = new CalendarController();
             final MonthDayCard daycard = new MonthDayCard(dayViews, controller);
-            AnimationDriver.getInstance().add(daycard,"calendarcontainer");
-            
+            AnimationDriver.getInstance().add(daycard, "calendarcontainer");
+
             DayFilteredCalendarModel model = new DayFilteredCalendarModel();
             daycard.setBorder(BorderFactory.createLineBorder(Color.lightGray));
             /*
@@ -184,7 +185,7 @@ public class CalendarContainer extends JPanel {
 
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    DayEvent newEvent = new DayEvent("New Event", new Date(110,4,13,0,0), new Date(110,4,16,0,0));
+                    DayEvent newEvent = new DayEvent("New Event", new Date(110, 4, 13, 0, 0), new Date(110, 4, 16, 0, 0));
                     CalendarChangeEvent changeEvent = new CalendarChangeEvent(newEvent, 0, CalendarChangeEvent.EventAdd, 0);
                     undoManager.execute(new AddEventCommand(controller, newEvent));
                     fireDataChangedEvent(changeEvent);
@@ -209,6 +210,24 @@ public class CalendarContainer extends JPanel {
 
             model.setRealCalendarModel(calendarModel);
 
+            daycard.addMouseListener(new MouseAdapter() {
+                DayPopupMenu popup = new DayPopupMenu();
+                public void mousePressed(MouseEvent e) {
+                    maybeShowPopup(e);
+                }
+
+                public void mouseReleased(MouseEvent e) {
+                    maybeShowPopup(e);
+                }
+
+                private void maybeShowPopup(MouseEvent e) {
+                    if (e.isPopupTrigger()) {
+                        popup.show(e.getComponent(),
+                                e.getX(), e.getY());
+                    }
+                }
+            });
+
             controller.addView(daycard);
             controller.addModel(model);
             views.add(daycard);
@@ -216,9 +235,12 @@ public class CalendarContainer extends JPanel {
             monthView.add(daycard);
 
 
-        }
-        //Call switchToMonth to attach the correct days (models) to the newly created MonthCards
+
+
+        } //Call switchToMonth to attach the correct days (models) to the newly created MonthCards
         switchToMonth(cal);
+
+
     }
 
     /*
@@ -229,39 +251,60 @@ public class CalendarContainer extends JPanel {
         monthTitleLabel.setText(tempCal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH)
                 + " " + tempCal.get(Calendar.YEAR));
 
+
+
         int numDays = tempCal.getActualMaximum(Calendar.DAY_OF_MONTH);
         // The start day of the month in integer form, so we know where to
         // start placing numbers in the grid.
         tempCal.set(Calendar.DAY_OF_MONTH, 1);
+
+
         int startDay = tempCal.get(Calendar.DAY_OF_WEEK);
 
 
-        for (int i = 1; i <= 42; i++) {
+
+
+        for (int i = 1; i
+                <= 42; i++) {
             final CardView currentView;     //variable to keep track what apperence the daycard should have
             final int index = i - 1;
 
+
+
             if (i >= (startDay) && i < (startDay + numDays)) {
                 currentView = dayViews;
-                tempCal.set(Calendar.DAY_OF_MONTH, i - startDay +1);
+                tempCal.set(Calendar.DAY_OF_MONTH, i - startDay + 1);
                 Date filter = tempCal.getTime();
                 controllers.get(index).setFilter(filter);
+
+
             } else {
                 currentView = CardView.NONE;
-                controllers.get(index).setFilter(new Date(0,0,0));
+                controllers.get(index).setFilter(new Date(0, 0, 0));
+
+
             }
             if (!SwingUtilities.isEventDispatchThread()) {
                 SwingUtilities.invokeLater(new Runnable() {
 
                     public void run() {
                         views.get(index).changeView(currentView);
+
+
                     }
                 });
 
+
+
             } else {
                 views.get(index).changeView(currentView);
+
+
             }
             views.get(index).revalidate();
             views.get(index).repaint();
+
+
         }
     }
 
@@ -271,6 +314,8 @@ public class CalendarContainer extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 CalendarContainer.this.previousMonthMouseClicked(e);
+
+
             }
         });
 
@@ -279,20 +324,30 @@ public class CalendarContainer extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 CalendarContainer.this.nextMonthMouseClicked(e);
+
+
             }
         });
+
+
     }
 
     private void nextMonthMouseClicked(MouseEvent e) {
 
         cal.set(Calendar.MONTH, cal.get(Calendar.MONTH) + 1);
-        switchToMonth(cal);
+        switchToMonth(
+                cal);
+
+
     }
 
     private void previousMonthMouseClicked(MouseEvent e) {
 
         cal.set(Calendar.MONTH, cal.get(Calendar.MONTH) - 1);
-        switchToMonth(cal);
+        switchToMonth(
+                cal);
+
+
     }
 
     /**
@@ -328,17 +383,22 @@ public class CalendarContainer extends JPanel {
      */
     public void addDataChangeListener(CalendarDataChangedListener listener) {
         dataChangedListeners.add(listener);
-    }
 
-    /*
+
+    } /*
      * Internal method that handles firing of data changed events.
      */
+
+
     private void fireDataChangedEvent(CalendarChangeEvent e) {
         Iterator<CalendarDataChangedListener> it = dataChangedListeners.iterator();
+
+
 
         while (it.hasNext()) {
             CalendarDataChangedListener listener = it.next();
             listener.dataChanged(e);
+
         }
     }
 }

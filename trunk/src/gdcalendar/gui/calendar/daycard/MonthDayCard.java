@@ -97,7 +97,6 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
      * Default constructor, creating an empty MonthDayCard
      */
     private MonthDayCard() {
-
         setLayout(new BorderLayout());
         titleLabel = new JLabel();
         titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
@@ -117,7 +116,6 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
         //Call MonthDayCard() for basic set up code
         this();
         this.view = view;
-
         addEventLabel = new JLabel("+");
         addEventLabel.setFont(new Font("Arial", Font.PLAIN, 18));
         removeEventLabel = new JLabel("-");
@@ -164,6 +162,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
         //the data in the given day
         this.controller = controller;
         calendar.setTime(filter);
+
 
         titleLabel.setText("" + calendar.get(Calendar.DAY_OF_MONTH));
 
@@ -375,23 +374,21 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
             eventLabels.clear();
             events.clear();
             DayEvent[] filteredEvents = (DayEvent[]) evt.getNewValue();
-//            System.out.println("In monthCard: filtered events " + filteredEvents.length);
             for (int i = 0; i < filteredEvents.length; i++) {
                 events.add(filteredEvents[i]);
                 JLabel eventLabel = new JLabel(filteredEvents[i].getEventName());
                 simpleView.add(eventLabel);
                 eventLabels.add(eventLabel);
+                
             }
 
             //Remove an event (the one at the bottom) from the DayCard, invoked in EDT
         } else if (evtName.equals(CalendarController.REMOVE_EVENT)) {
-            System.out.println("In monthCard: remove event");
             simpleView.remove(eventLabels.get(eventLabels.size() - 1));
             eventLabels.remove(eventLabels.size() - 1);
             events.remove(events.get(events.size() - 1));
 
         } else if (evtName.equals(CalendarController.FILTER)) {
-            System.out.println("In monthCard: changed filter");
             filter = (Date) evt.getNewValue();
             calendar.setTime(filter);
             titleLabel.setText("" + calendar.get(Calendar.DAY_OF_MONTH));
@@ -402,7 +399,6 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
             eventLabels.clear();
             events.clear();
             DayEvent[] filteredEvents = (DayEvent[]) evt.getNewValue();
-//            System.out.println("In monthCard: filtered events " + filteredEvents.length);
             for (int i = 0; i < filteredEvents.length; i++) {
                 events.add(filteredEvents[i]);
                 JLabel eventLabel = new JLabel(filteredEvents[i].getEventName());
@@ -505,5 +501,4 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
 	public int preferredFPS() {
 		return 10;
 	}
-
 }
