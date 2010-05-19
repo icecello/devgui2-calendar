@@ -1,14 +1,9 @@
-    package gdcalendar.gui;
+package gdcalendar.gui;
 
-import gdcalendar.gui.calendar.CalendarChangeEvent;
-import gdcalendar.gui.calendar.CalendarContainer;
-import gdcalendar.gui.calendar.CalendarDataChangedListener;
-import gdcalendar.gui.calendar.daycard.DayPopupMenu;
-import gdcalendar.gui.calendar.daycard.MonthDayCard.Marker;
+import gdcalendar.gui.calendar.*;
 import gdcalendar.logic.AnimationDriver;
-import gdcalendar.mvc.model.CalendarModel;
-import gdcalendar.mvc.model.DayEvent;
-import gdcalendar.mvc.model.DayEvent.Priority;
+import gdcalendar.mvc.model.*;
+
 import gdcalendar.xml.Configuration;
 import gdcalendar.xml.XMLUtils;
 
@@ -30,10 +25,16 @@ import actionmanager.Action;
 import actionmanager.ActionManager;
 
 import commandmanager.CommandManager;
+import gdcalendar.gui.calendar.daycard.DayPopupMenu;
+import gdcalendar.gui.calendar.daycard.MonthDayCard.Marker;
+import gdcalendar.mvc.model.Category;
+import gdcalendar.mvc.model.DayEvent.Priority;
 import javax.swing.UIManager;
 
-
 /**
+ * MainWindow for a Calendar application. Events are loaded from XML at initialization
+ * and events can be added/removed and modified to/from/in the calendar while running.
+ * At window close, all events present in the calendar is stored to XML.
  *
  * @author Tomas
  * @author Håkan
@@ -42,48 +43,58 @@ import javax.swing.UIManager;
 @SuppressWarnings("serial")
 public class MainWindow extends JFrame {
 
-	
-	private ResourceBundle resource;
-	private JMenuItem quitItem;
-        private JMenuItem undoItem;
-	private JMenuItem redoItem;
-        private JMenuItem aboutItem;
+    private ResourceBundle resource;
+    private JMenuItem quitItem;
+    private JMenuItem undoItem;
+    private JMenuItem redoItem;
+    private JMenuItem aboutItem;
 
-	/*
-	 * note that we would want an array here if we need more undo managers
-	 * for multiple calendars or whatever...
-	 */
-	private final CommandManager cm = new CommandManager(0);
-	private ActionManager actionManager;
-	private CalendarContainer calendarContainer;
-	private CalendarModel calendarModel;
-	
+    /*
+     * note that we would want an array here if we need more undo managers
+     * for multiple calendars or whatever...
+     */
+    private final CommandManager cm = new CommandManager(0);
+    private ActionManager actionManager;
+    private CalendarContainer calendarContainer;
+    private CalendarModel calendarModel;
+
     public MainWindow() throws Exception {
         super("GDCalendar");
+        setLayout(new BorderLayout());
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+
+        resource = ResourceBundle.getBundle("gdcalendar.resource_en_US");
+        actionManager = new ActionManager(this, resource);
 
         if (System.getProperties().get("os.name").toString().contains("Windows")) {
             UIManager.setLookAndFeel(
-                "com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+                    "com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
         }
 
         ArrayList<DayEvent> events = null;
+        ArrayList<Category> categories = null;
         try {
-        	 events = XMLUtils.loadDayEvents(Configuration.getProperty("calendar"));
-        } catch(Exception e){
-        	System.err.println("In MainWindow: Error loading events from file");
+            categories = XMLUtils.loadCategories(Configuration.getProperty("categories"));
+            events = XMLUtils.loadDayEvents(Configuration.getProperty("calendar"));
+        } catch (Exception e) {
+            System.err.println("In MainWindow: Error loading events from file");
         }
         calendarModel = new CalendarModel(events);
-        setLayout(new BorderLayout());
+        calendarContainer = new CalendarContainer(cm, calendarModel);
 
-        //load the resource file
-        resource = ResourceBundle.getBundle("gdcalendar.resource_en_US");
-        actionManager = new ActionManager(this, resource);
-        
-        /*
-         * construct a simple menu
-         * currently uses the ActionManager class to construct
-         * AbstractAction objects...
-         */
+        initMenuBar();
+        initListners();
+
+        CollapsiblePanel collapsiblePanel = new CollapsiblePanel(CollapsiblePanel.EAST);
+        collapsiblePanel.setLayout(new BorderLayout());
+        collapsiblePanel.setCollapsButtonSize(5);
+        collapsiblePanel.add(new LeftItemPanel(), BorderLayout.PAGE_START, -1);
+        add(calendarContainer, BorderLayout.CENTER);
+        add(collapsiblePanel, BorderLayout.LINE_START);
+        pack();
+    }
+
+    private void initMenuBar() {
         JMenuBar mb = new JMenuBar();
 
         JMenu fileMenu = new JMenu(resource.getString("menu.file.text"));
@@ -96,7 +107,7 @@ public class MainWindow extends JFrame {
         redoItem = new JMenuItem(actionManager.getAction("doRedo"));
         JMenuItem preferencesItem = new JMenuItem(actionManager.getAction("showPreferences"));
         JMenuItem showPrioItem = new JMenuItem(actionManager.getAction("showPrio"));
-        
+
         editMenu.add(undoItem);
         editMenu.add(redoItem);
         editMenu.add(new JSeparator());
@@ -114,21 +125,25 @@ public class MainWindow extends JFrame {
         mb.add(editMenu);
         mb.add(helpMenu);
         this.setJMenuBar(mb);
-        
-        CollapsiblePanel collapsiblePanel = new CollapsiblePanel(CollapsiblePanel.EAST);
-        collapsiblePanel.setLayout(new BorderLayout());
-        collapsiblePanel.setCollapsButtonSize(5);
-        collapsiblePanel.add(new LeftItemPanel(), BorderLayout.PAGE_START, -1);
+    }
 
-        calendarContainer = new CalendarContainer(cm, calendarModel);
-        
+    /**
+     * Initialize listners for the main window. This include listners
+     * for the calendar container (pop-up menu & datachange listner) and
+     * a window listner
+     */
+    private void initListners() {
         calendarContainer.addEventMouseListener(new MouseAdapter() {
-        	//TODO: add commandmananger as parameter to daypopupmenu
-        	private DayPopupMenu popupMenu = new DayPopupMenu();
+            //TODO: add commandmananger as parameter to daypopupmenu
+
+            private DayPopupMenu popupMenu = new DayPopupMenu();
+
+            @Override
             public void mousePressed(MouseEvent e) {
                 maybeShowPopup(e);
             }
 
+            @Override
             public void mouseReleased(MouseEvent e) {
                 maybeShowPopup(e);
             }
@@ -136,37 +151,47 @@ public class MainWindow extends JFrame {
             private void maybeShowPopup(MouseEvent e) {
                 if (e.isPopupTrigger()) {
                     popupMenu.show(e.getComponent(),
-                               e.getX(), e.getY());
+                            e.getX(), e.getY());
                 }
             }
         });
         /*
          * Add listener for data change events from the calendar
          * to set undo/redo properly
-         * 
+         *
          * Not much else is done currently but it's possible
          * to see what kind of change was made if we need that
          * for anything...
          */
         calendarContainer.addDataChangeListener(new CalendarDataChangedListener() {
-			@Override
-			public void dataChanged(CalendarChangeEvent e) {
-				undoItem.setEnabled(cm.canUndo());
-				redoItem.setEnabled(cm.canRedo());
-			}
-		});
-        
-        add(calendarContainer, BorderLayout.CENTER);
-        
-        add(collapsiblePanel, BorderLayout.LINE_START);
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        pack();
 
+            @Override
+            public void dataChanged(CalendarChangeEvent e) {
+                undoItem.setEnabled(cm.canUndo());
+                redoItem.setEnabled(cm.canRedo());
+            }
+        });
+
+
+
+
+        /*
+         * Stop animation driver and store the calendar to
+         * XML file
+         */
         this.addWindowListener(new WindowAdapter() {
-			public void windowClosed(WindowEvent e) {
-        		AnimationDriver.getInstance().stopAll();
-        	}
-		});
+
+            @Override
+            public void windowClosed(WindowEvent e) {
+                AnimationDriver.getInstance().stopAll();
+                ArrayList<DayEvent> events = new ArrayList<DayEvent>();
+                DayEvent[] temp = calendarModel.getEvents();
+                for (int i = 0; i < temp.length; i++) {
+                    events.add(calendarModel.getEvents()[i]);
+                }
+                XMLUtils.saveDayEvents(events);
+            }
+        });
     }
 
     /**
@@ -176,15 +201,15 @@ public class MainWindow extends JFrame {
      * @param marker	marker to change to
      */
     public void changeMarker(Marker marker) {
-    	calendarContainer.setMarker(marker);
+        calendarContainer.setMarker(marker);
     }
-    
+
     /**
      * Quits the program.
      */
     @Action
     public void quit() {
-    	System.exit(0);
+        System.exit(0);
     }
 
     /**
@@ -194,7 +219,7 @@ public class MainWindow extends JFrame {
      */
     @Action
     public void showPrio() {
-    	calendarContainer.highlight(Priority.LOW);
+        calendarContainer.highlight(Priority.LOW);
     }
 
     /**
@@ -204,8 +229,9 @@ public class MainWindow extends JFrame {
      */
     @Action
     public void showPreferences() {
-    	new PreferencesWindow(this);
+        new PreferencesWindow(this);
     }
+
     /**
      * This action is performed whenever an event executed on the calendar
      * is to be undone. This also updates the menu entries for undo/redo
@@ -213,17 +239,17 @@ public class MainWindow extends JFrame {
      */
     @Action
     public void doUndo() {
-    	try {
-			cm.undo(1);
-			undoItem.setEnabled(cm.canUndo());
-			redoItem.setEnabled(cm.canRedo());
-		} catch (Exception e1) {
-			// TODO add proper exception handling, stack trace
-			// is good for debugging only
-			e1.printStackTrace();
-		}
+        try {
+            cm.undo(1);
+            undoItem.setEnabled(cm.canUndo());
+            redoItem.setEnabled(cm.canRedo());
+        } catch (Exception e1) {
+            // TODO add proper exception handling, stack trace
+            // is good for debugging only
+            e1.printStackTrace();
+        }
     }
-    
+
     /**
      * Action performed when an event previously executed on the calendar
      * is to be redone. This also updates the menu entries for undo/redo
@@ -231,15 +257,15 @@ public class MainWindow extends JFrame {
      */
     @Action
     public void doRedo() {
-    	try {
-			cm.redo(1);
-			undoItem.setEnabled(cm.canUndo());
-			redoItem.setEnabled(cm.canRedo());
-		} catch (Exception e1) {
-			// TODO add proper exception handling, stack trace
-			// is good for debugging only
-			e1.printStackTrace();
-		}
+        try {
+            cm.redo(1);
+            undoItem.setEnabled(cm.canUndo());
+            redoItem.setEnabled(cm.canRedo());
+        } catch (Exception e1) {
+            // TODO add proper exception handling, stack trace
+            // is good for debugging only
+            e1.printStackTrace();
+        }
     }
 
     /**
@@ -247,6 +273,6 @@ public class MainWindow extends JFrame {
      */
     @Action
     public void about() {
-    	new AboutWindow(this).setVisible(true);
+        new AboutWindow(this).setVisible(true);
     }
 }

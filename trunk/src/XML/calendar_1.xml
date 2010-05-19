@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE calendar SYSTEM "calendar.dtd">
+
+<calendar>
+    <dayEvent>
+        <name>Event</name>
+        <startDate>2010-05-20 10:00</startDate>
+        <endDate>2010-05-20 12:00</endDate>
+        <category></category>
+        <priority>LOW</priority>
+    </dayEvent>
+
+</calendar>
+
+

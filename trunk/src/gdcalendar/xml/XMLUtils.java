@@ -3,6 +3,7 @@ package gdcalendar.xml;
 import gdcalendar.mvc.model.Category;
 import gdcalendar.mvc.model.DayEvent;
 import gdcalendar.mvc.model.DayEvent.Priority;
+import java.awt.Color;
 import java.io.*;
 import java.text.*;
 import java.util.*;
@@ -24,7 +25,7 @@ public class XMLUtils {
     /**
      *  Return an element given a Document, tag name and index
      * @param doc 
-     * @param tagName
+     * @param attribute
      * @param index
      * @return the element corresponding to the input data
      */
@@ -36,7 +37,7 @@ public class XMLUtils {
     /**
      * Return the number of items in the Document
      * @param doc
-     * @param tagName
+     * @param attribute
      * @return the number of items in the document
      */
     public static int getSize(Document doc, String tagName) {
@@ -49,7 +50,7 @@ public class XMLUtils {
      *  by the tagName, then must traverse that Node to get the
      *  value.
      * @param e
-     * @param tagName
+     * @param attribute
      * @return the value of the corresponding element
      */
     public static String getValue(Element e, String tagName) {
@@ -75,39 +76,64 @@ public class XMLUtils {
         return null;
     }
 
+   /**
+    * Retrieve the value of the specified attribute and node
+    * @param node the node containing the attribute
+    * @param attribute the name of the attribute
+    * @return the value of the attribute
+    */
+    public static String getAttribute(Node node, String attribute) {
+        return node.getAttributes().getNamedItem(attribute).getNodeValue();
+    }
+
     /**
      * Loads the categories from file.
      * @param filePath Path to the file holding category information.
      * @return An Arraylist of Category elements.
      */
-    /*    public static ArrayList<Category> loadCategories(String filePath){
+    public static ArrayList<Category> loadCategories(String filePath) {
 
-    ArrayList<Category> categoryList = new ArrayList<Category>();
-    if(filePath == null || filePath.equals(""))
-    return categoryList;
-    try{
-    SAXBuilder parser = new SAXBuilder();
-    org.jdom.Document jdomDoc  = parser.build(filePath);
-    DOMOutputter outputter = new DOMOutputter();
-    Document doc = outputter.output(jdomDoc);
+        ArrayList<Category> categoryList = new ArrayList<Category>();
+        if (filePath == null || filePath.equals("")) {
+            return categoryList;
+        }
+        try {
+            SAXBuilder parser = new SAXBuilder();
+            org.jdom.Document jdomDoc = parser.build(filePath);
+            DOMOutputter outputter = new DOMOutputter();
+            Document doc = outputter.output(jdomDoc);
 
-    // Loop through each todo-item in XML-file and extract properties
-    for(int i=0; i < XMLUtils.getSize(doc, "category"); i++){
-    Element element = XMLUtils.getElement(doc, "category", i);
-    String name = XMLUtils.getValue(element, "name");
+            Node color, icon;
+            String iconSrc = "";
+            int red = 0, green = 0, blue = 0;
+            // Loop through each todo-item in XML-file and extract properties
+            for (int i = 0; i < XMLUtils.getSize(doc, "category"); i++) {
+                Element element = XMLUtils.getElement(doc, "category", i);
+                String name = XMLUtils.getValue(element, "name");
+                String description = XMLUtils.getValue(element, "description");
+                color = element.getElementsByTagName("color").item(0);
+                if (color != null) {
+                    red = Integer.parseInt(getAttribute(color, "red"));
+                    green = Integer.parseInt(getAttribute(color, "green"));
+                    blue = Integer.parseInt(getAttribute(color, "blue"));
+                }
 
-    // Create category item
-    Category category = new Category(name);
-    categoryList.add(category);
+                icon = element.getElementsByTagName("icon").item(0);
+                if (icon != null) {
+                     iconSrc = getAttribute(icon, "src");
+                }
+
+
+                // Create category item
+                Category category = new Category(name,description,new Color(red,green,blue));
+                categoryList.add(category);
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return categoryList;
     }
-    }
-    catch(Exception e)
-    {
-    System.out.println(e.getMessage());
-    }
-    return categoryList;
-    }
-     */
+
     /**
      * Load tasks(todo items) from file.
      * @param filePath Path to the file holding tasks information.
@@ -170,12 +196,12 @@ public class XMLUtils {
 
         for (int i = 0; i < todoList.size(); i++) {
             DayEvent event = todoList.get(i);
-            org.jdom.Element item = new org.jdom.Element("dayEven");
+            org.jdom.Element item = new org.jdom.Element("dayEvent");
             item.addContent(new org.jdom.Element("name").setText(event.getEventName()));
-            item.addContent(new org.jdom.Element("startDate").setText(formatter.format(event.getEndTime())));
+            item.addContent(new org.jdom.Element("startDate").setText(formatter.format(event.getStartTime())));
             item.addContent(new org.jdom.Element("endDate").setText(formatter.format(event.getEndTime())));
-            item.addContent(new org.jdom.Element("category").setText(event.getCategory().getName()));
-            item.addContent(new org.jdom.Element("priority").setText(event.getPriority().name()));
+            item.addContent(new org.jdom.Element("category").setText("test"));
+            item.addContent(new org.jdom.Element("priority").setText("LOW"));
             root.addContent(item);
         }
 

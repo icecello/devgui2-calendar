@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE categories SYSTEM "categories.dtd">
+
+<categories>
+  <category>
+    <name>First event</name>
+    <description>
+        Short description
+    </description>
+    <color red="100" green="200" blue="200"/>
+  </category>
+  <category>
+    <name>Second Event</name>
+    <description>This is the second event</description>
+    <color red="200" green="100" blue="100"/>
+    <icon src=""/>
+  </category>
+</categories>
+

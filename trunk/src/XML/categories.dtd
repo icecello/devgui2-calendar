@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!ELEMENT categories (category)*>
+<!ELEMENT category (name, description?, color?, icon?)>
+<!ELEMENT name (#PCDATA) >
+<!ELEMENT description (#PCDATA)>
+
+
+
+<!--
+All of red, green, and blue should contain a integer value between 0 - 255
+that describes the amount of red, green, and blue, respectively.
+-->
+<!ELEMENT color EMPTY>
+<!ATTLIST color
+    red CDATA #REQUIRED
+    green CDATA #REQUIRED
+    blue CDATA #REQUIRED>
+    
+<!--
+icon should contain the qualified filename of the image.
+Eg. /src/image/icons/default_icon.ppm
+-->
+<!ELEMENT icon EMPTY>
+<!ATTLIST icon src CDATA #REQUIRED>
