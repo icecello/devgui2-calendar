@@ -122,7 +122,7 @@ public class MainWindow extends JFrame {
 
         calendarContainer = new CalendarContainer(cm, calendarModel);
         
-        calendarContainer.addDayMouseListener(new MouseAdapter() {
+        calendarContainer.addEventMouseListener(new MouseAdapter() {
         	//TODO: add commandmananger as parameter to daypopupmenu
         	private DayPopupMenu popupMenu = new DayPopupMenu();
             public void mousePressed(MouseEvent e) {
