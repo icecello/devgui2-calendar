@@ -142,6 +142,52 @@ public class CalendarContainer extends JPanel {
     }
 
     /**
+     * Set the background color for the calendar, which means
+     * the background of all days.
+     * @param color
+     */
+    public void setBackground(Color color) {
+    	for (int i=0; i < views.size(); i++) {
+    		views.get(i).setBackground(color);
+    	}
+    }
+    
+    /**
+     * Set the background color for the month title area and
+     * the filler space between navigation components.
+     * @param color
+     */
+    public void setComponentBackground(Color color) {
+    	super.setBackground(color);
+    	monthTitle.setBackground(color);
+    	monthNavPanel.setBackground(color);
+    }
+    
+    /**
+     * Set the color of auxiliary text inside each day, like the
+     * title.
+     * 
+     * @param color
+     */
+    public void setDayForeground(Color color) {
+    	for (int i=0; i < views.size(); i++) {
+    		views.get(i).setTitleForeground(color);
+    	}
+    }
+    
+    /**
+     * Set the color for text displaying event names.
+     * 
+     * @param color
+     */
+    public void setEventForeground(Color color) {
+    	for (int i=0; i < views.size(); i++) {
+    		views.get(i).setEventForeground(color);
+    	}
+    }
+    
+    
+    /**
      * 
      * @param marker
      */
