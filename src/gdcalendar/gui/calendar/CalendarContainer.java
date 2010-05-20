@@ -103,7 +103,7 @@ public class CalendarContainer extends JPanel {
         monthTitle = new JPanel(new FlowLayout(FlowLayout.CENTER));
         monthTitleLabel = new JLabel();
         monthTitle.add(monthTitleLabel);
-        	
+
         monthTitle.setFont(monthTitle.getFont().deriveFont(Font.BOLD));
         monthTitle.setBackground(SystemColor.window);
         //monthTitle.setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -147,22 +147,24 @@ public class CalendarContainer extends JPanel {
      * @param color
      */
     public void setBackground(Color color) {
-    	for (int i=0; i < views.size(); i++) {
-    		views.get(i).setBackground(color);
-    	}
+        if (views != null) {
+            for (int i = 0; i < views.size(); i++) {
+                views.get(i).setBackground(color);
+            }
+        }
     }
-    
+
     /**
      * Set the background color for the month title area and
      * the filler space between navigation components.
      * @param color
      */
     public void setComponentBackground(Color color) {
-    	super.setBackground(color);
-    	monthTitle.setBackground(color);
-    	monthNavPanel.setBackground(color);
+        super.setBackground(color);
+        monthTitle.setBackground(color);
+        monthNavPanel.setBackground(color);
     }
-    
+
     /**
      * Set the color of auxiliary text inside each day, like the
      * title.
@@ -170,23 +172,22 @@ public class CalendarContainer extends JPanel {
      * @param color
      */
     public void setDayForeground(Color color) {
-    	for (int i=0; i < views.size(); i++) {
-    		views.get(i).setTitleForeground(color);
-    	}
+        for (int i = 0; i < views.size(); i++) {
+            views.get(i).setTitleForeground(color);
+        }
     }
-    
+
     /**
      * Set the color for text displaying event names.
      * 
      * @param color
      */
     public void setEventForeground(Color color) {
-    	for (int i=0; i < views.size(); i++) {
-    		views.get(i).setEventForeground(color);
-    	}
+        for (int i = 0; i < views.size(); i++) {
+            views.get(i).setEventForeground(color);
+        }
     }
-    
-    
+
     /**
      * 
      * @param marker
@@ -232,8 +233,8 @@ public class CalendarContainer extends JPanel {
             AnimationDriver.getInstance().add(daycard, "calendarcontainer");
 
             DayFilteredCalendarModel model = new DayFilteredCalendarModel();
-            daycard.setBorder(BorderFactory.createLineBorder(new Color(240,240,240)));
-            
+            daycard.setBorder(BorderFactory.createLineBorder(new Color(240, 240, 240)));
+
             /*
              * as mentioned in MonthDayCard previously, this is a temporary way of adding new events
              * we would like a method for the user to specify his data...
@@ -394,21 +395,21 @@ public class CalendarContainer extends JPanel {
      * @param l
      */
     public void addDayMouseListener(MouseListener l) {
-    	for (int i = 0; i < views.size(); i++) {
-    		views.get(i).addMouseListener(l);
-    	}
+        for (int i = 0; i < views.size(); i++) {
+            views.get(i).addMouseListener(l);
+        }
     }
-    
+
     /**
      * 
      * @param l	
      */
     public void addEventMouseListener(MouseListener l) {
-    	for (int i = 0; i < views.size(); i++) {
-    		views.get(i).addEventMouseListener(l);
-    	}
+        for (int i = 0; i < views.size(); i++) {
+            views.get(i).addEventMouseListener(l);
+        }
     }
-    
+
     /**
      * Add a listener that will be invoked whenever the data of this
      * calendar has changed in some way.
