@@ -6,28 +6,28 @@
     <name>New Event</name>
     <startDate>2010-05-11 00:00</startDate>
     <endDate>2010-05-12 00:00</endDate>
-    <category>test</category>
+    <category>category1</category>
     <priority>LOW</priority>
   </dayEvent>
   <dayEvent>
     <name>New Event</name>
     <startDate>2010-05-13 10:00</startDate>
     <endDate>2010-05-16 11:00</endDate>
-    <category>test</category>
+    <category>category1</category>
     <priority>LOW</priority>
   </dayEvent>
   <dayEvent>
     <name>Event</name>
     <startDate>2010-05-20 12:00</startDate>
     <endDate>2010-05-20 12:00</endDate>
-    <category>test</category>
+    <category>category2</category>
     <priority>LOW</priority>
   </dayEvent>
   <dayEvent>
     <name>New Event</name>
     <startDate>2010-05-13 10:00</startDate>
     <endDate>2010-05-16 11:00</endDate>
-    <category>test</category>
+    <category>category2</category>
     <priority>LOW</priority>
   </dayEvent>
 </calendar>
