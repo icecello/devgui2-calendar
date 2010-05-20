@@ -6,6 +6,7 @@
 package gdcalendar.gui;
 
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Insets;
@@ -21,6 +22,7 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SpinnerDateModel;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SpringLayout;
@@ -33,14 +35,12 @@ import javax.swing.border.Border;
 public class AddEventWindow extends JDialog {
 
     private JTextField titleField;
-    private JSpinner startYearSpinner;
-    private JComboBox startMonthComboBox ;
     private JSpinner startDateSpinner;
     private JSpinner startHourSpinner;
     private JSpinner startMinuteSpinner;
-    private JSpinner endYearSpinner;
-    private JComboBox endMonthComboBox;
+    private JSpinner startTimeSpinner;
     private JSpinner endDateSpinner;
+    private JSpinner endTimeSpinner;
     private JSpinner endHourSpinner;
     private JSpinner endMinuteSpinner;
     private JComboBox categoryComboBox;
@@ -57,65 +57,99 @@ public class AddEventWindow extends JDialog {
     public AddEventWindow(Date date) {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-        setLayout(new GridLayout(8, 0));
+        setLayout(new GridLayout(6, 0));
         calendar = Calendar.getInstance();
         calendar.setTime(date);
+
+        // TITLE PANEL //
 
         JPanel titlePanel = new JPanel();
         titlePanel.setBorder(BorderFactory.createTitledBorder("Title"));
         titleField = new JTextField(20);
         titlePanel.add(titleField);
 
-        int currentYear = calendar.get(Calendar.YEAR);
-        int currentDay = calendar.get(Calendar.DAY_OF_MONTH);
-        int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
-        int currentMinute = roundToFive(calendar.get(Calendar.MINUTE));
-        SpinnerModel startYearModel = new SpinnerNumberModel(currentYear, currentYear-100, currentYear+100, 1);
-        SpinnerModel startDayModel = new SpinnerNumberModel(currentDay, 1, calendar.getActualMaximum(Calendar.DAY_OF_MONTH), 1);
-        SpinnerModel startHourModel = new SpinnerNumberModel(currentHour, 0, 23, 1);
-        SpinnerModel startMinuteModel = new SpinnerNumberModel(currentMinute, 0, 59, 5);
-        SpinnerModel endYearModel = new SpinnerNumberModel(currentYear, currentYear-100, currentYear+100, 1);
-        SpinnerModel endDayModel = new SpinnerNumberModel(currentDay, 1, calendar.getActualMaximum(Calendar.DAY_OF_MONTH), 1);
-        SpinnerModel endHourModel = new SpinnerNumberModel(currentHour + 1, 0, 23, 1);
-        SpinnerModel endMinuteModel = new SpinnerNumberModel(currentMinute, 0, 59, 5);
+        // START TIME //
+
+        Calendar startTimeCal = (Calendar) calendar.clone();
+        Date startInitTime = startTimeCal.getTime();
+        startTimeCal.add(Calendar.YEAR, -100);
+        Date startEarliestTime = startTimeCal.getTime();
+        startTimeCal.add(Calendar.YEAR, 200);
+        Date startLatestTime = startTimeCal.getTime();
+        SpinnerModel startTimeModel = new SpinnerDateModel(startInitTime,
+                                     startEarliestTime,
+                                     startLatestTime,
+                                     Calendar.YEAR);    //ignored for user input
+
+        startTimeSpinner = new JSpinner(startTimeModel);
+        startTimeSpinner.setEditor(new JSpinner.DateEditor(startTimeSpinner, "HH:mm"));
+
+        // START DATE //
+
+        Calendar startDateCal = (Calendar) calendar.clone();
+        Date startInitDate = startDateCal.getTime();
+        startDateCal.add(Calendar.YEAR, -100);
+        Date startEarliestDate = startDateCal.getTime();
+        startDateCal.add(Calendar.YEAR, 200);
+        Date startLatestDate = startDateCal.getTime();
+        SpinnerModel startDateModel = new SpinnerDateModel(startInitDate,
+                                     startEarliestDate,
+                                     startLatestDate,
+                                     Calendar.YEAR);    //ignored for user input
+
+        startDateSpinner = new JSpinner(startDateModel);
+        startDateSpinner.setEditor(new JSpinner.DateEditor(startDateSpinner, "MMM dd yyyy"));
+
+        // START TIME PANEL //
 
         JPanel startTimePanel = new JPanel();
         startTimePanel.setBorder(BorderFactory.createTitledBorder("Start Time"));
-        startHourSpinner = new JSpinner(startHourModel);
-        startMinuteSpinner = new JSpinner(startMinuteModel);
+
+        startTimePanel.add(startTimeSpinner);
+        startTimePanel.add(startDateSpinner);
+
+        // END TIME //
+
+        Calendar endTimeCal = (Calendar) calendar.clone();
+        endTimeCal.add(Calendar.HOUR, 1);
+        Date endInitTime = endTimeCal.getTime();
+        endTimeCal.add(Calendar.YEAR, -100);
+        Date endEarliestTime = endTimeCal.getTime();
+        endTimeCal.add(Calendar.YEAR, 200);
+        Date endLatestTime = endTimeCal.getTime();
+        SpinnerModel endTimeModel = new SpinnerDateModel(endInitTime,
+                                     endEarliestTime,
+                                     endLatestTime,
+                                     Calendar.YEAR);    //ignored for user input
+
+        endTimeSpinner = new JSpinner(endTimeModel);
+        endTimeSpinner.setEditor(new JSpinner.DateEditor(endTimeSpinner, "HH:mm"));
         
-        startTimePanel.add(startHourSpinner);
-        startTimePanel.add(startMinuteSpinner);
+        // END DATE //
 
-        JPanel startDatePanel = new JPanel();
-        startDatePanel.setBorder(BorderFactory.createTitledBorder("Start Date"));
-        startDateSpinner = new JSpinner(startDayModel);
-        startMonthComboBox = new JComboBox(months);
-        startMonthComboBox.setSelectedIndex(calendar.get(Calendar.MONTH));
-        startYearSpinner = new JSpinner(startYearModel);
+        Calendar endDateCal = (Calendar) calendar.clone();
+        Date endInitDate = endDateCal.getTime();
+        endDateCal.add(Calendar.YEAR, -100);
+        Date endEarliestDate = endDateCal.getTime();
+        endDateCal.add(Calendar.YEAR, 200);
+        Date endLatestDate = endDateCal.getTime();
+        SpinnerModel endDateModel = new SpinnerDateModel(endInitDate,
+                                     endEarliestDate,
+                                     endLatestDate,
+                                     Calendar.YEAR);    //ignored for user input
 
-        startDatePanel.add(startDateSpinner);
-        startDatePanel.add(startMonthComboBox);
-        startDatePanel.add(startYearSpinner);
+        endDateSpinner = new JSpinner(endDateModel);
+        endDateSpinner.setEditor(new JSpinner.DateEditor(endDateSpinner, "MMM dd yyyy"));
+
+        // END TIME PANEL //
 
         JPanel endTimePanel = new JPanel();
         endTimePanel.setBorder(BorderFactory.createTitledBorder("End Time"));
-        endHourSpinner = new JSpinner(endHourModel);
-        endMinuteSpinner = new JSpinner(endMinuteModel);
 
-        endTimePanel.add(endHourSpinner);
-        endTimePanel.add(endMinuteSpinner);
+        endTimePanel.add(endTimeSpinner);
+        endTimePanel.add(endDateSpinner);
 
-        JPanel endDatePanel = new JPanel();
-        endDatePanel.setBorder(BorderFactory.createTitledBorder("End Date"));
-        endDateSpinner = new JSpinner(endDayModel);
-        endMonthComboBox = new JComboBox(months);
-        endMonthComboBox.setSelectedIndex(calendar.get(Calendar.MONTH));
-        endYearSpinner = new JSpinner(endYearModel);
-
-        endDatePanel.add(endDateSpinner);
-        endDatePanel.add(endMonthComboBox);
-        endDatePanel.add(endYearSpinner);
+        // CATEGORY & PRIORITY PANEL //
 
         JPanel catPrioPanel = new JPanel();
 
@@ -132,11 +166,15 @@ public class AddEventWindow extends JDialog {
         catPrioPanel.add(categoryPanel);
         catPrioPanel.add(priorityPanel);
 
+        // DESCRIPTION PANEL //
+
         JPanel descriptionPanel = new JPanel();
         descriptionPanel.setBorder(BorderFactory.createTitledBorder("Description"));
         descTextArea = new JTextArea(4, 20);
         descTextArea.setLineWrap(true);
         descriptionPanel.add(descTextArea);
+
+        // BUTTON PANEL //
 
         JPanel buttonPanel = new JPanel();
         saveButton = new JButton("Save");
@@ -144,11 +182,11 @@ public class AddEventWindow extends JDialog {
         buttonPanel.add(saveButton);
         buttonPanel.add(cancelButton);
 
+        // ADD THE PANELS //
+
         add(titlePanel);
         add(startTimePanel);
-        add(startDatePanel);
         add(endTimePanel);
-        add(endDatePanel);
         add(catPrioPanel);
         add(descriptionPanel);
         add(buttonPanel);
@@ -164,10 +202,9 @@ public class AddEventWindow extends JDialog {
         return value;
     }
 
-public static void main(String[] args){
-    AddEventWindow window = new AddEventWindow(new Date());
-    window.setVisible(true);
-   
-}
+    public static void main(String[] args){
+        AddEventWindow window = new AddEventWindow(new Date());
+        window.setVisible(true);
+    }
 
 }
