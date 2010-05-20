@@ -15,6 +15,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.JSpinner.DateEditor;
 
 import commandmanager.CommandManager;
 import gdcalendar.gui.calendar.daycard.DayPopupMenu;
@@ -84,6 +85,7 @@ public class CalendarContainer extends JPanel {
     private ArrayList<CalendarDataChangedListener> dataChangedListeners = new ArrayList<CalendarDataChangedListener>();
     private CalendarModel calendarModel = new CalendarModel();
 
+    private ArrayList<JLabel> dayTitleLabels = new ArrayList<JLabel>();
     /**
      * Construct the calendar, with all it's child components and data it needs.
      * For now, we still need to pass the command manager into the calendar, I'm
@@ -104,8 +106,6 @@ public class CalendarContainer extends JPanel {
         monthTitleLabel = new JLabel();
         monthTitle.add(monthTitleLabel);
 
-        monthTitle.setFont(monthTitle.getFont().deriveFont(Font.BOLD));
-        monthTitle.setBackground(SystemColor.window);
         //monthTitle.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
         previousMonthButton = new JButton("<<");
@@ -115,11 +115,9 @@ public class CalendarContainer extends JPanel {
         monthNavPanel.add(previousMonthButton, BorderLayout.LINE_START);
         monthNavPanel.add(monthTitle, BorderLayout.CENTER);
         monthNavPanel.add(nextMonthButton, BorderLayout.LINE_END);
-        monthNavPanel.setBackground(SystemColor.window);
-
 
         dayTitle = new JPanel(new GridLayout(1, 7));
-        dayTitle.setBackground(SystemColor.window);
+        
         //dayTitle.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
         Calendar tempCalendar = GregorianCalendar.getInstance();
@@ -128,6 +126,7 @@ public class CalendarContainer extends JPanel {
             JLabel newLabel = new JLabel(tempCalendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH));
             newLabel.setHorizontalAlignment(JLabel.CENTER);
             dayTitle.add(newLabel);
+            dayTitleLabels.add(newLabel);
         }
 
         topPanel.add(monthNavPanel, BorderLayout.PAGE_START);
@@ -139,6 +138,12 @@ public class CalendarContainer extends JPanel {
         add(topPanel, BorderLayout.PAGE_START);
         add(monthView, BorderLayout.CENTER);
         initListeners();
+        
+        //set some default colors and fonts
+        setBackground(SystemColor.white);
+        setComponentBackground(SystemColor.window);
+        setDayTitleBackground(SystemColor.window);
+        setDayFont(new Font("Arial", Font.PLAIN, 16));
     }
 
     /**
@@ -146,25 +151,82 @@ public class CalendarContainer extends JPanel {
      * the background of all days.
      * @param color
      */
+    @Override
     public void setBackground(Color color) {
-        if (views != null) {
-            for (int i = 0; i < views.size(); i++) {
-                views.get(i).setBackground(color);
-            }
-        }
+    	super.setBackground(color);
+    	
+    	//avoid doing this if we got called before views has been created
+    	if (views != null) {
+	    	for (int i=0; i < views.size(); i++) {
+	    		views.get(i).setBackground(color);
+	    	}
+    	}
     }
-
+    
+    /**
+     * Set the font for the Month title. This is just the name
+     * of the current month.
+     * 
+     * @param font
+     */
+    public void setMonthFont(Font font) {
+    	monthTitleLabel.setFont(font);
+    }
+    
+    /**
+     * Set the font to use for the day titles, which refers to
+     * the 7 names of days listed on the top of the calendar.
+     * 
+     * @param font
+     */
+    public void setDayTitleFont(Font font) {
+    	for (int i = 0; i < dayTitleLabels.size(); i++) {
+    		dayTitleLabels.get(i).setFont(font);
+    	}
+    }
+    
+    /**
+     * Set the font to use for each individual day's title.
+     * 
+     * @param font
+     */
+    public void setDayFont(Font font) {
+    	for (int i = 0; i < views.size(); i++) {
+    		views.get(i).setTitleFont(font);
+    	}
+    }
+    /**
+     * Set the background color of the area listing
+     * the days, Sun-Mon
+     * 
+     * @param color
+     */
+    public void setDayTitleBackground(Color color) {
+    	dayTitle.setBackground(color);
+    }
+    
+    /**
+     * Set the foreground color of the area listing
+     * the days, Sun-Mon
+     * @param color
+     */
+    public void setDayTitleForeground(Color color) {
+    	for (int i = 0; i < dayTitleLabels.size(); i++) {
+    		dayTitleLabels.get(i).setForeground(color);
+    	}
+    	
+    }
     /**
      * Set the background color for the month title area and
      * the filler space between navigation components.
      * @param color
      */
     public void setComponentBackground(Color color) {
-        super.setBackground(color);
-        monthTitle.setBackground(color);
-        monthNavPanel.setBackground(color);
+    	super.setBackground(color);
+    	monthTitle.setBackground(color);
+    	monthNavPanel.setBackground(color);
     }
-
+    
     /**
      * Set the color of auxiliary text inside each day, like the
      * title.
@@ -172,22 +234,23 @@ public class CalendarContainer extends JPanel {
      * @param color
      */
     public void setDayForeground(Color color) {
-        for (int i = 0; i < views.size(); i++) {
-            views.get(i).setTitleForeground(color);
-        }
+    	for (int i=0; i < views.size(); i++) {
+    		views.get(i).setTitleForeground(color);
+    	}
     }
-
+    
     /**
      * Set the color for text displaying event names.
      * 
      * @param color
      */
     public void setEventForeground(Color color) {
-        for (int i = 0; i < views.size(); i++) {
-            views.get(i).setEventForeground(color);
-        }
+    	for (int i=0; i < views.size(); i++) {
+    		views.get(i).setEventForeground(color);
+    	}
     }
-
+    
+    
     /**
      * 
      * @param marker
@@ -233,8 +296,8 @@ public class CalendarContainer extends JPanel {
             AnimationDriver.getInstance().add(daycard, "calendarcontainer");
 
             DayFilteredCalendarModel model = new DayFilteredCalendarModel();
-            daycard.setBorder(BorderFactory.createLineBorder(new Color(240, 240, 240)));
-
+            daycard.setBorder(BorderFactory.createLineBorder(new Color(240,240,240)));
+            
             /*
              * as mentioned in MonthDayCard previously, this is a temporary way of adding new events
              * we would like a method for the user to specify his data...
@@ -334,8 +397,6 @@ public class CalendarContainer extends JPanel {
                     }
                 });
 
-
-
             } else {
                 views.get(index).changeView(currentView);
 
@@ -395,21 +456,21 @@ public class CalendarContainer extends JPanel {
      * @param l
      */
     public void addDayMouseListener(MouseListener l) {
-        for (int i = 0; i < views.size(); i++) {
-            views.get(i).addMouseListener(l);
-        }
+    	for (int i = 0; i < views.size(); i++) {
+    		views.get(i).addMouseListener(l);
+    	}
     }
-
+    
     /**
      * 
      * @param l	
      */
     public void addEventMouseListener(MouseListener l) {
-        for (int i = 0; i < views.size(); i++) {
-            views.get(i).addEventMouseListener(l);
-        }
+    	for (int i = 0; i < views.size(); i++) {
+    		views.get(i).addEventMouseListener(l);
+    	}
     }
-
+    
     /**
      * Add a listener that will be invoked whenever the data of this
      * calendar has changed in some way.

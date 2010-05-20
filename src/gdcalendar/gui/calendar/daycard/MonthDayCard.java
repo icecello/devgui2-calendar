@@ -91,7 +91,8 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     //connected models
     private ArrayList<JLabel> eventLabels;  //The visual representation of the day events
     private ArrayList<DayEvent> events;     //The events of the day
-
+    private ArrayList<MouseListener> eventMouseListeners = new ArrayList<MouseListener>();
+    
     private Color eventForeground = SystemColor.textText;
     
     private Marker highlightMarker = Marker.NONE;
@@ -101,16 +102,16 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     private void Init() {
         setLayout(new BorderLayout());
         titleLabel = new JLabel();
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         
         /*
          * setup colors for the calendar based on system colors, so
          * the user's choices are respected
          */
-        titleLabel.setBackground(SystemColor.window);
+        //titleLabel.setBackground(SystemColor.window);
         titleLabel.setOpaque(true);
-        this.setBackground(SystemColor.text);
+        //this.setBackground(SystemColor.text);
         simpleView.setBackground(SystemColor.text);
         detailedView.setBackground(SystemColor.text);
         
@@ -189,6 +190,10 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
         controller.setFilter(filter);
     }
 
+    public void setTitleFont(Font font) {
+    	titleLabel.setFont(font);
+    }
+    
     /**
      * Set the color to be used for the daycards title text
      * 
@@ -429,6 +434,11 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
             for (int i = 0; i < filteredEvents.length; i++) {
                 events.add(filteredEvents[i]);
                 JLabel eventLabel = new JLabel(filteredEvents[i].getEventName());
+                eventLabel.setForeground(eventForeground);
+                //add all event mouse listeners to the event label
+                for (int j = 0; j < eventMouseListeners.size(); j++) {
+                	eventLabel.addMouseListener(eventMouseListeners.get(j));
+                }
                 simpleView.add(eventLabel);
                 eventLabels.add(eventLabel);
                 
@@ -455,6 +465,11 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
             for (int i = 0; i < filteredEvents.length; i++) {
                 events.add(filteredEvents[i]);
                 JLabel eventLabel = new JLabel(filteredEvents[i].getEventName());
+                eventLabel.setForeground(eventForeground);
+                //add all event mouse listeners to the event label
+                for (int j = 0; j < eventMouseListeners.size(); j++) {
+                	eventLabel.addMouseListener(eventMouseListeners.get(j));
+                }
                 simpleView.add(eventLabel);
                 eventLabels.add(eventLabel);
             }
@@ -501,6 +516,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
         }
     }
 
+    
     /**
      * Add a MouseListener that will be fired whenever
      * a mouse event occurs on events.
@@ -511,6 +527,8 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     	for (int i = 0; i < eventLabels.size(); i++) {
     		eventLabels.get(i).addMouseListener(l);
     	}
+    	
+    	eventMouseListeners.add(l);
     }
     
     /*
