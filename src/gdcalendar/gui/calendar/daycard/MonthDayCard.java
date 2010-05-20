@@ -92,6 +92,8 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     private ArrayList<JLabel> eventLabels;  //The visual representation of the day events
     private ArrayList<DayEvent> events;     //The events of the day
 
+    private Color eventForeground = SystemColor.textText;
+    
     private Marker highlightMarker = Marker.NONE;
     /**
      * internal method to handle basic setup of the daycard
@@ -187,6 +189,48 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
         controller.setFilter(filter);
     }
 
+    /**
+     * Set the color to be used for the daycards title text
+     * 
+     * @param color		color to use
+     */
+    public void setTitleForeground(Color color) {
+    	titleLabel.setForeground(color);
+    }
+    
+    /**
+     * Set the color to use for the background of the daycards
+     * title
+     * 
+     * @param color
+     */
+    public void setTitleBackground(Color color) {
+    	titleLabel.setBackground(color);
+    }
+    
+    /**
+     * Set the background color of the daycard
+     * 
+     * @param color		which color to use for background
+     */
+    public void setBackground(Color color) {
+    	super.setBackground(color);
+    }
+    
+    /**
+     * Set the color of text for events that are displayed in 
+     * the daycard
+     * 
+     * @param color
+     */
+    public void setEventForeground(Color color) {
+    	eventForeground = color;
+    	
+    	for (int i = 0; i < eventLabels.size(); i++) {
+    		eventLabels.get(i).setForeground(color);
+    	}
+    }
+    
     /**
      * Set which marker to use during highlighting of
      * priorities or categories.
