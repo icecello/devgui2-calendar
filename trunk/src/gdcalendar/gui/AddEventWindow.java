@@ -55,6 +55,7 @@ public class AddEventWindow extends JDialog {
 
 
     public AddEventWindow(Date date) {
+        setTitle("Add New Event");
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         setLayout(new GridLayout(6, 0));

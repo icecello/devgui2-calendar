@@ -7,8 +7,10 @@ package gdcalendar.gui.calendar.daycard;
 
 import actionmanager.Action;
 import actionmanager.ActionManager;
+import gdcalendar.gui.AddEventWindow;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Date;
 import java.util.ResourceBundle;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -61,7 +63,10 @@ public class DayPopupMenu extends JPopupMenu {
      */
     @Action
     public void addEvent() {
-    	System.out.println("Adding event...");
+        // Should send the date of the current DayCard.
+    	AddEventWindow addEventWindow = new AddEventWindow(new Date());
+        addEventWindow.setVisible(true);
+        System.out.println("Adding event...");
     }
 
     /**
