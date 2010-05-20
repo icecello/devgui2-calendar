@@ -90,9 +90,9 @@ public class XMLUtils {
      * @param filePath Path to the file holding category information.
      * @return An Arraylist of Category elements.
      */
-    public static HashMap<String,Category> loadCategories(String filePath) {
+    public static HashMap<String, Category> loadCategories(String filePath) {
 
-        HashMap<String,Category> categoryMap = new HashMap<String,Category>();
+        HashMap<String, Category> categoryMap = new HashMap<String, Category>();
         if (filePath == null || filePath.equals("")) {
             return categoryMap;
         }
@@ -125,7 +125,7 @@ public class XMLUtils {
 
                 // Create category item
                 Category category = new Category(name, description, new Color(red, green, blue));
-                categoryMap.put(name,category);
+                categoryMap.put(name, category);
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -183,7 +183,7 @@ public class XMLUtils {
             DOMOutputter outputter = new DOMOutputter();
             Document doc = outputter.output(jdomDoc);
 
-            HashMap<String,Category> categories = loadCategories(Configuration.getProperty("categories"));
+            HashMap<String, Category> categories = loadCategories(Configuration.getProperty("categories"));
 
             // Loop through each todo-item in XML-file and extract properties
             for (int i = 0; i < XMLUtils.getSize(doc, "dayEvent"); i++) {
@@ -237,8 +237,10 @@ public class XMLUtils {
             item.addContent(new org.jdom.Element("name").setText(event.getEventName()));
             item.addContent(new org.jdom.Element("startDate").setText(formatter.format(event.getStartTime())));
             item.addContent(new org.jdom.Element("endDate").setText(formatter.format(event.getEndTime())));
-            item.addContent(new org.jdom.Element("category").setText("test"));
-            item.addContent(new org.jdom.Element("priority").setText("LOW"));
+            if (event.getCategory() != null) {
+                item.addContent(new org.jdom.Element("category").setText(event.getCategory().getName()));
+            }
+            item.addContent(new org.jdom.Element("priority").setText(event.getPriority().name()));
             root.addContent(item);
         }
 
