@@ -10,7 +10,6 @@ import java.util.*;
 import org.jdom.DocType;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.*;
-import org.jdom.output.Format;
 import org.w3c.dom.*;
 
 /**
@@ -25,7 +24,7 @@ public class XMLUtils {
     /**
      *  Return an element given a Document, tag name and index
      * @param doc 
-     * @param attribute
+     * @param tagName
      * @param index
      * @return the element corresponding to the input data
      */
@@ -37,7 +36,7 @@ public class XMLUtils {
     /**
      * Return the number of items in the Document
      * @param doc
-     * @param attribute
+     * @param tagName
      * @return the number of items in the document
      */
     public static int getSize(Document doc, String tagName) {
@@ -50,7 +49,7 @@ public class XMLUtils {
      *  by the tagName, then must traverse that Node to get the
      *  value.
      * @param e
-     * @param attribute
+     * @param tagName
      * @return the value of the corresponding element
      */
     public static String getValue(Element e, String tagName) {
@@ -76,12 +75,12 @@ public class XMLUtils {
         return null;
     }
 
-   /**
-    * Retrieve the value of the specified attribute and node
-    * @param node the node containing the attribute
-    * @param attribute the name of the attribute
-    * @return the value of the attribute
-    */
+    /**
+     * Retrieve the value of the specified attribute and node
+     * @param node the node containing the attribute
+     * @param attribute the name of the attribute
+     * @return the value of the attribute
+     */
     public static String getAttribute(Node node, String attribute) {
         return node.getAttributes().getNamedItem(attribute).getNodeValue();
     }
@@ -91,11 +90,11 @@ public class XMLUtils {
      * @param filePath Path to the file holding category information.
      * @return An Arraylist of Category elements.
      */
-    public static ArrayList<Category> loadCategories(String filePath) {
+    public static HashMap<String,Category> loadCategories(String filePath) {
 
-        ArrayList<Category> categoryList = new ArrayList<Category>();
+        HashMap<String,Category> categoryMap = new HashMap<String,Category>();
         if (filePath == null || filePath.equals("")) {
-            return categoryList;
+            return categoryMap;
         }
         try {
             SAXBuilder parser = new SAXBuilder();
@@ -120,22 +119,56 @@ public class XMLUtils {
 
                 icon = element.getElementsByTagName("icon").item(0);
                 if (icon != null) {
-                     iconSrc = getAttribute(icon, "src");
+                    iconSrc = getAttribute(icon, "src");
                 }
 
 
                 // Create category item
-                Category category = new Category(name,description,new Color(red,green,blue));
-                categoryList.add(category);
+                Category category = new Category(name, description, new Color(red, green, blue));
+                categoryMap.put(name,category);
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-        return categoryList;
+        return categoryMap;
     }
 
     /**
-     * Load tasks(todo items) from file.
+     * Saves the given Categories to file using JDOMs
+     * @param categories the categories to save
+     */
+    public static void saveCategories(ArrayList<Category> categories) {
+        org.jdom.Element root = new org.jdom.Element("categories");
+        DocType type = new DocType("categories", "categories.dtd");
+        org.jdom.Document doc = new org.jdom.Document(root, type);
+
+        for (Category category : categories) {
+            org.jdom.Element item = new org.jdom.Element("category");
+            item.addContent(new org.jdom.Element("name").setText(category.getName()));
+            item.addContent(new org.jdom.Element("description").setText(category.getDescription()));
+            if (category.getCategoryColor() != null) {
+                Color color = category.getCategoryColor();
+                org.jdom.Element elem = item.addContent("color");
+                elem.setAttribute("red", "" + color.getRed());
+                elem.setAttribute("green", "" + color.getGreen());
+                elem.setAttribute("blue", "" + color.getBlue());
+            }
+            root.addContent(item);
+        }
+
+        XMLOutputter outputter = new XMLOutputter();
+        outputter.setFormat(org.jdom.output.Format.getPrettyFormat());
+        try {
+            FileWriter writer = new FileWriter(Configuration.getProperty("categories"));
+            outputter.output(doc, writer);
+        } catch (IOException e) {
+            System.err.println("saveCategories: failed to save categories to file");
+        }
+    }
+
+    /**
+     * Load tasks(todo items) from file. The method will by default also load
+     * the categories into the events.
      * @param filePath Path to the file holding tasks information.
      * @return An ArrayList of ToDoItem elements.
      */
@@ -149,6 +182,8 @@ public class XMLUtils {
             org.jdom.Document jdomDoc = parser.build(filePath);
             DOMOutputter outputter = new DOMOutputter();
             Document doc = outputter.output(jdomDoc);
+
+            HashMap<String,Category> categories = loadCategories(Configuration.getProperty("categories"));
 
             // Loop through each todo-item in XML-file and extract properties
             for (int i = 0; i < XMLUtils.getSize(doc, "dayEvent"); i++) {
@@ -173,7 +208,9 @@ public class XMLUtils {
 
                 // Create todo item
                 DayEvent event = new DayEvent(name, startDate, endDate);
-                event.setCategory(new Category(category));
+                if (category != null && !category.equals("")) {
+                    event.setCategory(categories.get(category));
+                }
                 event.setPriority(Priority.valueOf(priority));
 
                 // Make a SimpleDateFormat for toString()'s output
@@ -187,15 +224,15 @@ public class XMLUtils {
 
     /**
      * Saves the given ToDoItems to the xml file using JDom.
-     * @param todoList The items to store.
+     * @param events The items to store.
      */
-    public static void saveDayEvents(ArrayList<DayEvent> todoList) {
+    public static void saveDayEvents(ArrayList<DayEvent> events) {
         org.jdom.Element root = new org.jdom.Element("calendar");
         DocType type = new DocType("calendar", "calendar.dtd");
         org.jdom.Document doc = new org.jdom.Document(root, type);
 
-        for (int i = 0; i < todoList.size(); i++) {
-            DayEvent event = todoList.get(i);
+        for (int i = 0; i < events.size(); i++) {
+            DayEvent event = events.get(i);
             org.jdom.Element item = new org.jdom.Element("dayEvent");
             item.addContent(new org.jdom.Element("name").setText(event.getEventName()));
             item.addContent(new org.jdom.Element("startDate").setText(formatter.format(event.getStartTime())));
@@ -206,7 +243,7 @@ public class XMLUtils {
         }
 
         XMLOutputter outputter = new XMLOutputter();
-        outputter.setFormat(Format.getPrettyFormat());
+        outputter.setFormat(org.jdom.output.Format.getPrettyFormat());
         try {
             FileWriter writer = new FileWriter(Configuration.getProperty("calendar"));
             outputter.output(doc, writer);
