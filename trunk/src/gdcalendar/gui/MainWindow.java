@@ -74,10 +74,12 @@ public class MainWindow extends JFrame {
         ArrayList<DayEvent> events = null;
         ArrayList<Category> categories = null;
         try {
-            categories = XMLUtils.loadCategories(Configuration.getProperty("categories"));
             events = XMLUtils.loadDayEvents(Configuration.getProperty("calendar"));
         } catch (Exception e) {
             System.err.println("In MainWindow: Error loading events from file");
+        }
+        for(DayEvent event : events){
+            System.out.println(event.getCategory().getDescription());
         }
         calendarModel = new CalendarModel(events);
         calendarContainer = new CalendarContainer(cm, calendarModel);
