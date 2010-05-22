@@ -12,10 +12,10 @@ import gdcalendar.xml.Configuration;
 import gdcalendar.xml.XMLUtils;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeSupport;
 import java.util.Calendar;
 import java.util.Date;
 import javax.swing.BorderFactory;
@@ -28,6 +28,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpinnerDateModel;
 import javax.swing.SpinnerModel;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -137,6 +138,27 @@ public class AddEventWindow extends JDialog {
 
         endDateSpinner = new JSpinner(endDateModel);
         endDateSpinner.setEditor(new JSpinner.DateEditor(endDateSpinner, "MMM dd yyyy"));
+        
+        //Make the minute text get highlighted, dunno if this is good or not
+        //but the technique could be used in other places
+        final JTextField field = ((JSpinner.DateEditor) endTimeSpinner.getEditor()).getTextField();
+        field.addFocusListener(new FocusAdapter() {
+
+            @Override
+            public void focusGained(FocusEvent e) {
+
+                if (isEnabled()) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            field.setCaretPosition(5);
+                            field.setSelectionEnd(5);
+                            field.setSelectionStart(3);
+                        }
+                    });
+                }
+            }
+        });
+
 
         // END TIME PANEL //
 
@@ -203,18 +225,26 @@ public class AddEventWindow extends JDialog {
         buttonPanel.add(cancelButton);
 
         // ADD THE PANELS //
-        c.gridx = 0; c.gridy = 0; c.gridwidth = 2;
-        add(titlePanel,c);
-        c.gridy = 1; c.gridwidth = 1;
-        add(startTimePanel,c);
+        c.gridx = 0;
+        c.gridy = 0;
+        c.gridwidth = 2;
+        add(titlePanel, c);
+        c.gridy = 1;
+        c.gridwidth = 1;
+        add(startTimePanel, c);
         c.gridy = 2;
-        add(endTimePanel,c);
-        c.gridx = 0; c.gridy = 3; c.gridwidth = 2;
-        add(catPrioPanel,c);
-        c.gridy = 4; c.gridwidth = 2; c.gridheight = 3;
-        add(descriptionPanel,c);
-        c.gridy = 8; c.gridheight = 1;
-        add(buttonPanel,c);
+        add(endTimePanel, c);
+        c.gridx = 0;
+        c.gridy = 3;
+        c.gridwidth = 2;
+        add(catPrioPanel, c);
+        c.gridy = 4;
+        c.gridwidth = 2;
+        c.gridheight = 3;
+        add(descriptionPanel, c);
+        c.gridy = 8;
+        c.gridheight = 1;
+        add(buttonPanel, c);
 
         pack();
     }
