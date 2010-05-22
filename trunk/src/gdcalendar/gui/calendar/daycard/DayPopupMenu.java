@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package gdcalendar.gui.calendar.daycard;
 
 import actionmanager.Action;
@@ -22,14 +21,11 @@ import javax.swing.JSeparator;
  *
  * @author James
  */
-
 public class DayPopupMenu extends JPopupMenu {
 
     protected DayPopupMenu popup = this;
-
     private ActionManager actionManager;
     private ResourceBundle resource;
-
     private JMenuItem viewItem;
     private JMenuItem addItem;
     private JMenuItem editItem;
@@ -57,7 +53,7 @@ public class DayPopupMenu extends JPopupMenu {
      */
     @Action
     public void viewDay() {
-    	System.out.println("Viewing daycard...");
+        System.out.println("Viewing daycard...");
     }
 
     /**
@@ -66,11 +62,15 @@ public class DayPopupMenu extends JPopupMenu {
     @Action
     public void addEvent() {
         // Should send the date of the current DayCard.
-    	AddEventWindow addEventWindow = new AddEventWindow(new Date());
+        AddEventWindow addEventWindow = new AddEventWindow(new Date());
         addEventWindow.addPropertyChangeListener(new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
-                System.out.println("Something happend" + evt.getPropertyName());
+                if (evt.getPropertyName().equals("newEvent")) {
+                    
+                    System.out.println("Something happend \n" + evt.getNewValue());
+                    
+                }
             }
         });
         addEventWindow.setVisible(true);
@@ -82,7 +82,7 @@ public class DayPopupMenu extends JPopupMenu {
      */
     @Action
     public void editEvent() {
-    	System.out.println("Editing event...");
+        System.out.println("Editing event...");
     }
 
     /**
@@ -90,6 +90,6 @@ public class DayPopupMenu extends JPopupMenu {
      */
     @Action
     public void deleteEvent() {
-    	System.out.println("Deleting event...");
+        System.out.println("Deleting event...");
     }
 }

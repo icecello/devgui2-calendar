@@ -176,12 +176,7 @@ public class AddEventWindow extends JDialog {
         saveButton.addMouseListener(new MouseAdapter() {
 
             @Override
-            public void mousePressed(MouseEvent e) {
-                addEvent();
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
+            public void mouseClicked(MouseEvent e) {
                 addEvent();
             }
         });
@@ -197,7 +192,6 @@ public class AddEventWindow extends JDialog {
             public void mouseReleased(MouseEvent e) {
                 AddEventWindow.this.dispose();
             }
-
         });
         buttonPanel.add(saveButton);
         buttonPanel.add(cancelButton);
@@ -252,7 +246,7 @@ public class AddEventWindow extends JDialog {
         String desc = (String) descTextArea.getText();
 
         DayEvent dayEvent = new DayEvent(name, startDate, endDate, category, prio);
-
+        dayEvent.setDescription(desc);
         firePropertyChange("newEvent", null, dayEvent);
     }
 
