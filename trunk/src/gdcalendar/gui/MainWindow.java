@@ -12,6 +12,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
@@ -29,6 +30,9 @@ import gdcalendar.gui.calendar.daycard.DayPopupMenu;
 import gdcalendar.gui.calendar.daycard.MonthDayCard.Marker;
 import gdcalendar.mvc.model.Category;
 import gdcalendar.mvc.model.DayEvent.Priority;
+import java.beans.PropertyChangeListener;
+import java.util.UUID;
+import javax.swing.JLabel;
 import javax.swing.UIManager;
 
 /**
@@ -57,6 +61,7 @@ public class MainWindow extends JFrame {
     private ActionManager actionManager;
     private CalendarContainer calendarContainer;
     private CalendarModel calendarModel;
+    private DayPopupMenu popMenu;
 
     public MainWindow() throws Exception {
         super("GDCalendar");
@@ -78,7 +83,7 @@ public class MainWindow extends JFrame {
         } catch (Exception e) {
             System.err.println("In MainWindow: Error loading events from file");
         }
-        for(DayEvent event : events){
+        for (DayEvent event : events) {
             System.out.println(event.getCategory().getDescription());
         }
         calendarModel = new CalendarModel(events);
@@ -135,10 +140,9 @@ public class MainWindow extends JFrame {
      * a window listner
      */
     private void initListners() {
+        popMenu = new DayPopupMenu();
         calendarContainer.addEventMouseListener(new MouseAdapter() {
             //TODO: add commandmananger as parameter to daypopupmenu
-
-            private DayPopupMenu popupMenu = new DayPopupMenu();
 
             @Override
             public void mousePressed(MouseEvent e) {
@@ -152,7 +156,7 @@ public class MainWindow extends JFrame {
 
             private void maybeShowPopup(MouseEvent e) {
                 if (e.isPopupTrigger()) {
-                    popupMenu.show(e.getComponent(),
+                    popMenu.show(e.getComponent(),
                             e.getX(), e.getY());
                 }
             }
@@ -192,6 +196,19 @@ public class MainWindow extends JFrame {
                     events.add(calendarModel.getEvents()[i]);
                 }
                 XMLUtils.saveDayEvents(events);
+            }
+        });
+        popMenu.addPropertyChangeListener(new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                String evtName = evt.getPropertyName();
+                if (evtName.equals(DayPopupMenu.ADD)) {
+                    calendarModel.addDayEvent((DayEvent) evt.getNewValue());
+                } else if(evtName.equals(DayPopupMenu.DELETE)) {
+                    String ID = ((JLabel)popMenu.getInvoker()).getName();
+                    calendarModel.removeDayEvent(UUID.fromString(ID));
+//                    calendarModel.removeDayEvent(UUID.fromString(ID));
+                }
             }
         });
     }

@@ -11,6 +11,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.Date;
 import java.util.ResourceBundle;
 import javax.swing.JMenuItem;
@@ -23,6 +24,11 @@ import javax.swing.JSeparator;
  */
 public class DayPopupMenu extends JPopupMenu {
 
+    public static final String ADD = "add";
+    public static final String VIEW = "view";
+    public static final String EDIT = "edit";
+    public static final String DELETE = "delete";
+
     protected DayPopupMenu popup = this;
     private ActionManager actionManager;
     private ResourceBundle resource;
@@ -30,6 +36,7 @@ public class DayPopupMenu extends JPopupMenu {
     private JMenuItem addItem;
     private JMenuItem editItem;
     private JMenuItem deleteItem;
+    private PropertyChangeSupport propSupport = new PropertyChangeSupport(this);
 
     public DayPopupMenu() {
         //load the resource file
@@ -53,7 +60,7 @@ public class DayPopupMenu extends JPopupMenu {
      */
     @Action
     public void viewDay() {
-        System.out.println("Viewing daycard...");
+        propSupport.firePropertyChange(VIEW, null, null);
     }
 
     /**
@@ -66,15 +73,10 @@ public class DayPopupMenu extends JPopupMenu {
         addEventWindow.addPropertyChangeListener(new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
-                if (evt.getPropertyName().equals("newEvent")) {
-                    
-                    System.out.println("Something happend \n" + evt.getNewValue());
-                    
-                }
+                propSupport.firePropertyChange(ADD, evt.getOldValue(), evt.getNewValue());
             }
         });
         addEventWindow.setVisible(true);
-        System.out.println("Adding event...");
     }
 
     /**
@@ -82,7 +84,7 @@ public class DayPopupMenu extends JPopupMenu {
      */
     @Action
     public void editEvent() {
-        System.out.println("Editing event...");
+        propSupport.firePropertyChange(EDIT, null, null);
     }
 
     /**
@@ -90,6 +92,11 @@ public class DayPopupMenu extends JPopupMenu {
      */
     @Action
     public void deleteEvent() {
-        System.out.println("Deleting event...");
+        propSupport.firePropertyChange(DELETE, null, null);
+    }
+
+    @Override
+    public void addPropertyChangeListener(PropertyChangeListener l) {
+        propSupport.addPropertyChangeListener(l);
     }
 }
