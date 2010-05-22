@@ -30,6 +30,7 @@ import javax.swing.SpinnerModel;
  */
 public class AddEventWindow extends JDialog {
 
+
     private JTextField titleField;
     private JSpinner startDateSpinner;
     private JSpinner startTimeSpinner;
@@ -247,7 +248,7 @@ public class AddEventWindow extends JDialog {
 
         DayEvent dayEvent = new DayEvent(name, startDate, endDate, category, prio);
         dayEvent.setDescription(desc);
-        firePropertyChange("newEvent", null, dayEvent);
+        firePropertyChange("add", null, dayEvent);
     }
 
     public static void main(String[] args) {

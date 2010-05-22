@@ -434,6 +434,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
             for (int i = 0; i < filteredEvents.length; i++) {
                 events.add(filteredEvents[i]);
                 JLabel eventLabel = new JLabel(filteredEvents[i].getEventName());
+                eventLabel.setName(""+filteredEvents[i].getID());
                 eventLabel.setForeground(eventForeground);
                 //add all event mouse listeners to the event label
                 for (int j = 0; j < eventMouseListeners.size(); j++) {
@@ -465,6 +466,8 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
             for (int i = 0; i < filteredEvents.length; i++) {
                 events.add(filteredEvents[i]);
                 JLabel eventLabel = new JLabel(filteredEvents[i].getEventName());
+                eventLabel.setName(""+filteredEvents[i].getID());
+
                 eventLabel.setForeground(eventForeground);
                 //add all event mouse listeners to the event label
                 for (int j = 0; j < eventMouseListeners.size(); j++) {
