@@ -42,6 +42,7 @@ public class DayEvent extends AbstractModel{
     //Default values for category and priority
     private Category category = new Category("none");
     private Priority priority = Priority.LOW;
+    private String description;
     private UUID id;
 
     public DayEvent() {
@@ -176,6 +177,14 @@ public class DayEvent extends AbstractModel{
 
     public UUID getID(){
         return id;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
 
