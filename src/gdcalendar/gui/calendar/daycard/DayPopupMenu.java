@@ -10,6 +10,8 @@ import actionmanager.ActionManager;
 import gdcalendar.gui.AddEventWindow;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Date;
 import java.util.ResourceBundle;
 import javax.swing.JMenuItem;
@@ -65,6 +67,12 @@ public class DayPopupMenu extends JPopupMenu {
     public void addEvent() {
         // Should send the date of the current DayCard.
     	AddEventWindow addEventWindow = new AddEventWindow(new Date());
+        addEventWindow.addPropertyChangeListener(new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                System.out.println("Something happend" + evt.getPropertyName());
+            }
+        });
         addEventWindow.setVisible(true);
         System.out.println("Adding event...");
     }
