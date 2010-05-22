@@ -4,9 +4,14 @@
  */
 package gdcalendar.gui;
 
+import gdcalendar.Main;
 import gdcalendar.mvc.model.Category;
 import gdcalendar.mvc.model.DayEvent;
 import gdcalendar.mvc.model.DayEvent.Priority;
+import gdcalendar.xml.Configuration;
+import gdcalendar.xml.XMLUtils;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -30,7 +35,6 @@ import javax.swing.SpinnerModel;
  */
 public class AddEventWindow extends JDialog {
 
-
     private JTextField titleField;
     private JSpinner startDateSpinner;
     private JSpinner startTimeSpinner;
@@ -42,14 +46,14 @@ public class AddEventWindow extends JDialog {
     private JButton saveButton;
     private JButton cancelButton;
     private Calendar calendar;
-    private PropertyChangeSupport propSupport;
 
     public AddEventWindow(Date date) {
         setTitle("Add New Event");
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-
         setResizable(false);
-        setLayout(new GridLayout(6, 0));
+
+        setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
         calendar = Calendar.getInstance();
         calendar.setTime(date);
 
@@ -149,14 +153,15 @@ public class AddEventWindow extends JDialog {
         JPanel categoryPanel = new JPanel();
         categoryPanel.setBorder(BorderFactory.createTitledBorder("Category"));
         Category[] cat = new Category[1];
-        cat[0] = new Category("category1", "descp");
 
-        categoryComboBox = new JComboBox(cat);
+
+        categoryComboBox = new JComboBox(Main.categories.values().toArray());
         categoryPanel.add(categoryComboBox);
 
         JPanel priorityPanel = new JPanel();
         priorityPanel.setBorder(BorderFactory.createTitledBorder("Priority"));
         priorityComboBox = new JComboBox(Priority.values());
+        priorityComboBox.setSelectedItem(Priority.MEDIUM);
         priorityPanel.add(priorityComboBox);
 
         catPrioPanel.add(categoryPanel);
@@ -198,13 +203,18 @@ public class AddEventWindow extends JDialog {
         buttonPanel.add(cancelButton);
 
         // ADD THE PANELS //
-
-        add(titlePanel);
-        add(startTimePanel);
-        add(endTimePanel);
-        add(catPrioPanel);
-        add(descriptionPanel);
-        add(buttonPanel);
+        c.gridx = 0; c.gridy = 0; c.gridwidth = 2;
+        add(titlePanel,c);
+        c.gridy = 1; c.gridwidth = 1;
+        add(startTimePanel,c);
+        c.gridy = 2;
+        add(endTimePanel,c);
+        c.gridx = 0; c.gridy = 3; c.gridwidth = 2;
+        add(catPrioPanel,c);
+        c.gridy = 4; c.gridwidth = 2; c.gridheight = 3;
+        add(descriptionPanel,c);
+        c.gridy = 8; c.gridheight = 1;
+        add(buttonPanel,c);
 
         pack();
     }
@@ -252,6 +262,7 @@ public class AddEventWindow extends JDialog {
     }
 
     public static void main(String[] args) {
+        Main.categories = XMLUtils.loadCategories(Configuration.getProperty("categories"));
         AddEventWindow window = new AddEventWindow(new Date());
         window.setVisible(true);
     }

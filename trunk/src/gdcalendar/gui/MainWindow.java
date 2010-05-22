@@ -83,9 +83,6 @@ public class MainWindow extends JFrame {
         } catch (Exception e) {
             System.err.println("In MainWindow: Error loading events from file");
         }
-        for (DayEvent event : events) {
-            System.out.println(event.getCategory().getDescription());
-        }
         calendarModel = new CalendarModel(events);
         calendarContainer = new CalendarContainer(cm, calendarModel);
 
@@ -204,12 +201,16 @@ public class MainWindow extends JFrame {
                 String evtName = evt.getPropertyName();
                 if (evtName.equals(DayPopupMenu.ADD)) {
                     calendarModel.addDayEvent((DayEvent) evt.getNewValue());
-                } else if(evtName.equals(DayPopupMenu.DELETE)) {
-                    String ID = ((JLabel)popMenu.getInvoker()).getName();
+                } else if (evtName.equals(DayPopupMenu.DELETE)) {
+                    String ID = ((JLabel) popMenu.getInvoker()).getName();
                     calendarModel.removeDayEvent(UUID.fromString(ID));
-//                    calendarModel.removeDayEvent(UUID.fromString(ID));
+                } else if (evtName.equals(DayPopupMenu.EDIT)) {
+                    System.out.println("Edit");
+                } else if (evtName.equals(DayPopupMenu.VIEW)){
+                    System.out.println("View");
                 }
             }
+
         });
     }
 
