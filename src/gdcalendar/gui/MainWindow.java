@@ -125,7 +125,7 @@ public class MainWindow extends JFrame {
         AnimationDriver.getInstance().runThread("calendarcontainer");
     }
 
-    void initHighlightPanel() {
+    private void initHighlightPanel() {
         highlightPanel = new JPanel();
 
         toolBar = new JToolBar();
@@ -173,9 +173,9 @@ public class MainWindow extends JFrame {
     }
 
     /**
-     * Initialize listners for the main window. This include listners
-     * for the calendar container (pop-up menu & datachange listner) and
-     * a window listner
+     * Initialize listeners for the main window. This include listeners
+     * for the calendar container (pop-up menu & datachange listener) and
+     * a window listener
      */
     private void initListeners() {
         //Pop-menu shown when right click the daycards
@@ -392,6 +392,11 @@ public class MainWindow extends JFrame {
     private HashMap<Category, Boolean> checkedCategories = new HashMap<Category, Boolean>();
     private HashMap<Priority, Boolean> checkedPriorities = new HashMap<Priority, Boolean>();
     
+    /**
+     * Display a popupmenu with checkbox items to mark
+     * which categories that we want to highlight by
+     * animation
+     */
     @Action
     public void highlightCategoryPopup() {
     	final JPopupMenu menu = new JPopupMenu();
@@ -431,6 +436,11 @@ public class MainWindow extends JFrame {
         
     }
     
+    /**
+     * Display a popupmenu with checkbox items
+     * for selecting priorities to highlight with
+     * animations.
+     */
     @Action
     public void highlightPriorityPopup() {
     	final JPopupMenu menu = new JPopupMenu();
