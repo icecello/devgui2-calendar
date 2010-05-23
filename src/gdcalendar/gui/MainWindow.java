@@ -52,6 +52,7 @@ public class MainWindow extends JFrame {
     private JMenuItem quitItem;
     private JMenuItem undoItem;
     private JMenuItem redoItem;
+    private JMenuItem onlineHelpItem;
     private JMenuItem aboutItem;
 
     /*
@@ -123,8 +124,10 @@ public class MainWindow extends JFrame {
         redoItem.setEnabled(false);
 
         JMenu helpMenu = new JMenu(resource.getString("menu.help.text"));
+        
+        onlineHelpItem = new JMenuItem(actionManager.getAction("onlineHelp"));
         aboutItem = new JMenuItem(actionManager.getAction("about"));
-
+        helpMenu.add(onlineHelpItem);
         helpMenu.add(aboutItem);
 
         mb.add(fileMenu);
@@ -288,6 +291,15 @@ public class MainWindow extends JFrame {
             // is good for debugging only
             e1.printStackTrace();
         }
+    }
+
+    /**
+     * Shows Online Help window.
+     */
+    @Action
+    public void onlineHelp() {
+        new OnlineHelpWindow().setVisible(true);
+        //System.out.println("Online Help");
     }
 
     /**
