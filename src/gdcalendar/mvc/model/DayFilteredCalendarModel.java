@@ -121,9 +121,17 @@ public class DayFilteredCalendarModel extends AbstractModel {
 
                     boolean updated = false;
                     DayEvent updatedValue = (DayEvent) evt.getNewValue();
-                    if (updatedValue != null) {
-                        if (updatedValue.isActiveDuringDay(filter)) {
+                    if (evt.getPropertyName().equals(CalendarModel.EVENT_REPLACED)) {
+                        DayEvent oldValue = (DayEvent) evt.getOldValue();
+                        if (oldValue != null) {
+                            if (oldValue.isActiveDuringDay(filter) || updatedValue.isActiveDuringDay(filter));
                             updated = true;
+                        }
+                    } else {
+                        if (updatedValue != null) {
+                            if (updatedValue.isActiveDuringDay(filter)) {
+                                updated = true;
+                            }
                         }
                     }
 
@@ -135,15 +143,11 @@ public class DayFilteredCalendarModel extends AbstractModel {
                         } else if (evt.getPropertyName().equals(CalendarModel.EVENT_ADDED)) {
                             firePropertyChange(CalendarController.ADD_EVENT, null,
                                     getFilteredEvents());
-                        } else {
+                        } else if (evt.getPropertyName().equals(CalendarModel.EVENT_REPLACED)) {
                             firePropertyChange(CalendarController.FILTERED_EVENTS, null,
                                     getFilteredEvents());
                         }
-                    } else {
-                        if (evt.getPropertyName().equals(CalendarModel.EVENT_REPLACED)) {
-                            firePropertyChange(CalendarController.FILTERED_EVENTS, null,
-                                    getFilteredEvents());
-                        }
+
                     }
                 }
             };
