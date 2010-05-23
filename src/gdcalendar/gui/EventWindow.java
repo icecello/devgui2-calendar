@@ -217,7 +217,6 @@ public class EventWindow extends JDialog {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                addEvent();
                 EventWindow.this.dispose();
             }
         });
