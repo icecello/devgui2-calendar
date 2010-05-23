@@ -144,6 +144,7 @@ public class AnimationDriver {
             }
         };
   
+        
     	timerList.get(threadName).scheduleAtFixedRate(t, 10, (long)1000/(component.preferredFPS()) );
    
     }

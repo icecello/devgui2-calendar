@@ -85,8 +85,6 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     private JPanel detailedView = new JPanel(); //The advanced visual representation of the day
     private String newEventName;        //temporary storage for a new event name
     private JLabel titleLabel;          //Title label, showing the day of the month
-    private JLabel addEventLabel;       //Label, used for adding new events
-    private JLabel removeEventLabel;    //Label, used for removing events
     private CalendarController controller;   //The controller, responsible for updating the
     //connected models
     private ArrayList<JLabel> eventLabels;  //The visual representation of the day events
@@ -132,22 +130,6 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
         Init();
         
         this.view = view;
-        addEventLabel = new JLabel("+");
-        addEventLabel.setFont(new Font("Arial", Font.PLAIN, 18));
-        removeEventLabel = new JLabel("-");
-        removeEventLabel.setFont(new Font("Arial", Font.PLAIN, 18));
-        //If the view is set to none we don't wanna show the add and remove
-        //event labels
-        if (view == CardView.NONE) {
-            addEventLabel.setVisible(false);
-            removeEventLabel.setVisible(false);
-        }
-
-        JPanel eventModifyContainer = new JPanel(new BorderLayout());
-        eventModifyContainer.setBackground(SystemColor.text);
-        eventModifyContainer.add(removeEventLabel, BorderLayout.LINE_START);
-        eventModifyContainer.add(addEventLabel, BorderLayout.LINE_END);
-        add(eventModifyContainer, BorderLayout.PAGE_END);
 
         simpleView.setLayout(new BoxLayout(simpleView, BoxLayout.PAGE_AXIS));
         detailedView.setLayout(new BoxLayout(detailedView, BoxLayout.PAGE_AXIS));
@@ -190,6 +172,20 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
         controller.setFilter(filter);
     }
 
+    /**
+     * set the current color of the indicator triangle in the
+     * top right
+     * @param color
+     */
+    public void setTriangleColor(Color color) {
+    	triangleColor = color;
+    }
+    
+    /**
+     * set the font for the title of this daycard
+     * 
+     * @param font
+     */
     public void setTitleFont(Font font) {
     	titleLabel.setFont(font);
     }
@@ -248,23 +244,20 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     	highlightMarker = marker;
     }
     
+    
+    
+    
+    private ArrayList<Priority> arrayPrioritiesHighlight = new ArrayList<Priority>();
+    private ArrayList<Category> arrayCategoriesHighlight = new ArrayList<Category>();
     /**
      * highlight this daycard if contained events match the
      * specified category
      * 
      * @param category	name of category to match against
      */
-    public void highlight(Category category) {
-    	boolean foundMatch = false;
-    	for (int i = 0; i < events.size(); i++) {
-    		if (events.get(i).getCategory().getName().equals(category.getName())) {
-    			foundMatch = true;
-    		}
-    	}
-    	
-    	if (foundMatch && highlightMarker != Marker.NONE)
-    		isAnimationFinished = false;
-    		AnimationDriver.getInstance().run(this, "priority highlight");
+    public void addHighlight(Category category) {
+    	arrayCategoriesHighlight.add(category);
+    	AnimationDriver.getInstance().run(this, category.getName());
     }
     
     /**
@@ -273,33 +266,19 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
      * 
      * @param prio    priority to match against
      */
-    public void highlight(Priority prio) {
-    	boolean foundMatch = false;
-    	for (int i = 0; i < events.size(); i++) {
-    		if (events.get(i).getPriority() == prio) {
-    			foundMatch = true;
-    		}
-    	}
-    	
-    	if (foundMatch && hasMarker) {
-    		isAnimationFinished = false;
-    		AnimationDriver.getInstance().run(this, "priority highlight");
-    	}
+    public void addHighlight(Priority prio) {
+    	arrayPrioritiesHighlight.add(prio);
+    	AnimationDriver.getInstance().run(this, prio.toString());
     }
     
-    /**
-     *
-     * @see gdcalendar.gui.calendar.daycard.IDayCard#getDate()
-     */
-    @Override
-    public Calendar getDate() {
-        return calendar;
+    public void removeHighlight(Category category) {
+    	arrayCategoriesHighlight.remove(category);
     }
-
-    public void setDate(Calendar date) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    
+    public void removeHighlight(Priority prio) {
+    	arrayPrioritiesHighlight.remove(prio);
     }
-
+    
     /**
      * Get the currenty active view of this day card.
      * This is one of:
@@ -326,18 +305,11 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
         if (view == CardView.SIMPLE) {
             add(simpleView, BorderLayout.CENTER);
             titleLabel.setVisible(true);
-            addEventLabel.setVisible(true);
-            removeEventLabel.setVisible(true);
         } else if (view == CardView.DETAILED) {
             add(detailedView, BorderLayout.CENTER);
             titleLabel.setVisible(true);
-            addEventLabel.setVisible(true);
-            removeEventLabel.setVisible(true);
         } else {
             titleLabel.setVisible(false);
-            addEventLabel.setVisible(false);
-            removeEventLabel.setVisible(false);
-
         }
     }
 
@@ -492,33 +464,6 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
         	titleLabel.setForeground(SystemColor.textText);
         }
     }
-    /**
-     * Add a listener for the add new event component
-     * Note that this is still internal within the CalendarContainer.
-     * @param l
-     */
-    public void addAddEventListener(MouseListener l) {
-        if (addEventLabel == null) {
-            //don't add listeners if empty card
-        } else {
-            addEventLabel.addMouseListener(l);
-        }
-    }
-
-    /**
-     * Add a listener for the remove event component
-     * Note that this is still internal within the CalendarContainer.
-     * @param l
-     */
-    public void addRemoveEventListener(MouseListener l) {
-        if (removeEventLabel == null) {
-            //don't add listeners if empty card
-        } else {
-            removeEventLabel.addMouseListener(l);
-
-        }
-    }
-
     
     /**
      * Add a MouseListener that will be fired whenever
@@ -551,9 +496,26 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
 	public boolean animationFinished() {
 		//cancel the animation if it has finished or if this daycard has no marker
 		//to animate
-		if (isAnimationFinished || highlightMarker == Marker.NONE)
-			return true;
-		return false;
+		isAnimationFinished = true;
+		
+		if (hasMarker) {
+			for (int j = 0; j < events.size(); j++) {
+				System.out.println("inside event loop");
+				for (int i = 0; i < arrayPrioritiesHighlight.size(); i++) {
+					if (arrayPrioritiesHighlight.get(i).toString().equals(events.get(j).getPriority().toString())) {
+						isAnimationFinished = false;
+					}		
+				}
+				
+				for (int i = 0; i < arrayCategoriesHighlight.size(); i++) {
+					if (arrayCategoriesHighlight.get(i).equals(events.get(j).getCategory())) {
+						isAnimationFinished = false;
+					}
+				}
+			}
+		}
+		System.out.println("finished=" + isAnimationFinished);
+		return isAnimationFinished;
 	}
 
 	/*
@@ -576,6 +538,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
 				inc = 0.1f;
 			}
 			triangleColor = new Color(r, g, b);
+			System.out.println("fading");
 		}
 	}
 
