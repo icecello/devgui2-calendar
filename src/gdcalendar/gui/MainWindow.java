@@ -1,5 +1,6 @@
 package gdcalendar.gui;
 
+import gdcalendar.Main;
 import gdcalendar.gui.calendar.*;
 import gdcalendar.logic.AnimationDriver;
 import gdcalendar.mvc.model.*;
@@ -8,19 +9,32 @@ import gdcalendar.xml.Configuration;
 import gdcalendar.xml.XMLUtils;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.ResourceBundle;
 
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
+import javax.swing.JToolBar;
 
 import actionmanager.Action;
 import actionmanager.ActionManager;
@@ -36,6 +50,8 @@ import java.util.Date;
 import java.util.UUID;
 import javax.swing.JLabel;
 import javax.swing.UIManager;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /**
  * MainWindow for a Calendar application. Events are loaded from XML at initialization
@@ -65,7 +81,10 @@ public class MainWindow extends JFrame {
     private CalendarContainer calendarContainer;
     private CalendarModel calendarModel;
     private DayPopupMenu popMenu;
-
+    private JToolBar toolBar;
+    private JButton toolButtonCategory;
+    private JButton toolButtonPriority;
+    
     public MainWindow() throws Exception {
         super("GDCalendar");
         setLayout(new BorderLayout());
@@ -88,7 +107,7 @@ public class MainWindow extends JFrame {
             System.err.println("In MainWindow: Error loading events from file");
         }
         calendarModel = new CalendarModel(events);
-        calendarContainer = new CalendarContainer(cm, calendarModel);
+        calendarContainer = new CalendarContainer(calendarModel);
 
         initMenuBar();
         initListeners();
@@ -99,9 +118,26 @@ public class MainWindow extends JFrame {
         collapsiblePanel.add(new LeftItemPanel(), BorderLayout.PAGE_START, -1);
         add(calendarContainer, BorderLayout.CENTER);
         add(collapsiblePanel, BorderLayout.LINE_START);
+        
+        initHighlightPanel();
         pack();
     }
 
+    void initHighlightPanel() {
+    	JPanel highlightPanel = new JPanel();
+        add(highlightPanel, BorderLayout.PAGE_END);
+        
+        toolBar = new JToolBar();
+        
+        toolButtonCategory = new JButton(actionManager.getAction("highlightCategoryPopup"));
+        toolButtonPriority = new JButton(actionManager.getAction("highlightPriorityPopup"));
+        toolBar.add(toolButtonCategory);
+        toolBar.add(toolButtonPriority);
+        
+        highlightPanel.add(toolBar);
+        
+    }
+    
     private void initMenuBar() {
         JMenuBar mb = new JMenuBar();
 
@@ -114,13 +150,11 @@ public class MainWindow extends JFrame {
         undoItem = new JMenuItem(actionManager.getAction("doUndo"));
         redoItem = new JMenuItem(actionManager.getAction("doRedo"));
         JMenuItem preferencesItem = new JMenuItem(actionManager.getAction("showPreferences"));
-        JMenuItem showPrioItem = new JMenuItem(actionManager.getAction("showPrio"));
 
         editMenu.add(undoItem);
         editMenu.add(redoItem);
         editMenu.add(new JSeparator());
         editMenu.add(preferencesItem);
-        editMenu.add(showPrioItem);
         undoItem.setEnabled(false);
         redoItem.setEnabled(false);
 
@@ -276,16 +310,6 @@ public class MainWindow extends JFrame {
     }
 
     /**
-     * Action that invokes the highlight() method of the
-     * CalendarContainer to animate any daycards that
-     * contain events matching the specified priority.
-     */
-    @Action
-    public void showPrio() {
-        calendarContainer.highlight(Priority.LOW);
-    }
-
-    /**
      * Create and show a preferences window that
      * currently only supports changing the main
      * window's opacity.
@@ -346,5 +370,86 @@ public class MainWindow extends JFrame {
     @Action
     public void about() {
         new AboutWindow(this).setVisible(true);
+    }
+    
+    
+    private HashMap<Category, Boolean> checkedCategories = new HashMap<Category, Boolean>();
+    private HashMap<Priority, Boolean> checkedPriorities = new HashMap<Priority, Boolean>();
+    
+    @Action
+    public void highlightCategoryPopup() {
+    	final JPopupMenu menu = new JPopupMenu();
+    	
+    	Collection<Category> c = Main.categories.values();
+    	
+    	Iterator<Category> iter = c.iterator();
+    	while (iter.hasNext()) {
+    		
+    		final Category cat = iter.next();
+    		final JCheckBoxMenuItem item = new JCheckBoxMenuItem();
+    		if (checkedCategories.containsKey(cat)) {
+    			item.setState(checkedCategories.get(cat));
+    		}
+    		
+    		item.setAction(new AbstractAction(cat.getName()) {
+				
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					checkedCategories.put(cat, item.getState());
+					if (item.getState()) {
+						calendarContainer.addHighlight(cat);
+					} else {
+						AnimationDriver.getInstance().stopThread(cat.getName());
+						calendarContainer.removeHighlight(cat);
+						calendarContainer.setTriangleColor(new Color(0,100,0));
+					}
+				}
+			});
+
+    		menu.add(item);
+    	}
+    	
+    	Rectangle rect = toolButtonCategory.getBounds();
+        Point pt = new Point(rect.x, rect.y + rect.height);
+        pt = toolBar.getLocationOnScreen();
+        menu.show(this, pt.x, pt.y);
+        
+        
+    }
+    
+    @Action
+    public void highlightPriorityPopup() {
+    	final JPopupMenu menu = new JPopupMenu();
+    	final Priority[] p = Priority.values();
+    	
+    	for (int i = 0; i < p.length; i++) {
+    		final int ii = i;
+	    	final JCheckBoxMenuItem item = new JCheckBoxMenuItem();
+	    	if (checkedPriorities.containsKey(p[i])) {
+	    		item.setState(checkedPriorities.get(p[i]));
+	    	}
+	    	
+	    	item.setAction(new AbstractAction(p[i].name()) {
+	    		
+	    		@Override
+	    		public void actionPerformed(ActionEvent e) {
+	    			checkedPriorities.put(p[ii], item.getState());
+	    			if (item.getState()) {
+	    				calendarContainer.addHighlight(p[ii]);
+	    			} else {
+	    				AnimationDriver.getInstance().stopThread(p[ii].toString());
+	    				calendarContainer.removeHighlight(p[ii]);
+	    				calendarContainer.setTriangleColor(new Color(0,100,0));
+	    			}
+	    		}
+	    	});
+	    	menu.add(item);
+    	}
+    	
+    	
+    	Rectangle rect = toolButtonPriority.getBounds();
+        Point pt = new Point(rect.x, rect.y + rect.height);
+        Point pt2 = toolBar.getLocationOnScreen();
+        menu.show(this, pt2.x, pt2.y);
     }
 }

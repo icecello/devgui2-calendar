@@ -15,10 +15,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
-import javax.swing.JSpinner.DateEditor;
+
 
 import commandmanager.CommandManager;
-import gdcalendar.gui.calendar.daycard.DayPopupMenu;
 import gdcalendar.gui.calendar.daycard.MonthDayCard.CardView;
 import gdcalendar.gui.calendar.daycard.MonthDayCard.Marker;
 
@@ -78,7 +77,6 @@ public class CalendarContainer extends JPanel {
     //|_#_|_#_|_#_|_#_|_#_|_#_|_#_|
     //|_#_|_#_|_#_|_#_|_#_|_#_|_#_|
     private Calendar cal;
-    private CommandManager undoManager;
     private CardView dayViews = CardView.SIMPLE;
     private ArrayList<CalendarController> controllers = new ArrayList<CalendarController>();
     private ArrayList<MonthDayCard> views = new ArrayList<MonthDayCard>();
@@ -94,8 +92,7 @@ public class CalendarContainer extends JPanel {
      * 
      * @param undoManager		command manager to use for this calendar for handling all commands
      */
-    public CalendarContainer(CommandManager undoManager, CalendarModel calendarModel) {
-        this.undoManager = undoManager;
+    public CalendarContainer(CalendarModel calendarModel) {
         this.calendarModel = calendarModel;
         setLayout(new BorderLayout());
         topPanel = new JPanel(new BorderLayout());
@@ -146,6 +143,11 @@ public class CalendarContainer extends JPanel {
         setDayFont(new Font("Arial", Font.PLAIN, 16));
     }
 
+    public void setTriangleColor(Color color) {
+    	for (int i = 0; i < views.size(); i++) {
+    		views.get(i).setTriangleColor(color);
+    	}
+    }
     /**
      * Set the background color for the calendar, which means
      * the background of all days.
@@ -267,9 +269,20 @@ public class CalendarContainer extends JPanel {
      * 
      * @param category		name of category to match against
      */
-    public void highlight(Category category) {
+    public void addHighlight(Category category) {
         for (int i = 0; i < views.size(); i++) {
-            views.get(i).highlight(category);
+            views.get(i).addHighlight(category);
+        }
+    }
+    
+    /**
+     * remove the specified category from the list of
+     * categories to highlight
+     * @param category
+     */
+    public void removeHighlight(Category category) {
+    	for (int i = 0; i < views.size(); i++) {
+            views.get(i).removeHighlight(category);
         }
     }
 
@@ -279,9 +292,20 @@ public class CalendarContainer extends JPanel {
      * 
      * @param prio			priority to match against
      */
-    public void highlight(Priority prio) {
+    public void addHighlight(Priority prio) {
         for (int i = 0; i < views.size(); i++) {
-            views.get(i).highlight(prio);
+            views.get(i).addHighlight(prio);
+        }
+    }
+    
+    /**
+     * remove specified priority from the list of priorities
+     * to highlight
+     * @param prio
+     */
+    public void removeHighlight(Priority prio) {
+        for (int i = 0; i < views.size(); i++) {
+            views.get(i).removeHighlight(prio);
         }
     }
 
@@ -297,37 +321,6 @@ public class CalendarContainer extends JPanel {
 
             DayFilteredCalendarModel model = new DayFilteredCalendarModel();
             daycard.setBorder(BorderFactory.createLineBorder(new Color(240,240,240)));
-            
-            /*
-             * as mentioned in MonthDayCard previously, this is a temporary way of adding new events
-             * we would like a method for the user to specify his data...
-             */
-            daycard.addAddEventListener(new MouseAdapter() {
-
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    DayEvent newEvent = new DayEvent("New Event", new Date(110, 4, 13, 10, 0), new Date(110, 4, 16, 11, 0));
-                    CalendarChangeEvent changeEvent = new CalendarChangeEvent(newEvent, 0, CalendarChangeEvent.EventAdd, 0);
-                    undoManager.execute(new AddEventCommand(controller, newEvent));
-                    fireDataChangedEvent(changeEvent);
-                }
-            });
-
-            daycard.addRemoveEventListener(new MouseAdapter() {
-
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    try {
-                        //undoManager.execute(new RemoveEventCommand(controller))
-                        CalendarChangeEvent changeEvent = new CalendarChangeEvent(null, 0, CalendarChangeEvent.EventRemove, 0);
-
-                        undoManager.removeLast();
-                        fireDataChangedEvent(changeEvent);
-                    } catch (Exception e1) {
-                    }
-                }
-            });
-
 
             model.setRealCalendarModel(calendarModel);
 
