@@ -3,38 +3,17 @@
 
 <calendar>
   <dayEvent>
-    <name>Meeting</name>
-    <startDate>2010-05-23 20:17</startDate>
-    <endDate>2010-05-23 22:17</endDate>
+    <name>dgfdgdgfdg</name>
+    <startDate>2010-05-23 15:58</startDate>
+    <endDate>2010-05-23 16:58</endDate>
     <category>category1</category>
     <priority>MEDIUM</priority>
   </dayEvent>
   <dayEvent>
-    <name>Tomas</name>
-    <startDate>2010-05-22 17:41</startDate>
-    <endDate>2010-05-22 18:41</endDate>
+    <name>hey oh (snow...)</name>
+    <startDate>2010-05-25 16:25</startDate>
+    <endDate>2010-05-27 17:25</endDate>
     <category>category1</category>
-    <priority>HIGH</priority>
-  </dayEvent>
-  <dayEvent>
-    <name>New Event</name>
-    <startDate>2010-05-13 10:00</startDate>
-    <endDate>2010-05-16 11:00</endDate>
-    <category>none</category>
-    <priority>LOW</priority>
-  </dayEvent>
-  <dayEvent>
-    <name>New Event</name>
-    <startDate>2010-05-11 00:00</startDate>
-    <endDate>2010-05-12 00:00</endDate>
-    <category>category1</category>
-    <priority>LOW</priority>
-  </dayEvent>
-  <dayEvent>
-    <name>New Event</name>
-    <startDate>2010-05-13 10:00</startDate>
-    <endDate>2010-05-16 11:00</endDate>
-    <category>none</category>
     <priority>LOW</priority>
   </dayEvent>
 </calendar>
