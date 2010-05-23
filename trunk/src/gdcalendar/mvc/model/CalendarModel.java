@@ -12,17 +12,18 @@ import java.util.UUID;
  * @author Håkan, Tomas
  */
 public class CalendarModel extends AbstractModel {
+
     public static String EVENT_ADDED = "eventAdded";
     public static String EVENT_REMOVED = "eventRemoved";
-
+    public static String EVENT_REPLACED = "eventReplaced";
     //HashMap containing all DayEvents for the calendar
     private HashMap<UUID, DayEvent> dayMap = new HashMap<UUID, DayEvent>();
 
     public CalendarModel() {
     }
 
-    public CalendarModel(ArrayList<DayEvent> events){
-        for(DayEvent event: events){
+    public CalendarModel(ArrayList<DayEvent> events) {
+        for (DayEvent event : events) {
             dayMap.put(event.getID(), event);
         }
     }
@@ -46,9 +47,24 @@ public class CalendarModel extends AbstractModel {
     public DayEvent removeDayEvent(UUID eventID) {
         //Tell all models connected to this model that it has been updated
         final DayEvent event = dayMap.remove(eventID);
-        firePropertyChange(CalendarModel.EVENT_REMOVED, null,event);
+        firePropertyChange(CalendarModel.EVENT_REMOVED, null, event);
 
         return event;
+    }
+
+    /**
+     * Replace the event specified by the eventID by the events supplied.
+     *
+     * @param eventID	The ID that uniquely identifies a DayEvent to be replaced
+     * @return 		The event that should replace the old event
+     */
+    public DayEvent replaceDayEvent(UUID eventID, DayEvent editedEvent) {
+        DayEvent oldEvent = dayMap.remove(eventID);
+        dayMap.put(editedEvent.getID(), editedEvent);
+        //Tell all models connected to this model that it has been updated
+        firePropertyChange(CalendarModel.EVENT_REPLACED, oldEvent, editedEvent);
+
+        return oldEvent;
     }
 
     /**

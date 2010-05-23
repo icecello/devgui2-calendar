@@ -6,13 +6,8 @@ package gdcalendar.gui.calendar.daycard;
 
 import actionmanager.Action;
 import actionmanager.ActionManager;
-import gdcalendar.gui.AddEventWindow;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.Date;
 import java.util.ResourceBundle;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -24,10 +19,10 @@ import javax.swing.JSeparator;
  */
 public class DayPopupMenu extends JPopupMenu {
 
-    public static final String ADD = "add";
-    public static final String VIEW = "view";
-    public static final String EDIT = "edit";
-    public static final String DELETE = "delete";
+    public static final String ADD = "Add";
+    public static final String VIEW = "View";
+    public static final String EDIT = "Edit";
+    public static final String DELETE = "Delete";
 
     protected DayPopupMenu popup = this;
     private ActionManager actionManager;

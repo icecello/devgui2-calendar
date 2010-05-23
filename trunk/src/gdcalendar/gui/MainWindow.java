@@ -42,7 +42,7 @@ import actionmanager.ActionManager;
 import commandmanager.CommandManager;
 import gdcalendar.gui.calendar.daycard.DayPopupMenu;
 import gdcalendar.gui.calendar.daycard.MonthDayCard.Marker;
-import gdcalendar.mvc.model.Category;
+import gdcalendar.mvc.controller.CalendarController;
 import gdcalendar.mvc.model.DayEvent.Priority;
 import java.awt.Dimension;
 import java.beans.PropertyChangeListener;
@@ -100,7 +100,6 @@ public class MainWindow extends JFrame {
         }
 
         ArrayList<DayEvent> events = null;
-        ArrayList<Category> categories = null;
         try {
             events = XMLUtils.loadDayEvents(Configuration.getProperty("calendar"));
         } catch (Exception e) {
@@ -159,7 +158,7 @@ public class MainWindow extends JFrame {
         redoItem.setEnabled(false);
 
         JMenu helpMenu = new JMenu(resource.getString("menu.help.text"));
-        
+
         onlineHelpItem = new JMenuItem(actionManager.getAction("onlineHelp"));
         aboutItem = new JMenuItem(actionManager.getAction("about"));
         helpMenu.add(onlineHelpItem);
@@ -271,7 +270,7 @@ public class MainWindow extends JFrame {
                 String evtName = evt.getPropertyName();
                 if (evtName.equals(DayPopupMenu.ADD)) {
                     //Create a new addEvent window
-                    AddEventWindow addEventWindow = new AddEventWindow(new Date());
+                    EventWindow addEventWindow = new EventWindow(new Date(),null, DayPopupMenu.ADD);
                     addEventWindow.addPropertyChangeListener(new PropertyChangeListener() {
 
                         public void propertyChange(PropertyChangeEvent evt) {
@@ -279,11 +278,27 @@ public class MainWindow extends JFrame {
                         }
                     });
                     addEventWindow.setVisible(true);
+
+
                 } else if (evtName.equals(DayPopupMenu.DELETE)) {
                     String ID = ((JLabel) popMenu.getInvoker()).getName();
                     calendarModel.removeDayEvent(UUID.fromString(ID));
+
+
                 } else if (evtName.equals(DayPopupMenu.EDIT)) {
-                    System.out.println("Edit");
+                    //Create a new addEvent window
+                    String ID = ((JLabel) popMenu.getInvoker()).getName();
+                    final DayEvent d = calendarModel.getDayEvent(UUID.fromString(ID));
+                    EventWindow editEventWindow = new EventWindow(new Date(), d, DayPopupMenu.EDIT);
+                    
+                    editEventWindow.addPropertyChangeListener(new PropertyChangeListener() {
+
+                        public void propertyChange(PropertyChangeEvent evt) {
+                            DayEvent tempEvent = (DayEvent)evt.getNewValue();
+                            calendarModel.replaceDayEvent(d.getID(), tempEvent);
+                        }
+                    });
+                    editEventWindow.setVisible(true);
                 } else if (evtName.equals(DayPopupMenu.VIEW)) {
                     System.out.println("View");
                 }
