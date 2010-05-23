@@ -42,7 +42,6 @@ import actionmanager.ActionManager;
 import commandmanager.CommandManager;
 import gdcalendar.gui.calendar.daycard.DayPopupMenu;
 import gdcalendar.gui.calendar.daycard.MonthDayCard.Marker;
-import gdcalendar.mvc.controller.CalendarController;
 import gdcalendar.mvc.model.DayEvent.Priority;
 import java.awt.Dimension;
 import java.beans.PropertyChangeListener;
@@ -50,8 +49,6 @@ import java.util.Date;
 import java.util.UUID;
 import javax.swing.JLabel;
 import javax.swing.UIManager;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 /**
  * MainWindow for a Calendar application. Events are loaded from XML at initialization
@@ -82,9 +79,11 @@ public class MainWindow extends JFrame {
     private CalendarModel calendarModel;
     private DayPopupMenu popMenu;
     private JToolBar toolBar;
+    private CollapsiblePanel collapsiblePanel;
+    private JPanel highlightPanel;
     private JButton toolButtonCategory;
     private JButton toolButtonPriority;
-    
+
     public MainWindow() throws Exception {
         super("GDCalendar");
         setLayout(new BorderLayout());
@@ -110,33 +109,35 @@ public class MainWindow extends JFrame {
 
         initMenuBar();
         initListeners();
+        initHighlightPanel();
 
-        CollapsiblePanel collapsiblePanel = new CollapsiblePanel(CollapsiblePanel.EAST);
+        collapsiblePanel = new CollapsiblePanel(CollapsiblePanel.NORTH);
         collapsiblePanel.setLayout(new BorderLayout());
-        collapsiblePanel.setCollapsButtonSize(5);
-        collapsiblePanel.add(new LeftItemPanel(), BorderLayout.PAGE_START, -1);
+        collapsiblePanel.setCollapsButtonSize(7);
+        add(collapsiblePanel, BorderLayout.PAGE_END);
+        collapsiblePanel.add(highlightPanel);
+
         add(calendarContainer, BorderLayout.CENTER);
-        add(collapsiblePanel, BorderLayout.LINE_START);
-        
+
+
         initHighlightPanel();
         pack();
     }
 
     void initHighlightPanel() {
-    	JPanel highlightPanel = new JPanel();
-        add(highlightPanel, BorderLayout.PAGE_END);
-        
+        highlightPanel = new JPanel();
+
         toolBar = new JToolBar();
-        
+
         toolButtonCategory = new JButton(actionManager.getAction("highlightCategoryPopup"));
         toolButtonPriority = new JButton(actionManager.getAction("highlightPriorityPopup"));
         toolBar.add(toolButtonCategory);
         toolBar.add(toolButtonPriority);
-        
+
         highlightPanel.add(toolBar);
-        
+
     }
-    
+
     private void initMenuBar() {
         JMenuBar mb = new JMenuBar();
 
@@ -270,7 +271,7 @@ public class MainWindow extends JFrame {
                 String evtName = evt.getPropertyName();
                 if (evtName.equals(DayPopupMenu.ADD)) {
                     //Create a new addEvent window
-                    EventWindow addEventWindow = new EventWindow(new Date(),null, DayPopupMenu.ADD);
+                    EventWindow addEventWindow = new EventWindow(new Date(), null, DayPopupMenu.ADD);
                     addEventWindow.addPropertyChangeListener(new PropertyChangeListener() {
 
                         public void propertyChange(PropertyChangeEvent evt) {
@@ -290,11 +291,11 @@ public class MainWindow extends JFrame {
                     String ID = ((JLabel) popMenu.getInvoker()).getName();
                     final DayEvent d = calendarModel.getDayEvent(UUID.fromString(ID));
                     EventWindow editEventWindow = new EventWindow(new Date(), d, DayPopupMenu.EDIT);
-                    
+
                     editEventWindow.addPropertyChangeListener(new PropertyChangeListener() {
 
                         public void propertyChange(PropertyChangeEvent evt) {
-                            DayEvent tempEvent = (DayEvent)evt.getNewValue();
+                            DayEvent tempEvent = (DayEvent) evt.getNewValue();
                             calendarModel.replaceDayEvent(d.getID(), tempEvent);
                         }
                     });
@@ -386,83 +387,81 @@ public class MainWindow extends JFrame {
     public void about() {
         new AboutWindow(this).setVisible(true);
     }
-    
-    
     private HashMap<Category, Boolean> checkedCategories = new HashMap<Category, Boolean>();
     private HashMap<Priority, Boolean> checkedPriorities = new HashMap<Priority, Boolean>();
-    
+
     @Action
     public void highlightCategoryPopup() {
-    	final JPopupMenu menu = new JPopupMenu();
-    	
-    	Collection<Category> c = Main.categories.values();
-    	
-    	Iterator<Category> iter = c.iterator();
-    	while (iter.hasNext()) {
-    		
-    		final Category cat = iter.next();
-    		final JCheckBoxMenuItem item = new JCheckBoxMenuItem();
-    		if (checkedCategories.containsKey(cat)) {
-    			item.setState(checkedCategories.get(cat));
-    		}
-    		
-    		item.setAction(new AbstractAction(cat.getName()) {
-				
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					checkedCategories.put(cat, item.getState());
-					if (item.getState()) {
-						calendarContainer.addHighlight(cat);
-					} else {
-						AnimationDriver.getInstance().stopThread(cat.getName());
-						calendarContainer.removeHighlight(cat);
-						calendarContainer.setTriangleColor(new Color(0,100,0));
-					}
-				}
-			});
+        final JPopupMenu menu = new JPopupMenu();
 
-    		menu.add(item);
-    	}
-    	
-    	Rectangle rect = toolButtonCategory.getBounds();
+        Collection<Category> c = Main.categories.values();
+
+        Iterator<Category> iter = c.iterator();
+        while (iter.hasNext()) {
+
+            final Category cat = iter.next();
+            final JCheckBoxMenuItem item = new JCheckBoxMenuItem();
+            if (checkedCategories.containsKey(cat)) {
+                item.setState(checkedCategories.get(cat));
+            }
+
+            item.setAction(new AbstractAction(cat.getName()) {
+
+                @Override
+                public void actionPerformed(ActionEvent arg0) {
+                    checkedCategories.put(cat, item.getState());
+                    if (item.getState()) {
+                        calendarContainer.addHighlight(cat);
+                    } else {
+                        AnimationDriver.getInstance().stopThread(cat.getName());
+                        calendarContainer.removeHighlight(cat);
+                        calendarContainer.setTriangleColor(new Color(0, 100, 0));
+                    }
+                }
+            });
+
+            menu.add(item);
+        }
+
+        Rectangle rect = toolButtonCategory.getBounds();
         Point pt = new Point(rect.x, rect.y + rect.height);
         pt = toolBar.getLocationOnScreen();
         menu.show(this, pt.x, pt.y);
-        
-        
+
+
     }
-    
+
     @Action
     public void highlightPriorityPopup() {
-    	final JPopupMenu menu = new JPopupMenu();
-    	final Priority[] p = Priority.values();
-    	
-    	for (int i = 0; i < p.length; i++) {
-    		final int ii = i;
-	    	final JCheckBoxMenuItem item = new JCheckBoxMenuItem();
-	    	if (checkedPriorities.containsKey(p[i])) {
-	    		item.setState(checkedPriorities.get(p[i]));
-	    	}
-	    	
-	    	item.setAction(new AbstractAction(p[i].name()) {
-	    		
-	    		@Override
-	    		public void actionPerformed(ActionEvent e) {
-	    			checkedPriorities.put(p[ii], item.getState());
-	    			if (item.getState()) {
-	    				calendarContainer.addHighlight(p[ii]);
-	    			} else {
-	    				AnimationDriver.getInstance().stopThread(p[ii].toString());
-	    				calendarContainer.removeHighlight(p[ii]);
-	    				calendarContainer.setTriangleColor(new Color(0,100,0));
-	    			}
-	    		}
-	    	});
-	    	menu.add(item);
-    	}
-    	
-    	
-    	Rectangle rect = toolButtonPriority.getBounds();
+        final JPopupMenu menu = new JPopupMenu();
+        final Priority[] p = Priority.values();
+
+        for (int i = 0; i < p.length; i++) {
+            final int ii = i;
+            final JCheckBoxMenuItem item = new JCheckBoxMenuItem();
+            if (checkedPriorities.containsKey(p[i])) {
+                item.setState(checkedPriorities.get(p[i]));
+            }
+
+            item.setAction(new AbstractAction(p[i].name()) {
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    checkedPriorities.put(p[ii], item.getState());
+                    if (item.getState()) {
+                        calendarContainer.addHighlight(p[ii]);
+                    } else {
+                        AnimationDriver.getInstance().stopThread(p[ii].toString());
+                        calendarContainer.removeHighlight(p[ii]);
+                        calendarContainer.setTriangleColor(new Color(0, 100, 0));
+                    }
+                }
+            });
+            menu.add(item);
+        }
+
+
+        Rectangle rect = toolButtonPriority.getBounds();
         Point pt = new Point(rect.x, rect.y + rect.height);
         Point pt2 = toolBar.getLocationOnScreen();
         menu.show(this, pt2.x, pt2.y);

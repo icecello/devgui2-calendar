@@ -139,6 +139,11 @@ public class DayFilteredCalendarModel extends AbstractModel {
                             firePropertyChange(CalendarController.FILTERED_EVENTS, null,
                                     getFilteredEvents());
                         }
+                    } else {
+                        if (evt.getPropertyName().equals(CalendarModel.EVENT_REPLACED)) {
+                            firePropertyChange(CalendarController.FILTERED_EVENTS, null,
+                                    getFilteredEvents());
+                        }
                     }
                 }
             };
