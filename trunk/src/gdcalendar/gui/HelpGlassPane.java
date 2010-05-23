@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package gdcalendar.gui;
 
 import gdcalendar.logic.AnimationDriver;
@@ -12,6 +11,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
@@ -41,9 +41,18 @@ public class HelpGlassPane extends JComponent implements IAnimatedComponent {
     private void loadImages() {
         BufferedImage img = null;
         imgDir = new File(System.getProperty("user.dir") + "\\src\\helpimages\\addevent");
-        imgFiles = imgDir.listFiles();
+        imgFiles = imgDir.listFiles(new FilenameFilter() {
 
-        for (int i=0; i<imgFiles.length; i++) {
+            public boolean accept(File dir, String name) {
+                if (name.startsWith(".")) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        });
+
+        for (int i = 0; i < imgFiles.length; i++) {
             try {
                 img = ImageIO.read(imgFiles[i]);
                 imageList.add(img);
@@ -61,13 +70,12 @@ public class HelpGlassPane extends JComponent implements IAnimatedComponent {
     @Override
     public Dimension getPreferredSize() {
         /*if (img == null) {
-             return new Dimension(100,100);
+        return new Dimension(100,100);
         } else {
-           return new Dimension(img.getWidth(null), img.getHeight(null));
-       }*/
+        return new Dimension(img.getWidth(null), img.getHeight(null));
+        }*/
         return new Dimension(600, 600);
     }
-
     private int step = 0;
     private boolean isAnimationFinished = false;
     private boolean hasMarker = true;
@@ -75,11 +83,11 @@ public class HelpGlassPane extends JComponent implements IAnimatedComponent {
 
     @Override
     public boolean animationFinished() {
-            //cancel the animation if it has finished or if this daycard has no marker
-            //to animate
-            //if (isAnimationFinished || highlightMarker == Marker.NONE)
-            //	return true;
-            return false;
+        //cancel the animation if it has finished or if this daycard has no marker
+        //to animate
+        //if (isAnimationFinished || highlightMarker == Marker.NONE)
+        //	return true;
+        return false;
     }
 
     /*
@@ -99,12 +107,12 @@ public class HelpGlassPane extends JComponent implements IAnimatedComponent {
 
     @Override
     public void displayAnimatation() {
-            this.repaint();
+        this.repaint();
     }
 
     @Override
     public double preferredFPS() {
-            return 0.3;
+        return 0.3;
     }
 
     @Override
