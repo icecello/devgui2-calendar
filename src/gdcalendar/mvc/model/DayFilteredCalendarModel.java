@@ -127,14 +127,16 @@ public class DayFilteredCalendarModel extends AbstractModel {
                         }
                     }
 
-
-//                    //If the filtered data has changed, notify the connected controllers
+                    //If the filtered data has changed, notify the connected controllers
                     if (updated) {
                         if (evt.getPropertyName().equals(CalendarModel.EVENT_REMOVED)) {
                             firePropertyChange(CalendarController.REMOVE_EVENT, null,
                                     getFilteredEvents());
-                        } else {
+                        } else if (evt.getPropertyName().equals(CalendarModel.EVENT_ADDED)) {
                             firePropertyChange(CalendarController.ADD_EVENT, null,
+                                    getFilteredEvents());
+                        } else {
+                            firePropertyChange(CalendarController.FILTERED_EVENTS, null,
                                     getFilteredEvents());
                         }
                     }

@@ -34,7 +34,7 @@ import javax.swing.SwingUtilities;
  *
  * @author Tomas
  */
-public class AddEventWindow extends JDialog {
+public class EventWindow extends JDialog {
 
     private JTextField titleField;
     private JSpinner startDateSpinner;
@@ -48,8 +48,11 @@ public class AddEventWindow extends JDialog {
     private JButton cancelButton;
     private Calendar calendar;
 
-    public AddEventWindow(Date date) {
-        setTitle("Add New Event");
+    private String notificationMessage;
+
+    public EventWindow(Date date, DayEvent dayEvent, String notificationString) {
+        setTitle(notificationString +" Event");
+        this.notificationMessage = notificationString;
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setResizable(false);
 
@@ -213,17 +216,24 @@ public class AddEventWindow extends JDialog {
 
             @Override
             public void mousePressed(MouseEvent e) {
-                AddEventWindow.this.dispose();
+                EventWindow.this.dispose();
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                AddEventWindow.this.dispose();
+                EventWindow.this.dispose();
             }
         });
         buttonPanel.add(saveButton);
         buttonPanel.add(cancelButton);
 
+
+        if(dayEvent != null){
+            titleField.setText(dayEvent.getEventName());
+            categoryComboBox.setSelectedItem(dayEvent.getCategory());
+            priorityComboBox.setSelectedItem(dayEvent.getPriority());
+            descTextArea.setText(dayEvent.getDescription());
+        }
         // ADD THE PANELS //
         c.gridx = 0;
         c.gridy = 0;
@@ -288,12 +298,12 @@ public class AddEventWindow extends JDialog {
 
         DayEvent dayEvent = new DayEvent(name, startDate, endDate, category, prio);
         dayEvent.setDescription(desc);
-        firePropertyChange("add", null, dayEvent);
+        firePropertyChange(notificationMessage, null, dayEvent);
     }
 
     public static void main(String[] args) {
         Main.categories = XMLUtils.loadCategories(Configuration.getProperty("categories"));
-        AddEventWindow window = new AddEventWindow(new Date());
+        EventWindow window = new EventWindow(new Date(),null, "Edit");
         window.setVisible(true);
     }
 }
