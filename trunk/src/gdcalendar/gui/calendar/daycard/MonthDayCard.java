@@ -519,7 +519,6 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
 		shouldAnimate = false;
 		if (hasMarker) {
 			for (int j = 0; j < events.size(); j++) {
-				System.out.println("inside event loop");
 				for (int i = 0; i < arrayPrioritiesHighlight.size(); i++) {
 					if (arrayPrioritiesHighlight.get(i).toString().equals(events.get(j).getPriority().toString())) {
 						shouldAnimate = true;
@@ -549,7 +548,6 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
 					inc = 0.2f;
 				}
 				triangleColor = new Color(r, g, b);
-				System.out.println("fading");
 			}
 		} else {
 			cleanup();
