@@ -30,6 +30,7 @@ import gdcalendar.gui.calendar.daycard.DayPopupMenu;
 import gdcalendar.gui.calendar.daycard.MonthDayCard.Marker;
 import gdcalendar.mvc.model.Category;
 import gdcalendar.mvc.model.DayEvent.Priority;
+import java.awt.Dimension;
 import java.beans.PropertyChangeListener;
 import java.util.UUID;
 import javax.swing.JLabel;
@@ -67,6 +68,7 @@ public class MainWindow extends JFrame {
         super("GDCalendar");
         setLayout(new BorderLayout());
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setMinimumSize(new Dimension(700, 500));
 
         resource = ResourceBundle.getBundle("gdcalendar.resource_en_US");
         actionManager = new ActionManager(this, resource);
