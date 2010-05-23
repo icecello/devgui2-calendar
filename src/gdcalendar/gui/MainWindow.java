@@ -32,6 +32,7 @@ import gdcalendar.mvc.model.Category;
 import gdcalendar.mvc.model.DayEvent.Priority;
 import java.awt.Dimension;
 import java.beans.PropertyChangeListener;
+import java.util.Date;
 import java.util.UUID;
 import javax.swing.JLabel;
 import javax.swing.UIManager;
@@ -90,7 +91,7 @@ public class MainWindow extends JFrame {
         calendarContainer = new CalendarContainer(cm, calendarModel);
 
         initMenuBar();
-        initListners();
+        initListeners();
 
         CollapsiblePanel collapsiblePanel = new CollapsiblePanel(CollapsiblePanel.EAST);
         collapsiblePanel.setLayout(new BorderLayout());
@@ -141,8 +142,11 @@ public class MainWindow extends JFrame {
      * for the calendar container (pop-up menu & datachange listner) and
      * a window listner
      */
-    private void initListners() {
+    private void initListeners() {
+        //Pop-menu shown when right click the daycards
         popMenu = new DayPopupMenu();
+
+        //Make the pop-up show when the user press an event
         calendarContainer.addEventMouseListener(new MouseAdapter() {
             //TODO: add commandmananger as parameter to daypopupmenu
 
@@ -158,6 +162,32 @@ public class MainWindow extends JFrame {
 
             private void maybeShowPopup(MouseEvent e) {
                 if (e.isPopupTrigger()) {
+                    popMenu.setEditEnabled(true);
+                    popMenu.setDeleteEnabled(true);
+                    popMenu.show(e.getComponent(),
+                            e.getX(), e.getY());
+                }
+            }
+        });
+        //Make the pop-up show when pressing a dayCard
+        calendarContainer.addDayMouseListener(new MouseAdapter() {
+            //TODO: add commandmananger as parameter to daypopupmenu
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                maybeShowPopup(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                maybeShowPopup(e);
+            }
+
+            private void maybeShowPopup(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    //Gray out edit and delete functionality
+                    popMenu.setEditEnabled(false);
+                    popMenu.setDeleteEnabled(false);
                     popMenu.show(e.getComponent(),
                             e.getX(), e.getY());
                 }
@@ -200,22 +230,30 @@ public class MainWindow extends JFrame {
                 XMLUtils.saveDayEvents(events);
             }
         });
+        //Take care of propertychanges from the pop-up menu
         popMenu.addPropertyChangeListener(new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
                 String evtName = evt.getPropertyName();
                 if (evtName.equals(DayPopupMenu.ADD)) {
-                    calendarModel.addDayEvent((DayEvent) evt.getNewValue());
+                    //Create a new addEvent window
+                    AddEventWindow addEventWindow = new AddEventWindow(new Date());
+                    addEventWindow.addPropertyChangeListener(new PropertyChangeListener() {
+
+                        public void propertyChange(PropertyChangeEvent evt) {
+                            calendarModel.addDayEvent((DayEvent) evt.getNewValue());
+                        }
+                    });
+                    addEventWindow.setVisible(true);
                 } else if (evtName.equals(DayPopupMenu.DELETE)) {
                     String ID = ((JLabel) popMenu.getInvoker()).getName();
                     calendarModel.removeDayEvent(UUID.fromString(ID));
                 } else if (evtName.equals(DayPopupMenu.EDIT)) {
                     System.out.println("Edit");
-                } else if (evtName.equals(DayPopupMenu.VIEW)){
+                } else if (evtName.equals(DayPopupMenu.VIEW)) {
                     System.out.println("View");
                 }
             }
-
         });
     }
 

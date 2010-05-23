@@ -68,15 +68,7 @@ public class DayPopupMenu extends JPopupMenu {
      */
     @Action
     public void addEvent() {
-        // Should send the date of the current DayCard.
-        AddEventWindow addEventWindow = new AddEventWindow(new Date());
-        addEventWindow.addPropertyChangeListener(new PropertyChangeListener() {
-
-            public void propertyChange(PropertyChangeEvent evt) {
-                propSupport.firePropertyChange(ADD, evt.getOldValue(), evt.getNewValue());
-            }
-        });
-        addEventWindow.setVisible(true);
+        propSupport.firePropertyChange(ADD, null, null);
     }
 
     /**
@@ -98,5 +90,13 @@ public class DayPopupMenu extends JPopupMenu {
     @Override
     public void addPropertyChangeListener(PropertyChangeListener l) {
         propSupport.addPropertyChangeListener(l);
+    }
+
+    public void setEditEnabled(boolean value){
+        actionManager.getAction("editEvent").setEnabled(value);
+    }
+
+    public void setDeleteEnabled(boolean value){
+        actionManager.getAction("deleteEvent").setEnabled(value);
     }
 }
