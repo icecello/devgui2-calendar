@@ -30,7 +30,7 @@ public interface IAnimatedComponent {
      * The value is an estimate, which the animation driver is aiming at.
      * @return The preferred frames per second for the animation, loaded into the animation driver.
      */
-    public int preferredFPS();
+    public double preferredFPS();
 
     /**
      * Show if the animation is done. If the animation is finished, it will no longer
@@ -38,4 +38,9 @@ public interface IAnimatedComponent {
      * @return True if the animation is finished, false otherwise
      */
     public boolean animationFinished();
+    
+    /**
+     * called when animationdriver stops this component's animation
+     */
+    public void cleanup();
 }

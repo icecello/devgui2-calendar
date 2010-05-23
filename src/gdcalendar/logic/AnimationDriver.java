@@ -24,10 +24,8 @@ public class AnimationDriver {
 
     //Singleton instance of the driver
     private static AnimationDriver _instance = new AnimationDriver();
-    //Hold all animation components
-    //private ArrayList<IAnimatedComponent> animatedComponents = new ArrayList<IAnimatedComponent>();
-    //Single timer, responsible for updating the animatedComponents at the correct pace
-    //private Timer timer = new Timer("animation driver", true);  
+
+    //map of different timers, one for each thread
     private HashMap<String, Timer> timerList = new HashMap<String, Timer>();
     private HashMap<String, ArrayList<IAnimatedComponent> > threadAnimatedComponents = 
     	new HashMap<String, ArrayList<IAnimatedComponent> >();
@@ -71,6 +69,10 @@ public class AnimationDriver {
      * @param threadName	Name of thread to add the component to
      */
     public void add(final IAnimatedComponent component, String threadName) {
+    	if (!timerList.containsKey(threadName)) {
+    		timerList.put(threadName, new Timer(threadName));
+    	}
+    	
     	ArrayList<IAnimatedComponent> array;
     	if (threadAnimatedComponents.containsKey(threadName)) {
     		array = threadAnimatedComponents.get(threadName);
@@ -124,7 +126,9 @@ public class AnimationDriver {
     		timerList.put(threadName, new Timer(threadName));
     	}
     	
-    	timerList.get(threadName).purge();
+    	add(component, threadName);
+    	
+    	
 
     	TimerTask t = new TimerTask() {
     		
@@ -144,8 +148,8 @@ public class AnimationDriver {
             }
         };
   
-        
-    	timerList.get(threadName).scheduleAtFixedRate(t, 10, (long)1000/(component.preferredFPS()) );
+        timerList.get(threadName).purge();
+    	timerList.get(threadName).scheduleAtFixedRate(t, 10, (long)(1000/(component.preferredFPS())) );
    
     }
     /**
@@ -155,7 +159,7 @@ public class AnimationDriver {
      */
     public void runThread(String threadName) {
     	
-    	timerList.get(threadName).purge();
+    	
 
     	for (int i = 0; i < threadAnimatedComponents.get(threadName).size(); i++) {
     		final IAnimatedComponent component = threadAnimatedComponents.get(threadName).get(i);
@@ -177,8 +181,8 @@ public class AnimationDriver {
 	                }
 	            }
 	        };
-  
-	        timerList.get(threadName).scheduleAtFixedRate(t, 10, (long)1000/(component.preferredFPS()) );
+	        timerList.get(threadName).purge();
+	        timerList.get(threadName).scheduleAtFixedRate(t, 10, (long)(1000/(component.preferredFPS())) );
     	}
     }
     
@@ -191,7 +195,12 @@ public class AnimationDriver {
      */
     public boolean stopThread(String threadName) {
     	if (timerList.containsKey(threadName)) {
+    		ArrayList<IAnimatedComponent> ar = threadAnimatedComponents.get(threadName);
+    		for (int i = 0; i < ar.size(); i++) {
+    			ar.get(i).cleanup();
+    		}
     		timerList.get(threadName).cancel();
+    		timerList.get(threadName).purge();
     		return true;
     	} else {
     		return false;

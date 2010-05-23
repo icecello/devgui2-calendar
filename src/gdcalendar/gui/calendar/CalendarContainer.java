@@ -143,11 +143,29 @@ public class CalendarContainer extends JPanel {
         setDayFont(new Font("Arial", Font.PLAIN, 16));
     }
 
+    /**
+     * Set the default color for the triangle in all
+     * daycards.
+     * @param color
+     */
     public void setTriangleColor(Color color) {
     	for (int i = 0; i < views.size(); i++) {
     		views.get(i).setTriangleColor(color);
     	}
     }
+    
+    /**
+     * Set the color the triangle indicator fades
+     * into for all daycards.
+     * 
+     * @param color
+     */
+    public void setTriangleFadeColor(Color color) {
+    	for (int i = 0; i < views.size(); i++) {
+    		views.get(i).setTriangleFadeColor(color);
+    	}
+    }
+    
     /**
      * Set the background color for the calendar, which means
      * the background of all days.
