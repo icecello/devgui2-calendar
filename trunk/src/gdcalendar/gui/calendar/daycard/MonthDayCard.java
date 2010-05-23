@@ -173,12 +173,20 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     }
 
     /**
-     * set the current color of the indicator triangle in the
-     * top right
+     * set the normal color for the triangle
      * @param color
      */
     public void setTriangleColor(Color color) {
-    	triangleColor = color;
+    	startColor = color;
+    }
+    
+    /** 
+     * set the color the triangle fades into
+     * during animation
+     * @param color
+     */
+    public void setTriangleFadeColor(Color color) {
+    	endColor = color;
     }
     
     /**
@@ -257,7 +265,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
      */
     public void addHighlight(Category category) {
     	arrayCategoriesHighlight.add(category);
-    	AnimationDriver.getInstance().run(this, category.getName());
+    	//AnimationDriver.getInstance().run(this, category.getName());
     }
     
     /**
@@ -268,7 +276,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
      */
     public void addHighlight(Priority prio) {
     	arrayPrioritiesHighlight.add(prio);
-    	AnimationDriver.getInstance().run(this, prio.toString());
+    	//AnimationDriver.getInstance().run(this);
     }
     
     public void removeHighlight(Category category) {
@@ -488,57 +496,63 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     private Color endColor = new Color(0,210,0);
     private Color triangleColor = startColor;
     private float step = 0.0f;
-    private boolean isAnimationFinished = false;
     private boolean hasMarker = true;
-    private float inc = 0.1f;
+    private float inc = 0.2f;
+    private boolean shouldAnimate = false;
     
 	@Override
 	public boolean animationFinished() {
-		//cancel the animation if it has finished or if this daycard has no marker
-		//to animate
-		isAnimationFinished = true;
-		
-		if (hasMarker) {
-			for (int j = 0; j < events.size(); j++) {
-				System.out.println("inside event loop");
-				for (int i = 0; i < arrayPrioritiesHighlight.size(); i++) {
-					if (arrayPrioritiesHighlight.get(i).toString().equals(events.get(j).getPriority().toString())) {
-						isAnimationFinished = false;
-					}		
-				}
-				
-				for (int i = 0; i < arrayCategoriesHighlight.size(); i++) {
-					if (arrayCategoriesHighlight.get(i).equals(events.get(j).getCategory())) {
-						isAnimationFinished = false;
-					}
-				}
-			}
-		}
-		System.out.println("finished=" + isAnimationFinished);
-		return isAnimationFinished;
+		return false;
 	}
 
+	@Override
+	public void cleanup() {
+		triangleColor = startColor;
+		step = 0.2f;
+	}
 	/*
 	 * perform a simple animation that smoothly changes between two colors
 	 * in the triangle, any other animation is not yet supported
 	 */
 	@Override
 	public void computeAnimatation() {
-		
-		switch (highlightMarker) {
-		
-		case TRIANGLE_FADING:
-			int r = (int) ((1 - step) * startColor.getRed() + step * endColor.getRed());
-			int g = (int) ((1 - step) * startColor.getGreen() + step * endColor.getGreen());
-			int b = (int) ((1 - step) * startColor.getBlue() + step * endColor.getBlue());
-			step += inc;
-			if (step >= 1) {
-				inc = -0.1f;
-			} else if (step <= 0.1f) {
-				inc = 0.1f;
+		shouldAnimate = false;
+		if (hasMarker) {
+			for (int j = 0; j < events.size(); j++) {
+				System.out.println("inside event loop");
+				for (int i = 0; i < arrayPrioritiesHighlight.size(); i++) {
+					if (arrayPrioritiesHighlight.get(i).toString().equals(events.get(j).getPriority().toString())) {
+						shouldAnimate = true;
+					}		
+				}
+				
+				for (int i = 0; i < arrayCategoriesHighlight.size(); i++) {
+					if (arrayCategoriesHighlight.get(i).equals(events.get(j).getCategory())) {
+						shouldAnimate = true;
+					}
+				}
 			}
-			triangleColor = new Color(r, g, b);
-			System.out.println("fading");
+		}
+		
+		if (shouldAnimate) {
+			switch (highlightMarker) {
+			
+			
+			case TRIANGLE_FADING:
+				int r = (int) ((1 - step) * startColor.getRed() + step * endColor.getRed());
+				int g = (int) ((1 - step) * startColor.getGreen() + step * endColor.getGreen());
+				int b = (int) ((1 - step) * startColor.getBlue() + step * endColor.getBlue());
+				step += inc;
+				if (step >= 1) {
+					inc = -0.2f;
+				} else if (step <= 0.1f) {
+					inc = 0.2f;
+				}
+				triangleColor = new Color(r, g, b);
+				System.out.println("fading");
+			}
+		} else {
+			cleanup();
 		}
 	}
 
@@ -548,7 +562,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
 	}
 
 	@Override
-	public int preferredFPS() {
-		return 10;
+	public double preferredFPS() {
+		return 5;
 	}
 }

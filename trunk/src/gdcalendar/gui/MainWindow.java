@@ -120,8 +120,9 @@ public class MainWindow extends JFrame {
         add(calendarContainer, BorderLayout.CENTER);
 
 
-        initHighlightPanel();
         pack();
+        
+        AnimationDriver.getInstance().runThread("calendarcontainer");
     }
 
     void initHighlightPanel() {
@@ -379,7 +380,6 @@ public class MainWindow extends JFrame {
         new OnlineHelpWindow().setVisible(true);
         //System.out.println("Online Help");
     }
-
     /**
      * Shows About window.
      */
@@ -387,83 +387,84 @@ public class MainWindow extends JFrame {
     public void about() {
         new AboutWindow(this).setVisible(true);
     }
+    
+    
     private HashMap<Category, Boolean> checkedCategories = new HashMap<Category, Boolean>();
     private HashMap<Priority, Boolean> checkedPriorities = new HashMap<Priority, Boolean>();
-
+    
     @Action
     public void highlightCategoryPopup() {
-        final JPopupMenu menu = new JPopupMenu();
+    	final JPopupMenu menu = new JPopupMenu();
+    	
+    	Collection<Category> c = Main.categories.values();
+    	
+    	Iterator<Category> iter = c.iterator();
+    	while (iter.hasNext()) {
+    		
+    		final Category cat = iter.next();
+    		final JCheckBoxMenuItem item = new JCheckBoxMenuItem();
+    		if (checkedCategories.containsKey(cat)) {
+    			item.setState(checkedCategories.get(cat));
+    		}
+    		
+    		item.setAction(new AbstractAction(cat.getName()) {
+				
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					checkedCategories.put(cat, item.getState());
+					if (item.getState()) {
+						calendarContainer.addHighlight(cat);
+					} else {
+						AnimationDriver.getInstance().stopThread(cat.getName());
+						calendarContainer.removeHighlight(cat);
+					}
+				}
+			});
 
-        Collection<Category> c = Main.categories.values();
-
-        Iterator<Category> iter = c.iterator();
-        while (iter.hasNext()) {
-
-            final Category cat = iter.next();
-            final JCheckBoxMenuItem item = new JCheckBoxMenuItem();
-            if (checkedCategories.containsKey(cat)) {
-                item.setState(checkedCategories.get(cat));
-            }
-
-            item.setAction(new AbstractAction(cat.getName()) {
-
-                @Override
-                public void actionPerformed(ActionEvent arg0) {
-                    checkedCategories.put(cat, item.getState());
-                    if (item.getState()) {
-                        calendarContainer.addHighlight(cat);
-                    } else {
-                        AnimationDriver.getInstance().stopThread(cat.getName());
-                        calendarContainer.removeHighlight(cat);
-                        calendarContainer.setTriangleColor(new Color(0, 100, 0));
-                    }
-                }
-            });
-
-            menu.add(item);
-        }
-
-        Rectangle rect = toolButtonCategory.getBounds();
+    		menu.add(item);
+    	}
+    	
+    	Rectangle rect = toolButtonCategory.getBounds();
         Point pt = new Point(rect.x, rect.y + rect.height);
         pt = toolBar.getLocationOnScreen();
         menu.show(this, pt.x, pt.y);
-
-
+        
+        
     }
-
+    
     @Action
     public void highlightPriorityPopup() {
-        final JPopupMenu menu = new JPopupMenu();
-        final Priority[] p = Priority.values();
-
-        for (int i = 0; i < p.length; i++) {
-            final int ii = i;
-            final JCheckBoxMenuItem item = new JCheckBoxMenuItem();
-            if (checkedPriorities.containsKey(p[i])) {
-                item.setState(checkedPriorities.get(p[i]));
-            }
-
-            item.setAction(new AbstractAction(p[i].name()) {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    checkedPriorities.put(p[ii], item.getState());
-                    if (item.getState()) {
-                        calendarContainer.addHighlight(p[ii]);
-                    } else {
-                        AnimationDriver.getInstance().stopThread(p[ii].toString());
-                        calendarContainer.removeHighlight(p[ii]);
-                        calendarContainer.setTriangleColor(new Color(0, 100, 0));
-                    }
-                }
-            });
-            menu.add(item);
-        }
-
-
-        Rectangle rect = toolButtonPriority.getBounds();
+    	final JPopupMenu menu = new JPopupMenu();
+    	final Priority[] p = Priority.values();
+    	
+    	for (int i = 0; i < p.length; i++) {
+    		final int ii = i;
+	    	final JCheckBoxMenuItem item = new JCheckBoxMenuItem();
+	    	if (checkedPriorities.containsKey(p[i])) {
+	    		item.setState(checkedPriorities.get(p[i]));
+	    	}
+	    	
+	    	item.setAction(new AbstractAction(p[i].name()) {
+	    		
+	    		@Override
+	    		public void actionPerformed(ActionEvent e) {
+	    			checkedPriorities.put(p[ii], item.getState());
+	    			if (item.getState()) {
+	    				calendarContainer.addHighlight(p[ii]);
+	    			} else {
+	    				AnimationDriver.getInstance().stopThread(p[ii].toString());
+	    				calendarContainer.removeHighlight(p[ii]);
+	    			}
+	    		}
+	    	});
+	    	menu.add(item);
+    	}
+    	
+    	
+    	Rectangle rect = toolButtonPriority.getBounds();
         Point pt = new Point(rect.x, rect.y + rect.height);
         Point pt2 = toolBar.getLocationOnScreen();
+        //Point pt2 = this.getLocationOnScreen();
         menu.show(this, pt2.x, pt2.y);
     }
 }
