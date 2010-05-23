@@ -31,6 +31,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.swing.plaf.SliderUI;
 
 /**
  * @author Håkan
@@ -499,6 +500,8 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     private boolean hasMarker = true;
     private float inc = 0.2f;
     private boolean shouldAnimate = false;
+    private boolean doCleanup = false;
+    private int cleanupCounter = 0;
     
 	@Override
 	public boolean animationFinished() {
@@ -509,6 +512,8 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
 	public void cleanup() {
 		triangleColor = startColor;
 		step = 0.2f;
+		//this.repaint();
+
 	}
 	/*
 	 * perform a simple animation that smoothly changes between two colors
@@ -522,11 +527,11 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
 				for (int i = 0; i < arrayPrioritiesHighlight.size(); i++) {
 					if (arrayPrioritiesHighlight.get(i).toString().equals(events.get(j).getPriority().toString())) {
 						shouldAnimate = true;
-					}		
+					}
 				}
 				
 				for (int i = 0; i < arrayCategoriesHighlight.size(); i++) {
-					if (arrayCategoriesHighlight.get(i).equals(events.get(j).getCategory())) {
+					if (arrayCategoriesHighlight.get(i).getName().equals(events.get(j).getCategory().getName())) {
 						shouldAnimate = true;
 					}
 				}
@@ -556,7 +561,9 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
 
 	@Override
 	public void displayAnimatation() {
-		this.repaint();
+		if (shouldAnimate) {
+			this.repaint();
+		} 
 	}
 
 	@Override

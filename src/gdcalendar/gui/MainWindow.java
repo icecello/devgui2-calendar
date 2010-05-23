@@ -415,7 +415,6 @@ public class MainWindow extends JFrame {
 					if (item.getState()) {
 						calendarContainer.addHighlight(cat);
 					} else {
-						AnimationDriver.getInstance().stopThread(cat.getName());
 						calendarContainer.removeHighlight(cat);
 					}
 				}
@@ -452,7 +451,6 @@ public class MainWindow extends JFrame {
 	    			if (item.getState()) {
 	    				calendarContainer.addHighlight(p[ii]);
 	    			} else {
-	    				AnimationDriver.getInstance().stopThread(p[ii].toString());
 	    				calendarContainer.removeHighlight(p[ii]);
 	    			}
 	    		}
@@ -464,7 +462,6 @@ public class MainWindow extends JFrame {
     	Rectangle rect = toolButtonPriority.getBounds();
         Point pt = new Point(rect.x, rect.y + rect.height);
         Point pt2 = toolBar.getLocationOnScreen();
-        //Point pt2 = this.getLocationOnScreen();
         menu.show(this, pt2.x, pt2.y);
     }
 }
