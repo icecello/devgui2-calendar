@@ -209,6 +209,8 @@ public class AnimationDriver {
     
     /**
      * All animation threads are stopped
+     * 
+     * TODO: stopAll doesn't call cleanup() on components
      */
     public void stopAll() {
     	Collection<Timer> collection = timerList.values();
