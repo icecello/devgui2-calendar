@@ -209,18 +209,15 @@ public class EventWindow extends JDialog {
             @Override
             public void mouseClicked(MouseEvent e) {
                 addEvent();
+                EventWindow.this.dispose();
             }
         });
         cancelButton = new JButton("Cancel");
         cancelButton.addMouseListener(new MouseAdapter() {
 
             @Override
-            public void mousePressed(MouseEvent e) {
-                EventWindow.this.dispose();
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
+            public void mouseClicked(MouseEvent e) {
+                addEvent();
                 EventWindow.this.dispose();
             }
         });
