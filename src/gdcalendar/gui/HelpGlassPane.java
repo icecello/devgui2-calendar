@@ -107,7 +107,7 @@ public class HelpGlassPane extends JPanel implements IAnimatedComponent {
             }
             step += inc;
         } else {
-            AnimationDriver.getInstance().stopThread("show help image");
+            AnimationDriver.getInstance().removeAll("show help image");
             setVisible(false);
         }
     }
@@ -119,7 +119,8 @@ public class HelpGlassPane extends JPanel implements IAnimatedComponent {
 
     @Override
     public double preferredFPS() {
-        return 0.15;
+        return 1.0;
+        //return 0.15;
     }
 
     @Override
