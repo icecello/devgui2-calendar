@@ -173,6 +173,10 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
         controller.setFilter(filter);
     }
 
+    public Date getFilter() {
+        return filter;
+    }
+
     /**
      * set the normal color for the triangle
      * @param color

@@ -41,6 +41,7 @@ import actionmanager.ActionManager;
 
 import commandmanager.CommandManager;
 import gdcalendar.gui.calendar.daycard.DayPopupMenu;
+import gdcalendar.gui.calendar.daycard.MonthDayCard;
 import gdcalendar.gui.calendar.daycard.MonthDayCard.Marker;
 import gdcalendar.mvc.model.DayEvent.Priority;
 import java.awt.Dimension;
@@ -272,7 +273,8 @@ public class MainWindow extends JFrame {
                 String evtName = evt.getPropertyName();
                 if (evtName.equals(DayPopupMenu.ADD)) {
                     //Create a new addEvent window
-                    EventWindow addEventWindow = new EventWindow(new Date(), null, DayPopupMenu.ADD);
+                    Date eventDate  = ((MonthDayCard) popMenu.getInvoker()).getFilter();
+                    EventWindow addEventWindow = new EventWindow(eventDate, null, DayPopupMenu.ADD);
                     addEventWindow.addPropertyChangeListener(new PropertyChangeListener() {
 
                         public void propertyChange(PropertyChangeEvent evt) {
