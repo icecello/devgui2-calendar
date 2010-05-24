@@ -61,9 +61,6 @@ public class OnlineHelpWindow extends JFrame {
         helpGlassPane = new HelpGlassPane(this.getContentPane(), "addevent");
         this.setGlassPane(helpGlassPane);
         helpGlassPane.setVisible(true);
-
-        //System.out.println("Add Event Help");
-        //new PreferencesWindow(this);
     }
 
     /**
@@ -71,7 +68,8 @@ public class OnlineHelpWindow extends JFrame {
      */
     @Action
     public void transparencyHelp() {
-        //System.out.println("Transparency Help");
-        //new PreferencesWindow(this);
+        helpGlassPane = new HelpGlassPane(this.getContentPane(), "transparency");
+        this.setGlassPane(helpGlassPane);
+        helpGlassPane.setVisible(true);
     }
 }
