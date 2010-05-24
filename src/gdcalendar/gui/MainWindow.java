@@ -43,6 +43,8 @@ import commandmanager.CommandManager;
 import gdcalendar.gui.calendar.daycard.DayPopupMenu;
 import gdcalendar.gui.calendar.daycard.MonthDayCard;
 import gdcalendar.gui.calendar.daycard.MonthDayCard.Marker;
+import gdcalendar.gui.calendar.undoredo.AddEventCommand;
+import gdcalendar.gui.calendar.undoredo.RemoveEventCommand;
 import gdcalendar.mvc.model.DayEvent.Priority;
 import java.awt.Dimension;
 import java.beans.PropertyChangeListener;
@@ -115,11 +117,9 @@ public class MainWindow extends JFrame {
         collapsiblePanel = new CollapsiblePanel(CollapsiblePanel.NORTH);
         collapsiblePanel.setLayout(new BorderLayout());
         collapsiblePanel.setCollapsButtonSize(7);
-        add(collapsiblePanel, BorderLayout.PAGE_END);
         collapsiblePanel.add(highlightPanel);
-
+        add(collapsiblePanel, BorderLayout.PAGE_END);
         add(calendarContainer, BorderLayout.CENTER);
-
 
         pack();
 
@@ -130,7 +130,7 @@ public class MainWindow extends JFrame {
         highlightPanel = new JPanel();
 
         toolBar = new JToolBar();
-
+        toolBar.setFloatable(false);
         toolButtonCategory = new JButton(actionManager.getAction("highlightCategoryPopup"));
         toolButtonPriority = new JButton(actionManager.getAction("highlightPriorityPopup"));
         toolBar.add(toolButtonCategory);
@@ -145,7 +145,6 @@ public class MainWindow extends JFrame {
 
         JMenu fileMenu = new JMenu(resource.getString("menu.file.text"));
         quitItem = new JMenuItem(actionManager.getAction("quit"));
-
         fileMenu.add(quitItem);
 
         JMenu editMenu = new JMenu(resource.getString("menu.edit.text"));
@@ -157,8 +156,8 @@ public class MainWindow extends JFrame {
         editMenu.add(redoItem);
         editMenu.add(new JSeparator());
         editMenu.add(preferencesItem);
-        undoItem.setEnabled(false);
-        redoItem.setEnabled(false);
+        actionManager.getAction("doRedo").setEnabled(false);
+        actionManager.getAction("doUndo").setEnabled(false);
 
         JMenu helpMenu = new JMenu(resource.getString("menu.help.text"));
 
@@ -207,7 +206,6 @@ public class MainWindow extends JFrame {
         });
         //Make the pop-up show when pressing a dayCard
         calendarContainer.addDayMouseListener(new MouseAdapter() {
-            //TODO: add commandmananger as parameter to daypopupmenu
 
             @Override
             public void mousePressed(MouseEvent e) {
@@ -266,6 +264,7 @@ public class MainWindow extends JFrame {
                 XMLUtils.saveDayEvents(events);
             }
         });
+
         //Take care of propertychanges from the pop-up menu
         popMenu.addPropertyChangeListener(new PropertyChangeListener() {
 
@@ -273,12 +272,15 @@ public class MainWindow extends JFrame {
                 String evtName = evt.getPropertyName();
                 if (evtName.equals(DayPopupMenu.ADD)) {
                     //Create a new addEvent window
-                    Date eventDate  = ((MonthDayCard) popMenu.getInvoker()).getFilter();
+                    Date eventDate = ((MonthDayCard) popMenu.getInvoker()).getFilter();
                     EventWindow addEventWindow = new EventWindow(eventDate, null, DayPopupMenu.ADD);
+
                     addEventWindow.addPropertyChangeListener(new PropertyChangeListener() {
 
                         public void propertyChange(PropertyChangeEvent evt) {
-                            calendarModel.addDayEvent((DayEvent) evt.getNewValue());
+                            cm.execute(new AddEventCommand(calendarModel, (DayEvent) evt.getNewValue()));
+                            actionManager.getAction("doRedo").setEnabled(cm.canRedo());
+                            actionManager.getAction("doUndo").setEnabled(cm.canUndo());
                         }
                     });
                     addEventWindow.setVisible(true);
@@ -286,7 +288,10 @@ public class MainWindow extends JFrame {
 
                 } else if (evtName.equals(DayPopupMenu.DELETE)) {
                     String ID = ((JLabel) popMenu.getInvoker()).getName();
-                    calendarModel.removeDayEvent(UUID.fromString(ID));
+                    DayEvent event = calendarModel.getDayEvent(UUID.fromString(ID));
+                    cm.execute(new RemoveEventCommand(calendarModel, event));
+                    actionManager.getAction("doRedo").setEnabled(cm.canRedo());
+                    actionManager.getAction("doUndo").setEnabled(cm.canUndo());
 
 
                 } else if (evtName.equals(DayPopupMenu.EDIT)) {
@@ -298,8 +303,8 @@ public class MainWindow extends JFrame {
                     editEventWindow.addPropertyChangeListener(new PropertyChangeListener() {
 
                         public void propertyChange(PropertyChangeEvent evt) {
-                                DayEvent tempEvent = (DayEvent) evt.getNewValue();
-                                calendarModel.replaceDayEvent(d.getID(), tempEvent);
+                            DayEvent tempEvent = (DayEvent) evt.getNewValue();
+                            calendarModel.replaceDayEvent(d.getID(), tempEvent);
                         }
                     });
                     editEventWindow.setVisible(true);

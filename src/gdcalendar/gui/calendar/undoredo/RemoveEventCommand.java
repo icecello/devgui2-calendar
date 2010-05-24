@@ -2,9 +2,8 @@ package gdcalendar.gui.calendar.undoredo;
 
 import commandmanager.ICommand;
 
-import gdcalendar.mvc.controller.CalendarController;
+import gdcalendar.mvc.model.CalendarModel;
 import gdcalendar.mvc.model.DayEvent;
-import java.util.UUID;
 
 /**
  * This class implements the remove event command.
@@ -16,27 +15,27 @@ import java.util.UUID;
  *
  */
 public class RemoveEventCommand implements ICommand {
-	private CalendarController controller;
+	private CalendarModel model;
 	private DayEvent event;
 	
 	/**
 	 * 
 	 * @param controller
 	 */
-	public RemoveEventCommand(CalendarController controller) {
-		this.controller = controller;
-		this.event = null;
+	public RemoveEventCommand(CalendarModel cModel, DayEvent event) {
+		this.model = cModel;
+		this.event = event;
 	}
 
 	@Override
 	public void execute() {
-		controller.removeEvent(event.getID());
+		model.removeDayEvent(event.getID());
 
 	}
 
 	@Override
 	public void undo() {
-		controller.addDayEvent(event);
+		model.addDayEvent(event);
 	}
 
 	@Override

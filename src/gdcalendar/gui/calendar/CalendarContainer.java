@@ -1,26 +1,16 @@
 package gdcalendar.gui.calendar;
 
 import gdcalendar.gui.calendar.daycard.MonthDayCard;
-import gdcalendar.gui.calendar.undoredo.AddEventCommand;
-//this import will be used later as we sort out the details of how
-//to deal with removing events
-//see adding of events for functioning undo/redo operations
-//import gdcalendar.gui.calendar.undoredo.RemoveEventCommand;
 import gdcalendar.logic.AnimationDriver;
 import gdcalendar.mvc.controller.CalendarController;
 import gdcalendar.mvc.model.*;
 import gdcalendar.mvc.model.DayEvent.Priority;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
-
-
-import commandmanager.CommandManager;
 import gdcalendar.gui.calendar.daycard.MonthDayCard.CardView;
 import gdcalendar.gui.calendar.daycard.MonthDayCard.Marker;
-
 import java.util.ArrayList;
 
 /**
@@ -82,15 +72,12 @@ public class CalendarContainer extends JPanel {
     private ArrayList<MonthDayCard> views = new ArrayList<MonthDayCard>();
     private ArrayList<CalendarDataChangedListener> dataChangedListeners = new ArrayList<CalendarDataChangedListener>();
     private CalendarModel calendarModel = new CalendarModel();
-
     private ArrayList<JLabel> dayTitleLabels = new ArrayList<JLabel>();
+
     /**
      * Construct the calendar, with all it's child components and data it needs.
-     * For now, we still need to pass the command manager into the calendar, I'm
-     * not sure if that is really necessary, but at least it works, and we don't
-     * need the main window in the CalendarContainer anymore. That's a good thing.
      * 
-     * @param undoManager		command manager to use for this calendar for handling all commands
+     * @param calendarModel calendarModel containing all events shown in the calendar
      */
     public CalendarContainer(CalendarModel calendarModel) {
         this.calendarModel = calendarModel;
@@ -114,7 +101,7 @@ public class CalendarContainer extends JPanel {
         monthNavPanel.add(nextMonthButton, BorderLayout.LINE_END);
 
         dayTitle = new JPanel(new GridLayout(1, 7));
-        
+
         //dayTitle.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
         Calendar tempCalendar = GregorianCalendar.getInstance();
@@ -135,7 +122,7 @@ public class CalendarContainer extends JPanel {
         add(topPanel, BorderLayout.PAGE_START);
         add(monthView, BorderLayout.CENTER);
         initListeners();
-        
+
         //set some default colors and fonts
         setBackground(SystemColor.white);
         setComponentBackground(SystemColor.window);
@@ -149,11 +136,11 @@ public class CalendarContainer extends JPanel {
      * @param color
      */
     public void setTriangleColor(Color color) {
-    	for (int i = 0; i < views.size(); i++) {
-    		views.get(i).setTriangleColor(color);
-    	}
+        for (int i = 0; i < views.size(); i++) {
+            views.get(i).setTriangleColor(color);
+        }
     }
-    
+
     /**
      * Set the color the triangle indicator fades
      * into for all daycards.
@@ -161,11 +148,11 @@ public class CalendarContainer extends JPanel {
      * @param color
      */
     public void setTriangleFadeColor(Color color) {
-    	for (int i = 0; i < views.size(); i++) {
-    		views.get(i).setTriangleFadeColor(color);
-    	}
+        for (int i = 0; i < views.size(); i++) {
+            views.get(i).setTriangleFadeColor(color);
+        }
     }
-    
+
     /**
      * Set the background color for the calendar, which means
      * the background of all days.
@@ -173,16 +160,16 @@ public class CalendarContainer extends JPanel {
      */
     @Override
     public void setBackground(Color color) {
-    	super.setBackground(color);
-    	
-    	//avoid doing this if we got called before views has been created
-    	if (views != null) {
-	    	for (int i=0; i < views.size(); i++) {
-	    		views.get(i).setBackground(color);
-	    	}
-    	}
+        super.setBackground(color);
+
+        //avoid doing this if we got called before views has been created
+        if (views != null) {
+            for (int i = 0; i < views.size(); i++) {
+                views.get(i).setBackground(color);
+            }
+        }
     }
-    
+
     /**
      * Set the font for the Month title. This is just the name
      * of the current month.
@@ -190,9 +177,9 @@ public class CalendarContainer extends JPanel {
      * @param font
      */
     public void setMonthFont(Font font) {
-    	monthTitleLabel.setFont(font);
+        monthTitleLabel.setFont(font);
     }
-    
+
     /**
      * Set the font to use for the day titles, which refers to
      * the 7 names of days listed on the top of the calendar.
@@ -200,21 +187,22 @@ public class CalendarContainer extends JPanel {
      * @param font
      */
     public void setDayTitleFont(Font font) {
-    	for (int i = 0; i < dayTitleLabels.size(); i++) {
-    		dayTitleLabels.get(i).setFont(font);
-    	}
+        for (int i = 0; i < dayTitleLabels.size(); i++) {
+            dayTitleLabels.get(i).setFont(font);
+        }
     }
-    
+
     /**
      * Set the font to use for each individual day's title.
      * 
      * @param font
      */
     public void setDayFont(Font font) {
-    	for (int i = 0; i < views.size(); i++) {
-    		views.get(i).setTitleFont(font);
-    	}
+        for (int i = 0; i < views.size(); i++) {
+            views.get(i).setTitleFont(font);
+        }
     }
+
     /**
      * Set the background color of the area listing
      * the days, Sun-Mon
@@ -222,31 +210,32 @@ public class CalendarContainer extends JPanel {
      * @param color
      */
     public void setDayTitleBackground(Color color) {
-    	dayTitle.setBackground(color);
+        dayTitle.setBackground(color);
     }
-    
+
     /**
      * Set the foreground color of the area listing
      * the days, Sun-Mon
      * @param color
      */
     public void setDayTitleForeground(Color color) {
-    	for (int i = 0; i < dayTitleLabels.size(); i++) {
-    		dayTitleLabels.get(i).setForeground(color);
-    	}
-    	
+        for (int i = 0; i < dayTitleLabels.size(); i++) {
+            dayTitleLabels.get(i).setForeground(color);
+        }
+
     }
+
     /**
      * Set the background color for the month title area and
      * the filler space between navigation components.
      * @param color
      */
     public void setComponentBackground(Color color) {
-    	super.setBackground(color);
-    	monthTitle.setBackground(color);
-    	monthNavPanel.setBackground(color);
+        super.setBackground(color);
+        monthTitle.setBackground(color);
+        monthNavPanel.setBackground(color);
     }
-    
+
     /**
      * Set the color of auxiliary text inside each day, like the
      * title.
@@ -254,23 +243,22 @@ public class CalendarContainer extends JPanel {
      * @param color
      */
     public void setDayForeground(Color color) {
-    	for (int i=0; i < views.size(); i++) {
-    		views.get(i).setTitleForeground(color);
-    	}
+        for (int i = 0; i < views.size(); i++) {
+            views.get(i).setTitleForeground(color);
+        }
     }
-    
+
     /**
      * Set the color for text displaying event names.
      * 
      * @param color
      */
     public void setEventForeground(Color color) {
-    	for (int i=0; i < views.size(); i++) {
-    		views.get(i).setEventForeground(color);
-    	}
+        for (int i = 0; i < views.size(); i++) {
+            views.get(i).setEventForeground(color);
+        }
     }
-    
-    
+
     /**
      * 
      * @param marker
@@ -292,14 +280,14 @@ public class CalendarContainer extends JPanel {
             views.get(i).addHighlight(category);
         }
     }
-    
+
     /**
      * remove the specified category from the list of
      * categories to highlight
      * @param category
      */
     public void removeHighlight(Category category) {
-    	for (int i = 0; i < views.size(); i++) {
+        for (int i = 0; i < views.size(); i++) {
             views.get(i).removeHighlight(category);
         }
     }
@@ -315,7 +303,7 @@ public class CalendarContainer extends JPanel {
             views.get(i).addHighlight(prio);
         }
     }
-    
+
     /**
      * remove specified priority from the list of priorities
      * to highlight
@@ -338,7 +326,7 @@ public class CalendarContainer extends JPanel {
             AnimationDriver.getInstance().add(daycard, "calendarcontainer");
 
             DayFilteredCalendarModel model = new DayFilteredCalendarModel();
-            daycard.setBorder(BorderFactory.createLineBorder(new Color(240,240,240)));
+            daycard.setBorder(BorderFactory.createLineBorder(new Color(240, 240, 240)));
 
             model.setRealCalendarModel(calendarModel);
 
@@ -347,14 +335,8 @@ public class CalendarContainer extends JPanel {
             views.add(daycard);
             controllers.add(controller);
             monthView.add(daycard);
-
-
-
-
         } //Call switchToMonth to attach the correct days (models) to the newly created MonthCards
         switchToMonth(cal);
-
-
     }
 
     /*
@@ -365,25 +347,17 @@ public class CalendarContainer extends JPanel {
         monthTitleLabel.setText(tempCal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH)
                 + " " + tempCal.get(Calendar.YEAR));
 
-
-
         int numDays = tempCal.getActualMaximum(Calendar.DAY_OF_MONTH);
         // The start day of the month in integer form, so we know where to
         // start placing numbers in the grid.
         tempCal.set(Calendar.DAY_OF_MONTH, 1);
 
-
         int startDay = tempCal.get(Calendar.DAY_OF_WEEK);
-
-
-
 
         for (int i = 1; i
                 <= 42; i++) {
             final CardView currentView;     //variable to keep track what apperence the daycard should have
             final int index = i - 1;
-
-
 
             if (i >= (startDay) && i < (startDay + numDays)) {
                 currentView = dayViews;
@@ -391,32 +365,23 @@ public class CalendarContainer extends JPanel {
                 Date filter = tempCal.getTime();
                 controllers.get(index).setFilter(filter);
 
-
             } else {
                 currentView = CardView.NONE;
                 controllers.get(index).setFilter(new Date(0, 0, 0));
-
-
             }
             if (!SwingUtilities.isEventDispatchThread()) {
                 SwingUtilities.invokeLater(new Runnable() {
 
                     public void run() {
                         views.get(index).changeView(currentView);
-
-
                     }
                 });
 
             } else {
                 views.get(index).changeView(currentView);
-
-
             }
             views.get(index).revalidate();
             views.get(index).repaint();
-
-
         }
     }
 
@@ -426,8 +391,6 @@ public class CalendarContainer extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 CalendarContainer.this.previousMonthMouseClicked(e);
-
-
             }
         });
 
@@ -436,21 +399,14 @@ public class CalendarContainer extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 CalendarContainer.this.nextMonthMouseClicked(e);
-
-
             }
         });
-
-
     }
 
     private void nextMonthMouseClicked(MouseEvent e) {
 
         cal.set(Calendar.MONTH, cal.get(Calendar.MONTH) + 1);
-        switchToMonth(
-                cal);
-
-
+        switchToMonth(cal);
     }
 
     private void previousMonthMouseClicked(MouseEvent e) {
@@ -458,8 +414,6 @@ public class CalendarContainer extends JPanel {
         cal.set(Calendar.MONTH, cal.get(Calendar.MONTH) - 1);
         switchToMonth(
                 cal);
-
-
     }
 
     /**
@@ -467,21 +421,21 @@ public class CalendarContainer extends JPanel {
      * @param l
      */
     public void addDayMouseListener(MouseListener l) {
-    	for (int i = 0; i < views.size(); i++) {
-    		views.get(i).addMouseListener(l);
-    	}
+        for (int i = 0; i < views.size(); i++) {
+            views.get(i).addMouseListener(l);
+        }
     }
-    
+
     /**
      * 
      * @param l	
      */
     public void addEventMouseListener(MouseListener l) {
-    	for (int i = 0; i < views.size(); i++) {
-    		views.get(i).addEventMouseListener(l);
-    	}
+        for (int i = 0; i < views.size(); i++) {
+            views.get(i).addEventMouseListener(l);
+        }
     }
-    
+
     /**
      * Add a listener that will be invoked whenever the data of this
      * calendar has changed in some way.
@@ -495,8 +449,6 @@ public class CalendarContainer extends JPanel {
      */
     public void addDataChangeListener(CalendarDataChangedListener listener) {
         dataChangedListeners.add(listener);
-
-
     } /*
      * Internal method that handles firing of data changed events.
      */
@@ -504,9 +456,6 @@ public class CalendarContainer extends JPanel {
 
     private void fireDataChangedEvent(CalendarChangeEvent e) {
         Iterator<CalendarDataChangedListener> it = dataChangedListeners.iterator();
-
-
-
         while (it.hasNext()) {
             CalendarDataChangedListener listener = it.next();
             listener.dataChanged(e);
