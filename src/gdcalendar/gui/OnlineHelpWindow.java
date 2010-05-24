@@ -56,7 +56,7 @@ public class OnlineHelpWindow extends JFrame {
      */
     @Action
     public void addEventHelp() {
-        helpGlassPane = new HelpGlassPane(this.getContentPane());
+        helpGlassPane = new HelpGlassPane(this.getContentPane(), "addevent");
         this.setGlassPane(helpGlassPane);
         helpGlassPane.setVisible(true);
 
