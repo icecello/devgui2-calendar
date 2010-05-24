@@ -27,9 +27,12 @@ public class HelpGlassPane extends JComponent implements IAnimatedComponent {
     BufferedImage imageToShow;
     File imgDir;
     File[] imgFiles;
+    String helpType;
 
-    public HelpGlassPane(Container contentPane) {
+    public HelpGlassPane(Container contentPane, String helpType) {
         setSize(new Dimension(400, 400));
+
+        this.helpType = helpType;
 
         imageToShow = null;
         imageList = new ArrayList<BufferedImage>();
@@ -40,7 +43,7 @@ public class HelpGlassPane extends JComponent implements IAnimatedComponent {
 
     private void loadImages() {
         BufferedImage img = null;
-        imgDir = new File(System.getProperty("user.dir") + "\\src\\helpimages\\addevent");
+        imgDir = new File(System.getProperty("user.dir") + "\\src\\helpimages\\" + helpType);
         imgFiles = imgDir.listFiles(new FilenameFilter() {
 
             public boolean accept(File dir, String name) {
