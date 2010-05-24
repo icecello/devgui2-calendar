@@ -30,7 +30,7 @@ public class HelpGlassPane extends JComponent implements IAnimatedComponent {
     String helpType;
 
     public HelpGlassPane(Container contentPane, String helpType) {
-        setSize(new Dimension(400, 400));
+        setSize(new Dimension(686, 464));
 
         this.helpType = helpType;
 

@@ -9,6 +9,8 @@ import actionmanager.Action;
 import actionmanager.ActionManager;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ResourceBundle;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -29,10 +31,10 @@ public class OnlineHelpWindow extends JFrame {
 
     public OnlineHelpWindow() {
         super("Online Help");
-        setSize(new Dimension(400, 400));
+        setSize(new Dimension(702, 502));
         setLayout(new GridLayout(3,0));
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-
+        
         resource = ResourceBundle.getBundle("gdcalendar.resource_en_US");
         actionManager = new ActionManager(this, resource);
 
@@ -48,7 +50,7 @@ public class OnlineHelpWindow extends JFrame {
 
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(600, 600);
+        return new Dimension(702, 502);
     }
 
     /**
