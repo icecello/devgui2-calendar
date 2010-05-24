@@ -12,9 +12,11 @@ import java.awt.GridLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ResourceBundle;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 /**
  *
@@ -28,29 +30,35 @@ public class OnlineHelpWindow extends JFrame {
     ActionManager actionManager;
     JButton addEventHelpButton;
     JButton transparencyHelpButton;
+    JPanel panel;
 
     public OnlineHelpWindow() {
         super("Online Help");
-        setSize(new Dimension(702, 527));
-        setLayout(new GridLayout(3,0));
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setSize(new Dimension(842, 527));
         
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+
+        panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
         resource = ResourceBundle.getBundle("gdcalendar.resource_en_US");
         actionManager = new ActionManager(this, resource);
 
         addEventHelpButton = new JButton(actionManager.getAction("addEventHelp"));
         transparencyHelpButton = new JButton(actionManager.getAction("transparencyHelp"));
 
-        add(new JLabel("I want to see help for:"));
-        add(addEventHelpButton);
-        add(transparencyHelpButton);
+        panel.add(new JLabel("I want to see help for:"));
+        panel.add(addEventHelpButton);
+        panel.add(transparencyHelpButton);
+
+        add(panel);
 
         pack();
     }
 
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(702, 527);
+        return new Dimension(842, 527);
     }
 
     /**

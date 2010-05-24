@@ -36,6 +36,7 @@ public class HelpGlassPane extends JPanel implements IAnimatedComponent {
 
     public HelpGlassPane(Container contentPane, String helpType) {
         setSize(new Dimension(686, 514));
+        setOpaque(false);
 
         this.helpType = helpType;
 
@@ -78,7 +79,7 @@ public class HelpGlassPane extends JPanel implements IAnimatedComponent {
     @Override
     public void paint(Graphics g) {
         super.paint(g);
-        g.drawImage(imageToShow, 0, 25, null);
+        g.drawImage(imageToShow, 140, 25, null);
     }
     
     private int step = 0;
@@ -119,8 +120,8 @@ public class HelpGlassPane extends JPanel implements IAnimatedComponent {
 
     @Override
     public double preferredFPS() {
-        return 1.0;
-        //return 0.15;
+        // return 1.0;   // used for testing purposes
+        return 0.15;
     }
 
     @Override
