@@ -47,11 +47,10 @@ public class EventWindow extends JDialog {
     private JButton saveButton;
     private JButton cancelButton;
     private Calendar calendar;
-
     private String notificationMessage;
 
     public EventWindow(Date date, DayEvent dayEvent, String notificationString) {
-        setTitle(notificationString +" Event");
+        setTitle(notificationString + " Event");
         this.notificationMessage = notificationString;
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setResizable(false);
@@ -141,7 +140,7 @@ public class EventWindow extends JDialog {
 
         endDateSpinner = new JSpinner(endDateModel);
         endDateSpinner.setEditor(new JSpinner.DateEditor(endDateSpinner, "MMM dd yyyy"));
-        
+
         //Make the minute text get highlighted, dunno if this is good or not
         //but the technique could be used in other places
         final JTextField field = ((JSpinner.DateEditor) endTimeSpinner.getEditor()).getTextField();
@@ -152,6 +151,7 @@ public class EventWindow extends JDialog {
 
                 if (isEnabled()) {
                     SwingUtilities.invokeLater(new Runnable() {
+
                         public void run() {
                             field.setCaretPosition(5);
                             field.setSelectionEnd(5);
@@ -224,11 +224,15 @@ public class EventWindow extends JDialog {
         buttonPanel.add(cancelButton);
 
 
-        if(dayEvent != null){
+        if (dayEvent != null) {
             titleField.setText(dayEvent.getEventName());
             categoryComboBox.setSelectedItem(dayEvent.getCategory());
             priorityComboBox.setSelectedItem(dayEvent.getPriority());
             descTextArea.setText(dayEvent.getDescription());
+            startTimeSpinner.setValue(dayEvent.getStartTime());
+            startDateSpinner.setValue(dayEvent.getStartTime());
+            endTimeSpinner.setValue(dayEvent.getEndTime());
+            endDateSpinner.setValue(dayEvent.getEndTime());
         }
         // ADD THE PANELS //
         c.gridx = 0;
@@ -299,7 +303,7 @@ public class EventWindow extends JDialog {
 
     public static void main(String[] args) {
         Main.categories = XMLUtils.loadCategories(Configuration.getProperty("categories"));
-        EventWindow window = new EventWindow(new Date(),null, "Edit");
+        EventWindow window = new EventWindow(new Date(), null, "Edit");
         window.setVisible(true);
     }
 }
