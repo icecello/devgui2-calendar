@@ -14,29 +14,39 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 import javax.imageio.ImageIO;
-import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 /**
  *
  * @author James
  */
-public class HelpGlassPane extends JComponent implements IAnimatedComponent {
+public class HelpGlassPane extends JPanel implements IAnimatedComponent {
 
     ArrayList<BufferedImage> imageList;
     BufferedImage imageToShow;
     File imgDir;
     File[] imgFiles;
     String helpType;
+    JLabel textLabel;
+    ResourceBundle resource;
 
     public HelpGlassPane(Container contentPane, String helpType) {
-        setSize(new Dimension(686, 464));
+        setSize(new Dimension(686, 514));
 
         this.helpType = helpType;
 
         imageToShow = null;
         imageList = new ArrayList<BufferedImage>();
         loadImages();
+
+        resource = ResourceBundle.getBundle("gdcalendar.resource_en_US");
+
+        textLabel = new JLabel(resource.getString("onlinehelp.defaulttext.text"));
+        add(textLabel);
 
         AnimationDriver.getInstance().run(this, "show help image");
     }
@@ -67,18 +77,10 @@ public class HelpGlassPane extends JComponent implements IAnimatedComponent {
 
     @Override
     public void paint(Graphics g) {
-        g.drawImage(imageToShow, 0, 0, null);
+        super.paint(g);
+        g.drawImage(imageToShow, 0, 25, null);
     }
-
-    @Override
-    public Dimension getPreferredSize() {
-        /*if (img == null) {
-        return new Dimension(100,100);
-        } else {
-        return new Dimension(img.getWidth(null), img.getHeight(null));
-        }*/
-        return new Dimension(600, 600);
-    }
+    
     private int step = 0;
     private boolean isAnimationFinished = false;
     private boolean hasMarker = true;
@@ -86,21 +88,23 @@ public class HelpGlassPane extends JComponent implements IAnimatedComponent {
 
     @Override
     public boolean animationFinished() {
-        //cancel the animation if it has finished or if this daycard has no marker
-        //to animate
-        //if (isAnimationFinished || highlightMarker == Marker.NONE)
-        //	return true;
+        // Check performed in computeAnimation().
         return false;
     }
 
     /*
-     * perform a simple animation that smoothly changes between two colors
-     * in the triangle, any other animation is not yet supported
+     * switch between images in the help.
      */
     @Override
     public void computeAnimatation() {
         if (step < imgFiles.length) {
             imageToShow = imageList.get(step);
+            try {
+                textLabel.setText(resource.getString("onlinehelp." + helpType + "." + (step+1) + ".text"));
+            }
+            catch (MissingResourceException ex) {
+                textLabel.setText(resource.getString("onlinehelp.defaulttext.text"));
+            }
             step += inc;
         } else {
             AnimationDriver.getInstance().stopThread("show help image");
@@ -115,7 +119,7 @@ public class HelpGlassPane extends JComponent implements IAnimatedComponent {
 
     @Override
     public double preferredFPS() {
-        return 0.3;
+        return 0.15;
     }
 
     @Override

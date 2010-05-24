@@ -31,7 +31,7 @@ public class OnlineHelpWindow extends JFrame {
 
     public OnlineHelpWindow() {
         super("Online Help");
-        setSize(new Dimension(702, 502));
+        setSize(new Dimension(702, 527));
         setLayout(new GridLayout(3,0));
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         
@@ -50,7 +50,7 @@ public class OnlineHelpWindow extends JFrame {
 
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(702, 502);
+        return new Dimension(702, 527);
     }
 
     /**
