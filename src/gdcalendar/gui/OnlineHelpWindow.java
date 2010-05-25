@@ -7,10 +7,8 @@ package gdcalendar.gui;
 
 import actionmanager.Action;
 import actionmanager.ActionManager;
+import gdcalendar.logic.AnimationDriver;
 import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ResourceBundle;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -30,6 +28,7 @@ public class OnlineHelpWindow extends JFrame {
     ActionManager actionManager;
     JButton addEventHelpButton;
     JButton transparencyHelpButton;
+    JButton stopButton;
     JPanel panel;
 
     public OnlineHelpWindow() {
@@ -40,16 +39,20 @@ public class OnlineHelpWindow extends JFrame {
 
         panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setSize(150, 400);
 
         resource = ResourceBundle.getBundle("gdcalendar.resource_en_US");
         actionManager = new ActionManager(this, resource);
 
         addEventHelpButton = new JButton(actionManager.getAction("addEventHelp"));
         transparencyHelpButton = new JButton(actionManager.getAction("transparencyHelp"));
+        stopButton = new JButton(actionManager.getAction("stopHelp"));
 
-        panel.add(new JLabel("I want to see help for:"));
+        JLabel helpLabel = new JLabel("I want to see help for:");
+        panel.add(helpLabel);
         panel.add(addEventHelpButton);
         panel.add(transparencyHelpButton);
+        panel.add(stopButton);
 
         add(panel);
 
@@ -79,5 +82,14 @@ public class OnlineHelpWindow extends JFrame {
         helpGlassPane = new HelpGlassPane(this.getContentPane(), "transparency");
         this.setGlassPane(helpGlassPane);
         helpGlassPane.setVisible(true);
+    }
+
+    /**
+     * Stops the currently playing help animation.
+     */
+    @Action
+    public void stopHelp() {
+        AnimationDriver.getInstance().removeAll("show help image");
+        helpGlassPane.setVisible(false);
     }
 }
