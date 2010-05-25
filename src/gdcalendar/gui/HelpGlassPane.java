@@ -54,7 +54,8 @@ public class HelpGlassPane extends JPanel implements IAnimatedComponent {
 
     private void loadImages() {
         BufferedImage img = null;
-        imgDir = new File(System.getProperty("user.dir") + "\\src\\helpimages\\" + helpType);
+        imgDir = new File(System.getProperty("user.dir") + File.separator + "src"
+                + File.separator + "helpimages" + File.separator + helpType);
         imgFiles = imgDir.listFiles(new FilenameFilter() {
 
             public boolean accept(File dir, String name) {
