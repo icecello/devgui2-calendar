@@ -520,7 +520,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     		 */
     		if (!color1.equals(color2)) {
     			Graphics2D g2d = (Graphics2D)graphics;
-    			Rectangle r = graphics.getClipBounds();
+    			Rectangle r = getBounds();
     			Point pt1 = new Point(1,1);
     			Point pt2 = new Point((int)r.getWidth(), (int)r.getHeight());
     			GradientPaint gp = new GradientPaint(pt1, color1, pt2, color2);
