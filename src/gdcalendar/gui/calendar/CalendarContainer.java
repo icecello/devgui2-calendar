@@ -9,6 +9,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.border.Border;
+
 import gdcalendar.gui.calendar.daycard.MonthDayCard.CardView;
 import gdcalendar.gui.calendar.daycard.MonthDayCard.Marker;
 import java.util.ArrayList;
@@ -123,7 +125,9 @@ public class CalendarContainer extends JPanel {
         add(monthView, BorderLayout.CENTER);
         initListeners();
 
-        //set some default colors and fonts
+        /*
+         * set some default properties of the calendar
+         */
         setBackground(SystemColor.white);
         setComponentBackground(SystemColor.window);
         setDayNameBackground(SystemColor.window);
@@ -131,8 +135,15 @@ public class CalendarContainer extends JPanel {
         
         setDayTitleBackground(Color.white);
         setDayTitleBackground2(new Color(0,0,150));
+        
+        setGridBorder(BorderFactory.createLineBorder(new Color(240, 240, 240)));
     }
 
+    public void setGridBorder(Border gridborder) {
+    	for (int i = 0; i < views.size(); i++) {
+    		views.get(i).setBorder(gridborder);
+    	}
+    }
     /**
      * Set the default color for the triangle in all
      * daycards.
@@ -291,8 +302,13 @@ public class CalendarContainer extends JPanel {
     }
 
     /**
+     * Set which kind of marker will be used for highlighting
+     * days that contain events matching specified criteria.
      * 
-     * @param marker
+     * @param marker		marker to use
+     * 
+     * @see #addHighlight(Category)
+     * @see #addHighlight(Priority)
      */
     public void setMarker(Marker marker) {
         for (int i = 0; i < views.size(); i++) {
@@ -301,10 +317,12 @@ public class CalendarContainer extends JPanel {
     }
 
     /**
-     * Use some means of highlighting all items that belong to 
-     * specified category
+     * Add a category to the list of categories that will be
+     * highlighted in the calendar by the specified marker
      * 
-     * @param category		name of category to match against
+     * @param category		category to match against
+     * 
+     * @see #setMarker(Marker)
      */
     public void addHighlight(Category category) {
         for (int i = 0; i < views.size(); i++) {
@@ -313,9 +331,10 @@ public class CalendarContainer extends JPanel {
     }
 
     /**
-     * remove the specified category from the list of
+     * Remove the specified category from the list of
      * categories to highlight
-     * @param category
+     * 
+     * @param category		category to remove
      */
     public void removeHighlight(Category category) {
         for (int i = 0; i < views.size(); i++) {
@@ -324,10 +343,12 @@ public class CalendarContainer extends JPanel {
     }
 
     /**
-     * Use some means of highlighting all items that have the
-     * specified priority.
+     * Add a priority to the list of priorities that will be
+     * highlighted in the calendar by the specified marker.
      * 
      * @param prio			priority to match against
+     * 
+     * @see #setMarker(Marker)
      */
     public void addHighlight(Priority prio) {
         for (int i = 0; i < views.size(); i++) {
@@ -354,10 +375,10 @@ public class CalendarContainer extends JPanel {
         for (int i = 1; i <= 42; i++) {
             final CalendarController controller = new CalendarController();
             final MonthDayCard daycard = new MonthDayCard(dayViews, controller);
+            //add each daycard into the animation driver under the thread "calendarcontainer"
             AnimationDriver.getInstance().add(daycard, "calendarcontainer");
 
             DayFilteredCalendarModel model = new DayFilteredCalendarModel();
-            daycard.setBorder(BorderFactory.createLineBorder(new Color(240, 240, 240)));
 
             model.setRealCalendarModel(calendarModel);
 

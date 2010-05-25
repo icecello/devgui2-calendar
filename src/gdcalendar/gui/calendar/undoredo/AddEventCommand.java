@@ -2,7 +2,6 @@ package gdcalendar.gui.calendar.undoredo;
 
 import commandmanager.ICommand;
 
-import gdcalendar.mvc.controller.CalendarController;
 import gdcalendar.mvc.model.CalendarModel;
 import gdcalendar.mvc.model.DayEvent;
 
