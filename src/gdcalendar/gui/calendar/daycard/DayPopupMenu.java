@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package gdcalendar.gui.calendar.daycard;
 
 import actionmanager.Action;
@@ -17,6 +13,7 @@ import javax.swing.JSeparator;
  *
  * @author James
  */
+@SuppressWarnings("serial")
 public class DayPopupMenu extends JPopupMenu {
 
     public static final String ADD = "Add";
@@ -24,7 +21,6 @@ public class DayPopupMenu extends JPopupMenu {
     public static final String EDIT = "Edit";
     public static final String DELETE = "Delete";
 
-    protected DayPopupMenu popup = this;
     private ActionManager actionManager;
     private ResourceBundle resource;
     private JMenuItem viewItem;
