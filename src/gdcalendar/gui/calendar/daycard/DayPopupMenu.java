@@ -10,8 +10,14 @@ import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 
 /**
+ * A pop-up menu showing modifications that can be done
+ * for a DayCard, such as adding of an event, editing an event
+ * and removing an event.
  *
+ * The pop-up menu sends notifications to all who are listning
+ * when are certain action is performed
  * @author James
+ * @author Tomas
  */
 @SuppressWarnings("serial")
 public class DayPopupMenu extends JPopupMenu {
@@ -47,7 +53,8 @@ public class DayPopupMenu extends JPopupMenu {
     }
 
     /**
-     * Info here.
+     * Sends a notification that view action should be called
+     * in the classes listening
      */
     @Action
     public void viewDay() {
@@ -55,7 +62,8 @@ public class DayPopupMenu extends JPopupMenu {
     }
 
     /**
-     * Info here.
+     * Sends a notification that add action should be called
+     * in the classes listening
      */
     @Action
     public void addEvent() {
@@ -63,7 +71,8 @@ public class DayPopupMenu extends JPopupMenu {
     }
 
     /**
-     * Info here.
+     * Sends a notification that edit action should be called
+     * in the classes listening
      */
     @Action
     public void editEvent() {
@@ -71,7 +80,8 @@ public class DayPopupMenu extends JPopupMenu {
     }
 
     /**
-     * Info here.
+     * Sends a notification that delete action should be called
+     * in the classes listening
      */
     @Action
     public void deleteEvent() {
@@ -83,10 +93,18 @@ public class DayPopupMenu extends JPopupMenu {
         propSupport.addPropertyChangeListener(l);
     }
 
+    /**
+     * Set if the edit item should be enabled or not
+     * @param value true if the item should be enables, and false otherwise
+     */
     public void setEditEnabled(boolean value){
         actionManager.getAction("editEvent").setEnabled(value);
     }
 
+    /**
+     * Set if the delete item should be enabled or not
+     * @param value true if the item should be enables, and false otherwise
+     */
     public void setDeleteEnabled(boolean value){
         actionManager.getAction("deleteEvent").setEnabled(value);
     }

@@ -3,7 +3,8 @@ package gdcalendar.mvc.model;
 import java.awt.Color;
 
 /**
- *
+ * Category, connected to DayEvents. A category consists of a name
+ * , (a description) and a color.
  * @author Tomas
  */
 public class Category {

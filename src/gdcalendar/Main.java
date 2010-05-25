@@ -14,20 +14,21 @@ import javax.swing.UIManager;
  */
 public class Main {
 
+    /**
+     * Categories stored in XML are available from this
+     * static variable
+     */
     public static HashMap<String, Category> categories;
+
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
 
-
-
         MainWindow mainWindow = null;
         try {
-        	if (System.getProperty("os.name") == "Windows") {
-        		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        	}
-        	
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+            //Load the categories from file
             categories = XMLUtils.loadCategories(Configuration.getProperty("categories"));
             mainWindow = new MainWindow();
 
@@ -36,7 +37,5 @@ public class Main {
             e.printStackTrace();
         }
         mainWindow.setVisible(true);
-
-
     }
 }

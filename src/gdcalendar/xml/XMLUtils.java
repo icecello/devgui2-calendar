@@ -16,6 +16,7 @@ import org.w3c.dom.*;
  * A class for handling all XML related functionality.
  *
  * @author anve
+ * @author Tomas
  */
 public class XMLUtils {
 

@@ -11,7 +11,7 @@ import gdcalendar.mvc.model.DayEvent;
  * of commands to undo/redo.
  * 
  * @author Håkan
- *
+ * @author Tomas
  */
 public class AddEventCommand implements ICommand {
 	

@@ -9,6 +9,7 @@ import java.util.Properties;
  * Configuration class handling window states and storing miscellaneous properties
  * such as XML file paths.
  * @author anve
+ * @author Tomas
  */
 public class Configuration {
 

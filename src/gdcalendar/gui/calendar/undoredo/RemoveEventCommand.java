@@ -12,7 +12,7 @@ import gdcalendar.mvc.model.DayEvent;
  * 
  * 
  * @author Håkan
- *
+ * @author Tomas
  */
 public class RemoveEventCommand implements ICommand {
 	private CalendarModel model;

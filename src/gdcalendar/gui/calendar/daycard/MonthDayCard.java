@@ -1,6 +1,3 @@
-/**
- * 
- */
 package gdcalendar.gui.calendar.daycard;
 
 import gdcalendar.logic.IAnimatedComponent;
