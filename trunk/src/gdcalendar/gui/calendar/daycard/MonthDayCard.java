@@ -100,14 +100,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
         titleLabel = new GradientLabel();
         
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        
-        /*
-         * setup colors for the calendar based on system colors, so
-         * the user's choices are respected
-         */
-        //titleLabel.setBackground(SystemColor.window);
-        titleLabel.setOpaque(true);
-        //this.setBackground(SystemColor.text);
+
         simpleView.setBackground(SystemColor.text);
         detailedView.setBackground(SystemColor.text);
         
@@ -522,36 +515,13 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     	
     	@Override
     	public void paintComponent(Graphics graphics) {
+    		super.paintComponent(graphics);
+    		
     		/*
     		 * if we have two different colors, let's
     		 * produce a nice gradient between them
     		 */
-    		
-    		super.paintComponent(graphics);
-    		
     		if (!color1.equals(color2)) {
-    			/*int r1 = color1.getRed();
-    			int g1 = color1.getGreen();
-    			int b1 = color1.getBlue();
-    			int r2 = color2.getRed();
-    			int g2 = color2.getGreen();
-    			int b2 = color2.getBlue();
-    			
-    			double step = 0.0;
-    			
-    			Rectangle rect = graphics.getClipBounds();
-    			double inc = 1 / rect.getWidth();
-    			int x = 0;
-    			while (step < 1.0) {
-    				int r = (int) ((1 - step) * r1 + step * r2);
-    				int g = (int) ((1 - step) * g1 + step * g2);
-    				int b = (int) ((1 - step) * b1 + step * b2);
-    				
-    				graphics.setColor(new Color(r, g, b));
-    				graphics.drawLine(x, 0, x, (int)rect.getHeight());
-    				x += 1;
-    				step += inc;
-    			}*/
     			Graphics2D g2d = (Graphics2D)graphics;
     			Rectangle r = graphics.getClipBounds();
     			Point pt1 = new Point(1,1);
@@ -569,7 +539,12 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     			for (int i = 0; i < getText().length(); i++) {
     				width += widths[getText().charAt(i)];
     			}
-    			
+    			/*
+    			 * Draw the actual text of the label, this has to be done manually
+    			 * after drawing the background, since calling super.paintComponent()
+    			 * draws both background and text, which would overwrite the custom
+    			 * drawing.
+    			 */
     			g2d.drawString(this.getText(), (int)r.getWidth()/2 - width/2, (int)r.getHeight()/2 + height/2-1);
     			
     		}
@@ -591,20 +566,26 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     private boolean hasMarker = true;
     private float colorInc = 0.2f;
     private boolean shouldAnimate = false;
+    private boolean cleanupDone = false;
     
 	@Override
 	public boolean animationFinished() {
 		return false;
 	}
 
-	//TODO: add some neat way to let repaint() happen here only once
+	/*
+	 * Reset the state of the animation to it's starting state.
+	 */
 	@Override
 	public void cleanup() {
-		triangleColor = triangleStartColor;
-		colorStep = 0.2f;
-		//this.repaint();
-
+		if (!cleanupDone) {
+			triangleColor = triangleStartColor;
+			colorStep = 0.2f;
+			this.repaint();
+			cleanupDone = true;
+		}
 	}
+	
 	/*
 	 * perform a simple animation that smoothly changes between two colors
 	 * in the triangle, any other animation is not yet supported
@@ -612,6 +593,13 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
 	@Override
 	public void computeAnimatation() {
 		shouldAnimate = false;
+		/*
+		 * Do nothing if we have no specified marker for the daycard
+		 * if we have a marker:
+		 * Look through the list of priorities and categories to highlight
+		 * and see if this daycard has events matching these. Animation
+		 * will only happen if we find a match.
+		 */
 		if (hasMarker) {
 			for (int j = 0; j < events.size(); j++) {
 				for (int i = 0; i < arrayPrioritiesHighlight.size(); i++) {
@@ -629,6 +617,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
 		}
 		
 		if (shouldAnimate) {
+			cleanupDone = false;
 			switch (highlightMarker) {
 			
 			
