@@ -24,7 +24,9 @@ public class Main {
 
         MainWindow mainWindow = null;
         try {
-        	UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+        	if (System.getProperty("os.name") == "Windows") {
+        		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        	}
         	
             categories = XMLUtils.loadCategories(Configuration.getProperty("categories"));
             mainWindow = new MainWindow();
