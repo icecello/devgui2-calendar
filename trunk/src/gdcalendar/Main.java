@@ -6,6 +6,8 @@ import gdcalendar.xml.Configuration;
 import gdcalendar.xml.XMLUtils;
 import java.util.HashMap;
 
+import javax.swing.UIManager;
+
 /**
  *
  * @author Tomas
@@ -22,6 +24,8 @@ public class Main {
 
         MainWindow mainWindow = null;
         try {
+        	UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+        	
             categories = XMLUtils.loadCategories(Configuration.getProperty("categories"));
             mainWindow = new MainWindow();
 

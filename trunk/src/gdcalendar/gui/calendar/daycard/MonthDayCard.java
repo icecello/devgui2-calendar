@@ -3,7 +3,6 @@
  */
 package gdcalendar.gui.calendar.daycard;
 
-import gdcalendar.logic.AnimationDriver;
 import gdcalendar.logic.IAnimatedComponent;
 import gdcalendar.mvc.controller.CalendarController;
 import gdcalendar.mvc.model.Category;
@@ -15,9 +14,12 @@ import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Polygon;
+import java.awt.Rectangle;
 import java.awt.SystemColor;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
@@ -30,23 +32,18 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-import javax.swing.UIManager;
-import javax.swing.plaf.SliderUI;
+
 
 /**
  * @author Håkan
  * @author James
  *
  * This is the implementation of a day card that can be used in the standard
- * calendar if we omit the week view for now. It's quite simple to change if 
- * we want to support week view later. It's a self-contained day view panel.
+ * calendar. It's a self-contained day view panel.
  * 
- * One possibility is to switch to detailed view on clicking the indicator
- * triangle in the corner...
- * 
- * Update 21/4-10: This comment is outdated, the class has changed quite a bit
- * since it was made... 
- * 
+ * It also handles animation by implementing the IAnimatedComponent interface.
+ * Note: this comment probably needs lots of development...
+ * TODO: update IDayCard interface to not be useless
  */
 @SuppressWarnings("serial")
 public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimatedComponent {
@@ -85,7 +82,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     private JPanel simpleView = new JPanel();   //The simple visual representation of the day
     private JPanel detailedView = new JPanel(); //The advanced visual representation of the day
     private String newEventName;        //temporary storage for a new event name
-    private JLabel titleLabel;          //Title label, showing the day of the month
+    private GradientLabel titleLabel;          //Title label, showing the day of the month
     private CalendarController controller;   //The controller, responsible for updating the
     //connected models
     private ArrayList<JLabel> eventLabels;  //The visual representation of the day events
@@ -100,7 +97,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
      */
     private void Init() {
         setLayout(new BorderLayout());
-        titleLabel = new JLabel();
+        titleLabel = new GradientLabel();
         
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         
@@ -182,7 +179,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
      * @param color
      */
     public void setTriangleColor(Color color) {
-    	startColor = color;
+    	triangleStartColor = color;
     }
     
     /** 
@@ -191,7 +188,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
      * @param color
      */
     public void setTriangleFadeColor(Color color) {
-    	endColor = color;
+    	triangleEndColor = color;
     }
     
     /**
@@ -220,6 +217,17 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
      */
     public void setTitleBackground(Color color) {
     	titleLabel.setBackground(color);
+    }
+    
+    /**
+     * Set the second color of the daycard's title background.
+     * If this color differs from the first background color
+     * chosen, a gradient will be produced between them.
+     * 
+     * @param color
+     */
+    public void setTitleBackground2(Color color) {
+    	titleLabel.setBackground2(color);
     }
     
     /**
@@ -492,30 +500,108 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     	eventMouseListeners.add(l);
     }
     
+    class GradientLabel extends JLabel {
+    	private Color color1;
+    	private Color color2;
+    	GradientLabel() {
+    		color1 = SystemColor.textText;
+    		color2 = SystemColor.textText;
+    	}
+    	
+    	@Override
+    	public void setBackground(Color color) {
+    		color1 = color;
+    		this.repaint();
+    		super.setBackground(color);
+    	}
+    	
+    	public void setBackground2(Color color) {
+    		color2 = color;
+    		this.repaint();
+    	}
+    	
+    	@Override
+    	public void paintComponent(Graphics graphics) {
+    		/*
+    		 * if we have two different colors, let's
+    		 * produce a nice gradient between them
+    		 */
+    		
+    		super.paintComponent(graphics);
+    		
+    		if (!color1.equals(color2)) {
+    			/*int r1 = color1.getRed();
+    			int g1 = color1.getGreen();
+    			int b1 = color1.getBlue();
+    			int r2 = color2.getRed();
+    			int g2 = color2.getGreen();
+    			int b2 = color2.getBlue();
+    			
+    			double step = 0.0;
+    			
+    			Rectangle rect = graphics.getClipBounds();
+    			double inc = 1 / rect.getWidth();
+    			int x = 0;
+    			while (step < 1.0) {
+    				int r = (int) ((1 - step) * r1 + step * r2);
+    				int g = (int) ((1 - step) * g1 + step * g2);
+    				int b = (int) ((1 - step) * b1 + step * b2);
+    				
+    				graphics.setColor(new Color(r, g, b));
+    				graphics.drawLine(x, 0, x, (int)rect.getHeight());
+    				x += 1;
+    				step += inc;
+    			}*/
+    			Graphics2D g2d = (Graphics2D)graphics;
+    			Rectangle r = graphics.getClipBounds();
+    			Point pt1 = new Point(1,1);
+    			Point pt2 = new Point((int)r.getWidth(), (int)r.getHeight());
+    			GradientPaint gp = new GradientPaint(pt1, color1, pt2, color2);
+    			
+    			g2d.setPaint(gp);
+    			g2d.fillRect(pt1.x, pt1.y, pt2.x, pt2.y);
+    			g2d.setColor(this.getForeground());
+    			g2d.setFont(this.getFont());
+    			//get font metrics to properly place the label text
+    			int height = this.getFontMetrics(this.getFont()).getHeight();
+    			int width = 0;
+    			int widths[] = getFontMetrics(getFont()).getWidths();
+    			for (int i = 0; i < getText().length(); i++) {
+    				width += widths[getText().charAt(i)];
+    			}
+    			
+    			g2d.drawString(this.getText(), (int)r.getWidth()/2 - width/2, (int)r.getHeight()/2 + height/2-1);
+    			
+    		}
+    		
+    		
+    	}
+    }
+    
+    
     /*
      * these variables are placed down here for the sole reason that it's much
      * easier to keep them close to the actual code that uses them, it makes sense
      * to have them nearby
      */
-    private Color startColor = new Color(0,100,0);
-    private Color endColor = new Color(0,210,0);
-    private Color triangleColor = startColor;
-    private float step = 0.0f;
+    private Color triangleStartColor = new Color(0,100,0);
+    private Color triangleEndColor = new Color(0,210,0);
+    private Color triangleColor = triangleStartColor;
+    private float colorStep = 0.0f;
     private boolean hasMarker = true;
-    private float inc = 0.2f;
+    private float colorInc = 0.2f;
     private boolean shouldAnimate = false;
-    private boolean doCleanup = false;
-    private int cleanupCounter = 0;
     
 	@Override
 	public boolean animationFinished() {
 		return false;
 	}
 
+	//TODO: add some neat way to let repaint() happen here only once
 	@Override
 	public void cleanup() {
-		triangleColor = startColor;
-		step = 0.2f;
+		triangleColor = triangleStartColor;
+		colorStep = 0.2f;
 		//this.repaint();
 
 	}
@@ -547,14 +633,14 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
 			
 			
 			case TRIANGLE_FADING:
-				int r = (int) ((1 - step) * startColor.getRed() + step * endColor.getRed());
-				int g = (int) ((1 - step) * startColor.getGreen() + step * endColor.getGreen());
-				int b = (int) ((1 - step) * startColor.getBlue() + step * endColor.getBlue());
-				step += inc;
-				if (step >= 1) {
-					inc = -0.2f;
-				} else if (step <= 0.1f) {
-					inc = 0.2f;
+				int r = (int) ((1 - colorStep) * triangleStartColor.getRed() + colorStep * triangleEndColor.getRed());
+				int g = (int) ((1 - colorStep) * triangleStartColor.getGreen() + colorStep * triangleEndColor.getGreen());
+				int b = (int) ((1 - colorStep) * triangleStartColor.getBlue() + colorStep * triangleEndColor.getBlue());
+				colorStep += colorInc;
+				if (colorStep >= 1) {
+					colorInc = -0.2f;
+				} else if (colorStep <= 0.1f) {
+					colorInc = 0.2f;
 				}
 				triangleColor = new Color(r, g, b);
 			}

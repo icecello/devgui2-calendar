@@ -9,7 +9,6 @@ import gdcalendar.xml.Configuration;
 import gdcalendar.xml.XMLUtils;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -51,7 +50,6 @@ import java.beans.PropertyChangeListener;
 import java.util.Date;
 import java.util.UUID;
 import javax.swing.JLabel;
-import javax.swing.UIManager;
 
 /**
  * MainWindow for a Calendar application. Events are loaded from XML at initialization
@@ -93,13 +91,11 @@ public class MainWindow extends JFrame {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setMinimumSize(new Dimension(700, 500));
 
+        
         resource = ResourceBundle.getBundle("gdcalendar.resource_en_US");
         actionManager = new ActionManager(this, resource);
 
-        if (System.getProperties().get("os.name").toString().contains("Windows")) {
-            UIManager.setLookAndFeel(
-                    "com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-        }
+
 
         ArrayList<DayEvent> events = null;
         try {
@@ -123,6 +119,7 @@ public class MainWindow extends JFrame {
 
         pack();
 
+        
         AnimationDriver.getInstance().runThread("calendarcontainer");
     }
 
@@ -433,11 +430,14 @@ public class MainWindow extends JFrame {
 
             menu.add(item);
         }
-
+        
         Rectangle rect = toolButtonCategory.getBounds();
-        Point pt = new Point(rect.x, rect.y + rect.height);
-        pt = toolBar.getLocationOnScreen();
-        menu.show(this, pt.x, pt.y);
+        Point bounds = new Point(rect.x, rect.y + rect.height);
+        Point toolButtonLocation = toolButtonCategory.getLocation();
+        Point toolBarLocation = toolBar.getLocationOnScreen();
+        Point windowDisplacement = this.getLocationOnScreen();
+        menu.show(this, toolBarLocation.x + toolButtonLocation.x - windowDisplacement.x, 
+        		toolBarLocation.y + toolButtonLocation.y + bounds.y - windowDisplacement.y);
 
 
     }
@@ -476,8 +476,11 @@ public class MainWindow extends JFrame {
 
 
         Rectangle rect = toolButtonPriority.getBounds();
-        Point pt = new Point(rect.x, rect.y + rect.height);
-        Point pt2 = toolBar.getLocationOnScreen();
-        menu.show(this, pt2.x, pt2.y);
+        Point bounds = new Point(rect.x, rect.y + rect.height);
+        Point toolButtonLocation = toolButtonPriority.getLocation();
+        Point toolBarLocation = toolBar.getLocationOnScreen();
+        Point windowDisplacement = this.getLocationOnScreen();
+        menu.show(this, toolBarLocation.x + toolButtonLocation.x - windowDisplacement.x, 
+        		toolBarLocation.y + toolButtonLocation.y + bounds.y - windowDisplacement.y);
     }
 }

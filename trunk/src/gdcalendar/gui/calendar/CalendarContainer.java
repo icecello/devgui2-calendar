@@ -126,8 +126,11 @@ public class CalendarContainer extends JPanel {
         //set some default colors and fonts
         setBackground(SystemColor.white);
         setComponentBackground(SystemColor.window);
-        setDayTitleBackground(SystemColor.window);
-        setDayFont(new Font("Arial", Font.PLAIN, 16));
+        setDayNameBackground(SystemColor.window);
+        setDayFont(new Font("Arial", Font.BOLD, 16));
+        
+        setDayTitleBackground(Color.white);
+        setDayTitleBackground2(new Color(0,0,150));
     }
 
     /**
@@ -163,6 +166,8 @@ public class CalendarContainer extends JPanel {
         super.setBackground(color);
 
         //avoid doing this if we got called before views has been created
+        //this happens in Swing automatically, and is a problem since 
+        //this is an overload of the default setBackground()
         if (views != null) {
             for (int i = 0; i < views.size(); i++) {
                 views.get(i).setBackground(color);
@@ -202,15 +207,17 @@ public class CalendarContainer extends JPanel {
             views.get(i).setTitleFont(font);
         }
     }
-
+    
     /**
      * Set the background color of the area listing
      * the days, Sun-Mon
      * 
      * @param color
      */
-    public void setDayTitleBackground(Color color) {
-        dayTitle.setBackground(color);
+    public void setDayNameBackground(Color color) {
+    	for (int i = 0; i < dayTitleLabels.size(); i++) {
+            dayTitleLabels.get(i).setBackground(color);
+        }
     }
 
     /**
@@ -218,7 +225,7 @@ public class CalendarContainer extends JPanel {
      * the days, Sun-Mon
      * @param color
      */
-    public void setDayTitleForeground(Color color) {
+    public void setDayNameForeground(Color color) {
         for (int i = 0; i < dayTitleLabels.size(); i++) {
             dayTitleLabels.get(i).setForeground(color);
         }
@@ -234,6 +241,30 @@ public class CalendarContainer extends JPanel {
         super.setBackground(color);
         monthTitle.setBackground(color);
         monthNavPanel.setBackground(color);
+    }
+
+    /**
+     * Set the background color of each day's title.
+     * 
+     * @param color
+     */
+    public void setDayTitleBackground(Color color) {
+    	for (int i = 0; i < views.size(); i++) {
+            views.get(i).setTitleBackground(color);
+        }
+    }
+    
+    /**
+     * Set the second background color of each day's title.
+     * This can be used to produce a gradient effect on the
+     * background.
+     * 
+     * @param color
+     */
+    public void setDayTitleBackground2(Color color) {
+    	for (int i = 0; i < views.size(); i++) {
+            views.get(i).setTitleBackground2(color);
+        }
     }
 
     /**

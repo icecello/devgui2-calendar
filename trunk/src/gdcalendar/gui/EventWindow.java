@@ -34,6 +34,7 @@ import javax.swing.SwingUtilities;
  *
  * @author Tomas
  */
+@SuppressWarnings("serial")
 public class EventWindow extends JDialog {
 
     private JTextField titleField;

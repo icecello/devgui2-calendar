@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package gdcalendar.gui;
 
 import gdcalendar.logic.AnimationDriver;
@@ -24,6 +20,7 @@ import javax.swing.JPanel;
  *
  * @author James
  */
+@SuppressWarnings("serial")
 public class HelpGlassPane extends JPanel implements IAnimatedComponent {
 
     ArrayList<BufferedImage> imageList;
@@ -84,8 +81,6 @@ public class HelpGlassPane extends JPanel implements IAnimatedComponent {
     }
     
     private int step = 0;
-    private boolean isAnimationFinished = false;
-    private boolean hasMarker = true;
     private int inc = 1;
 
     @Override
