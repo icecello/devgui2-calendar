@@ -11,7 +11,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 /**
- * 
+ *
+ *@author Tomas
  * @author James
  */
 @SuppressWarnings({ "restriction", "serial" })

@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package gdcalendar.gui;
 
 import gdcalendar.Main;
@@ -18,6 +14,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -31,8 +28,14 @@ import javax.swing.SpinnerModel;
 import javax.swing.SwingUtilities;
 
 /**
+ *General window for showing and manipulating events.
+ * Notifies all that are listning when the save button is 
+ * pressed. The notification message is specified at construction time.
+ * All who are listening to the specified message are sent the DayEvent
+ * described in the input fields.
  *
  * @author Tomas
+ * @author James
  */
 @SuppressWarnings("serial")
 public class EventWindow extends JDialog {
@@ -49,9 +52,11 @@ public class EventWindow extends JDialog {
     private JButton cancelButton;
     private Calendar calendar;
     private String notificationMessage;
+    private ResourceBundle resource;
 
     public EventWindow(Date date, DayEvent dayEvent, String notificationString) {
-        setTitle(notificationString + " Event");
+        resource = ResourceBundle.getBundle("gdcalendar.resource_en_US");
+        setTitle(notificationString + resource.getString("gdcalendar.gui.EventWindow.windowTitle"));
         this.notificationMessage = notificationString;
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setResizable(false);
@@ -64,7 +69,7 @@ public class EventWindow extends JDialog {
         // TITLE PANEL //
 
         JPanel titlePanel = new JPanel();
-        titlePanel.setBorder(BorderFactory.createTitledBorder("Title"));
+        titlePanel.setBorder(BorderFactory.createTitledBorder(resource.getString("gdcalendar.gui.EventWindow.border.title")));
         titleField = new JTextField(20);
         titlePanel.add(titleField);
 
@@ -82,7 +87,7 @@ public class EventWindow extends JDialog {
                 Calendar.YEAR);    //ignored for user input
 
         startTimeSpinner = new JSpinner(startTimeModel);
-        startTimeSpinner.setEditor(new JSpinner.DateEditor(startTimeSpinner, "HH:mm"));
+        startTimeSpinner.setEditor(new JSpinner.DateEditor(startTimeSpinner, resource.getString("gdcalendar.gui.EventWindow.format.time")));
 
         // START DATE //
 
@@ -98,12 +103,12 @@ public class EventWindow extends JDialog {
                 Calendar.YEAR);    //ignored for user input
 
         startDateSpinner = new JSpinner(startDateModel);
-        startDateSpinner.setEditor(new JSpinner.DateEditor(startDateSpinner, "MMM dd yyyy"));
+        startDateSpinner.setEditor(new JSpinner.DateEditor(startDateSpinner, resource.getString("gdcalendar.gui.EventWindow.format.date")));
 
         // START TIME PANEL //
 
         JPanel startTimePanel = new JPanel();
-        startTimePanel.setBorder(BorderFactory.createTitledBorder("Start Time"));
+        startTimePanel.setBorder(BorderFactory.createTitledBorder(resource.getString("gdcalendar.gui.EventWindow.border.startTime")));
 
         startTimePanel.add(startTimeSpinner);
         startTimePanel.add(startDateSpinner);
@@ -123,7 +128,7 @@ public class EventWindow extends JDialog {
                 Calendar.YEAR);    //ignored for user input
 
         endTimeSpinner = new JSpinner(endTimeModel);
-        endTimeSpinner.setEditor(new JSpinner.DateEditor(endTimeSpinner, "HH:mm"));
+        endTimeSpinner.setEditor(new JSpinner.DateEditor(endTimeSpinner, resource.getString("gdcalendar.gui.EventWindow.format.time")));
 
 
         // END DATE //
@@ -140,7 +145,7 @@ public class EventWindow extends JDialog {
                 Calendar.YEAR);    //ignored for user input
 
         endDateSpinner = new JSpinner(endDateModel);
-        endDateSpinner.setEditor(new JSpinner.DateEditor(endDateSpinner, "MMM dd yyyy"));
+        endDateSpinner.setEditor(new JSpinner.DateEditor(endDateSpinner, resource.getString("gdcalendar.gui.EventWindow.format.date")));
 
         //Make the minute text get highlighted, dunno if this is good or not
         //but the technique could be used in other places
@@ -167,7 +172,7 @@ public class EventWindow extends JDialog {
         // END TIME PANEL //
 
         JPanel endTimePanel = new JPanel();
-        endTimePanel.setBorder(BorderFactory.createTitledBorder("End Time"));
+        endTimePanel.setBorder(BorderFactory.createTitledBorder(resource.getString("gdcalendar.gui.EventWindow.border.endTime")));
 
         endTimePanel.add(endTimeSpinner);
         endTimePanel.add(endDateSpinner);
@@ -177,7 +182,7 @@ public class EventWindow extends JDialog {
         JPanel catPrioPanel = new JPanel();
 
         JPanel categoryPanel = new JPanel();
-        categoryPanel.setBorder(BorderFactory.createTitledBorder("Category"));
+        categoryPanel.setBorder(BorderFactory.createTitledBorder(resource.getString("gdcalendar.gui.EventWindow.border.category")));
         Category[] cat = new Category[1];
 
 
@@ -185,7 +190,7 @@ public class EventWindow extends JDialog {
         categoryPanel.add(categoryComboBox);
 
         JPanel priorityPanel = new JPanel();
-        priorityPanel.setBorder(BorderFactory.createTitledBorder("Priority"));
+        priorityPanel.setBorder(BorderFactory.createTitledBorder(resource.getString("gdcalendar.gui.EventWindow.border.priority")));
         priorityComboBox = new JComboBox(Priority.values());
         priorityComboBox.setSelectedItem(Priority.MEDIUM);
         priorityPanel.add(priorityComboBox);
@@ -196,7 +201,7 @@ public class EventWindow extends JDialog {
         // DESCRIPTION PANEL //
 
         JPanel descriptionPanel = new JPanel();
-        descriptionPanel.setBorder(BorderFactory.createTitledBorder("Description"));
+        descriptionPanel.setBorder(BorderFactory.createTitledBorder(resource.getString("gdcalendar.gui.EventWindow.border.description")));
         descTextArea = new JTextArea(4, 20);
         descTextArea.setLineWrap(true);
         descriptionPanel.add(descTextArea);
@@ -204,7 +209,7 @@ public class EventWindow extends JDialog {
         // BUTTON PANEL //
 
         JPanel buttonPanel = new JPanel();
-        saveButton = new JButton("Save");
+        saveButton = new JButton(resource.getString("gdcalendar.gui.EventWindow.save"));
         saveButton.addMouseListener(new MouseAdapter() {
 
             @Override
@@ -213,7 +218,7 @@ public class EventWindow extends JDialog {
                 EventWindow.this.dispose();
             }
         });
-        cancelButton = new JButton("Cancel");
+        cancelButton = new JButton(resource.getString("gdcalendar.gui.EventWindow.cancel"));
         cancelButton.addMouseListener(new MouseAdapter() {
 
             @Override
@@ -224,7 +229,7 @@ public class EventWindow extends JDialog {
         buttonPanel.add(saveButton);
         buttonPanel.add(cancelButton);
 
-
+        //If the DayEvent argument !=null, set the values of the fields that matches the input
         if (dayEvent != null) {
             titleField.setText(dayEvent.getEventName());
             categoryComboBox.setSelectedItem(dayEvent.getCategory());

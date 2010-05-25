@@ -1,7 +1,7 @@
 package gdcalendar.gui;
 
 import java.awt.Frame;
-import java.awt.event.ActionEvent;
+import java.util.ResourceBundle;
 import javax.swing.*;
 
 /**
@@ -11,6 +11,7 @@ import javax.swing.*;
  */
 public class AboutWindow extends JDialog {
 
+    private ResourceBundle bundle;
     public AboutWindow(Frame parent) {
         super(parent);
         initializeComponents();
@@ -18,20 +19,21 @@ public class AboutWindow extends JDialog {
 
     /**
      * Initializes the components within this dialog.
-     *
-     * TODO: Use ResourceBundle
      */
     private void initializeComponents() {
-        JLabel appTitleLabel = new JLabel("GDCalendar");
-        JLabel versionLabel = new JLabel("Version");
-        JLabel appVersionLabel = new JLabel("0.4");
-        JLabel vendorLabel = new JLabel("Author:");
-        JLabel appVendorLabel = new JLabel("Group D");
-        JLabel appDescLabel = new JLabel("A calendar application.");
+        //Read resources from property file
+        bundle = ResourceBundle.getBundle("gdcalendar.resource_en_US");
+
+        JLabel appTitleLabel = new JLabel(bundle.getString("gdcalendar.gui.AboutWindow.appTitleLabel"));
+        JLabel versionLabel = new JLabel(bundle.getString("gdcalendar.gui.AboutWindow.versionLabel"));
+        JLabel appVersionLabel = new JLabel(bundle.getString("gdcalendar.gui.AboutWindow.appVersionLabel"));
+        JLabel vendorLabel = new JLabel(bundle.getString("gdcalendar.gui.AboutWindow.vendorLabel"));
+        JLabel appVendorLabel = new JLabel(bundle.getString("gdcalendar.gui.AboutWindow.appVendorLabel"));
+        JLabel appDescLabel = new JLabel(bundle.getString("gdcalendar.gui.AboutWindow.appDescLabel"));
         JLabel imageLabel = new JLabel();
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("About GDCalendar");
+        setTitle(bundle.getString("gdcalendar.gui.AboutWindow.windowTitle"));
         setModal(true);
         setResizable(false);
 

@@ -3,16 +3,79 @@
 
 <calendar>
   <dayEvent>
-    <name>hey oh (snow...)</name>
-    <startDate>2010-05-27 16:41</startDate>
-    <endDate>2010-05-29 17:41</endDate>
+    <name>sdfsdf</name>
+    <startDate>2010-05-03 20:32</startDate>
+    <endDate>2010-05-03 21:32</endDate>
     <category>category1</category>
-    <priority>LOW</priority>
+    <priority>MEDIUM</priority>
+  </dayEvent>
+  <dayEvent>
+    <name>dfgfdg</name>
+    <startDate>1899-12-31 00:00</startDate>
+    <endDate>1899-12-31 01:00</endDate>
+    <category>category1</category>
+    <priority>MEDIUM</priority>
+  </dayEvent>
+  <dayEvent>
+    <name>sdfsdf</name>
+    <startDate>2010-05-03 20:32</startDate>
+    <endDate>2010-05-03 21:32</endDate>
+    <category>category1</category>
+    <priority>MEDIUM</priority>
+  </dayEvent>
+  <dayEvent>
+    <name>poster making</name>
+    <startDate>2010-05-26 21:33</startDate>
+    <endDate>2010-05-26 22:33</endDate>
+    <category>category1</category>
+    <priority>MEDIUM</priority>
+  </dayEvent>
+  <dayEvent>
+    <name>bhmnb</name>
+    <startDate>1899-12-31 00:00</startDate>
+    <endDate>1899-12-31 01:00</endDate>
+    <category>category1</category>
+    <priority>MEDIUM</priority>
+  </dayEvent>
+  <dayEvent>
+    <name>sdfsdf</name>
+    <startDate>2010-05-07 19:30</startDate>
+    <endDate>2010-05-07 20:30</endDate>
+    <category>category1</category>
+    <priority>MEDIUM</priority>
+  </dayEvent>
+  <dayEvent>
+    <name>fghfhfhhf</name>
+    <startDate>2010-05-14 17:03</startDate>
+    <endDate>2010-05-14 18:03</endDate>
+    <category>category1</category>
+    <priority>MEDIUM</priority>
+  </dayEvent>
+  <dayEvent>
+    <name>sedfsdf</name>
+    <startDate>1899-12-31 00:00</startDate>
+    <endDate>1899-12-31 01:00</endDate>
+    <category>category1</category>
+    <priority>MEDIUM</priority>
+  </dayEvent>
+  <dayEvent>
+    <name>sjkgdjd</name>
+    <startDate>2010-05-04 21:29</startDate>
+    <endDate>2010-05-04 22:29</endDate>
+    <category>category1</category>
+    <priority>MEDIUM</priority>
   </dayEvent>
   <dayEvent>
     <name>dgfdgdgfdg</name>
     <startDate>2010-05-23 15:58</startDate>
     <endDate>2010-05-23 16:58</endDate>
+    <category>category1</category>
+    <priority>MEDIUM</priority>
+  </dayEvent>
+  <dayEvent>
+    <name>fhfgh</name>
+    <startDate>2010-05-20 20:47</startDate>
+    <endDate>2010-05-20 21:47</endDate>
     <category>category1</category>
     <priority>MEDIUM</priority>
   </dayEvent>

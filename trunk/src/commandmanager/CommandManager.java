@@ -84,8 +84,6 @@ public class CommandManager {
 		commandQueue.add(command);
 		command.execute();
 		lastCommand++;
-		
-		System.out.println("size: " + commandQueue.size());
 	}
 	
 	/**
