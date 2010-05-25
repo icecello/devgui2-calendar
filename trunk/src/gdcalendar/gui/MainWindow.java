@@ -459,7 +459,7 @@ public class MainWindow extends JFrame {
                 item.setState(checkedPriorities.get(p[i]));
             }
 
-            item.setAction(new AbstractAction(p[i].name()) {
+            item.setAction(new AbstractAction(p[i].toString()) {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
