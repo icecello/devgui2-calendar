@@ -6,12 +6,17 @@ import gdcalendar.mvc.model.DayEvent;
 import gdcalendar.mvc.model.DayEvent.Priority;
 import gdcalendar.xml.Configuration;
 import gdcalendar.xml.XMLUtils;
+import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.ResourceBundle;
@@ -19,6 +24,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JEditorPane;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextArea;
@@ -26,6 +33,9 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerDateModel;
 import javax.swing.SpinnerModel;
 import javax.swing.SwingUtilities;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.plaf.basic.BasicComboBoxUI.PropertyChangeHandler;
 
 /**
  *General window for showing and manipulating events.
@@ -40,6 +50,9 @@ import javax.swing.SwingUtilities;
 @SuppressWarnings("serial")
 public class EventWindow extends JDialog {
 
+    private JLabel addCategory;
+    private JLabel removeCategory;
+    private JLabel editCategory;
     private JTextField titleField;
     private JSpinner startDateSpinner;
     private JSpinner startTimeSpinner;
@@ -179,15 +192,29 @@ public class EventWindow extends JDialog {
 
         // CATEGORY & PRIORITY PANEL //
 
-        JPanel catPrioPanel = new JPanel();
+        JPanel catPrioPanel = new JPanel(new GridBagLayout());
 
-        JPanel categoryPanel = new JPanel();
+        JPanel categoryPanel = new JPanel(new GridBagLayout());
         categoryPanel.setBorder(BorderFactory.createTitledBorder(resource.getString("gdcalendar.gui.EventWindow.border.category")));
-        Category[] cat = new Category[1];
 
-
+        addCategory = new JLabel("<html><a href='' color=#6666ff>Add</a></html>");
+        addCategory.setForeground(Color.BLACK);
+        addCategory.addMouseListener(new MouseLinkListner(addCategory,"Add"));
+        removeCategory = new JLabel("<html><a href='' color=#6666ff>Remove</a></html>");
+        removeCategory.addMouseListener(new MouseLinkListner(removeCategory,"Remove"));
+        editCategory = new JLabel("<html><a href='' color=#6666ff>Edit</a></html>");
+        editCategory.addMouseListener(new MouseLinkListner(editCategory, "Edit"));
+        
+        c.gridx = 0; c.gridy = 1;
+        c.insets = new Insets(0, 5, 10, 5);
+        categoryPanel.add(addCategory, c);
+        c.gridx = 1;
+        categoryPanel.add(removeCategory, c);
+        c.gridx = 2;
+        categoryPanel.add(editCategory, c);
         categoryComboBox = new JComboBox(Main.categories.values().toArray());
-        categoryPanel.add(categoryComboBox);
+        c.gridx = 0; c.gridy = 0; c.gridwidth = 3;
+        categoryPanel.add(categoryComboBox, c);
 
         JPanel priorityPanel = new JPanel();
         priorityPanel.setBorder(BorderFactory.createTitledBorder(resource.getString("gdcalendar.gui.EventWindow.border.priority")));
@@ -195,8 +222,15 @@ public class EventWindow extends JDialog {
         priorityComboBox.setSelectedItem(Priority.MEDIUM);
         priorityPanel.add(priorityComboBox);
 
-        catPrioPanel.add(categoryPanel);
-        catPrioPanel.add(priorityPanel);
+        c.insets = new Insets(0, 0, 0, 0);
+        c.gridx = 0;
+        c.gridy = 0;
+        c.gridwidth = 1;
+        c.weightx = 1;
+        c.fill = GridBagConstraints.BOTH;
+        catPrioPanel.add(categoryPanel, c);
+        c.gridx = 1;
+        catPrioPanel.add(priorityPanel, c);
 
         // DESCRIPTION PANEL //
 
@@ -264,6 +298,40 @@ public class EventWindow extends JDialog {
 
         pack();
     }
+
+    private class MouseLinkListner extends MouseAdapter {
+
+        private JLabel linkLabel;
+        private String linkText;
+
+        public MouseLinkListner(JLabel linkLabel, String linkText) {
+            this.linkLabel = linkLabel;
+            this.linkText = linkText;
+        }
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            CategoryWindow cWindow = new CategoryWindow(linkText, null);
+            cWindow.addPropertyChangeListener(new PropertyChangeListener() {
+
+                public void propertyChange(PropertyChangeEvent evt) {
+                    System.out.println(evt.getPropertyName());                }
+            });
+            cWindow.setVisible(true);
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+            linkLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            linkLabel.setText("<html><a href='' color=#6666aa>"+linkText+"</a></html>");
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+            linkLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            linkLabel.setText("<html><a href='' color=#6666ff>"+linkText+"</a></html>");
+        }
+    };
 
     public int roundToFive(int value) {
         if (value > 55) {
