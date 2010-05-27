@@ -2,6 +2,7 @@ package gdcalendar.gui;
 
 import gdcalendar.logic.AnimationDriver;
 import gdcalendar.logic.IAnimatedComponent;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -33,7 +34,8 @@ public class HelpGlassPane extends JPanel implements IAnimatedComponent {
 
     public HelpGlassPane(Container contentPane, String helpType) {
         setSize(new Dimension(686, 514));
-        setOpaque(false);
+        setOpaque(true);
+        setBackground(Color.black);
 
         this.helpType = helpType;
 
@@ -44,6 +46,7 @@ public class HelpGlassPane extends JPanel implements IAnimatedComponent {
         resource = ResourceBundle.getBundle("gdcalendar.resource_en_US");
 
         textLabel = new JLabel(resource.getString("onlinehelp.defaulttext.text"));
+        textLabel.setForeground(Color.white);
         add(textLabel);
 
         AnimationDriver.getInstance().run(this, "show help image");
@@ -77,7 +80,19 @@ public class HelpGlassPane extends JPanel implements IAnimatedComponent {
     @Override
     public void paint(Graphics g) {
         super.paint(g);
-        g.drawImage(imageToShow, 140, 25, null);
+
+        int xOffset = 0;
+        int yOffset = 0;
+
+        try {
+            xOffset = (this.getWidth() / 2) - (imageToShow.getWidth() / 2);
+            yOffset = (this.getHeight() / 2) - (imageToShow.getHeight() / 2) + 30;
+        } catch (NullPointerException e) {
+            // Do nothing... Doesn't affect anything.
+        }
+
+        textLabel.setLocation(textLabel.getLocation().x, yOffset-25);
+        g.drawImage(imageToShow, xOffset, yOffset, null);
     }
     
     private int step = 0;
@@ -116,8 +131,8 @@ public class HelpGlassPane extends JPanel implements IAnimatedComponent {
 
     @Override
     public double preferredFPS() {
-        // return 1.0;   // used for testing purposes
-        return 0.15;
+        return 1.0;   // used for testing purposes
+        //return 0.15;
     }
 
     @Override

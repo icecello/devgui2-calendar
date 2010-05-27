@@ -63,11 +63,15 @@ import javax.swing.JLabel;
 @SuppressWarnings("serial")
 public class MainWindow extends JFrame {
 
+    static private HelpGlassPane helpGlassPane;
+
     private ResourceBundle resource;
     private JMenuItem quitItem;
     private JMenuItem undoItem;
     private JMenuItem redoItem;
-    private JMenuItem onlineHelpItem;
+    private JMenu onlineHelpItem;
+    private JMenuItem addEventHelpItem;
+    private JMenuItem transparencyHelpItem;
     private JMenuItem aboutItem;
 
     /*
@@ -158,7 +162,13 @@ public class MainWindow extends JFrame {
 
         JMenu helpMenu = new JMenu(resource.getString("menu.help.text"));
 
-        onlineHelpItem = new JMenuItem(actionManager.getAction("onlineHelp"));
+        onlineHelpItem = new JMenu(resource.getString("menu.help.onlinehelp.text"));
+
+        addEventHelpItem = new JMenuItem(actionManager.getAction("addEventHelp"));
+        transparencyHelpItem = new JMenuItem(actionManager.getAction("transparencyHelp"));
+        onlineHelpItem.add(addEventHelpItem);
+        onlineHelpItem.add(transparencyHelpItem);
+
         aboutItem = new JMenuItem(actionManager.getAction("about"));
         helpMenu.add(onlineHelpItem);
         helpMenu.add(aboutItem);
@@ -377,12 +387,25 @@ public class MainWindow extends JFrame {
     }
 
     /**
-     * Shows Online Help window.
+     * Shows Online Help animation for Add Event.
      */
     @Action
-    public void onlineHelp() {
-        new OnlineHelpWindow().setVisible(true);
-        //System.out.println("Online Help");
+    public void addEventHelp() {
+        helpGlassPane = new HelpGlassPane(this.getContentPane(), "addevent");
+        this.setGlassPane(helpGlassPane);
+        helpGlassPane.setVisible(true);
+        System.out.println("Add Event Help");
+    }
+
+    /**
+     * Shows Online Help animation for changing transparency.
+     */
+    @Action
+    public void transparencyHelp() {
+        helpGlassPane = new HelpGlassPane(this.getContentPane(), "transparency");
+        this.setGlassPane(helpGlassPane);
+        helpGlassPane.setVisible(true);
+        System.out.println("Transparency Help");
     }
 
     /**
