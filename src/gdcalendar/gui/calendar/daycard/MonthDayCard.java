@@ -365,7 +365,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
              * we may want to move these calculations into a resize event instead of paint
              */
         	int triangleX[] = { (getWidth() - (titleLabel.getHeight()*2)), getWidth(), getWidth() };
-            int triangleY[] = {0, titleLabel.getHeight(), 0 };
+            int triangleY[] = {2, titleLabel.getHeight(), 2 };
 
 
             Polygon triangle = new Polygon(triangleX, triangleY, 3);
@@ -524,7 +524,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     			Point pt1 = new Point(1,1);
     			Point pt2 = new Point((int)r.getWidth(), (int)r.getHeight());
     			GradientPaint gp = new GradientPaint(pt1, color1, pt2, color2);
-    			
+
     			g2d.setPaint(gp);
     			g2d.fillRect(pt1.x, pt1.y, pt2.x, pt2.y);
     			g2d.setColor(this.getForeground());
@@ -543,7 +543,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     			 * drawing.
     			 */
     			g2d.drawString(this.getText(), (int)r.getWidth()/2 - width/2, (int)r.getHeight()/2 + height/2-1);
-    			
+
     		}
     		
     		

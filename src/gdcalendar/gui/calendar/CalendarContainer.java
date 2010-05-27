@@ -129,12 +129,12 @@ public class CalendarContainer extends JPanel {
          * set some default properties of the calendar
          */
         setBackground(SystemColor.white);
-        setComponentBackground(SystemColor.window);
+        setComponentBackground(SystemColor.control);
         setDayNameBackground(SystemColor.window);
         setDayFont(new Font("Arial", Font.BOLD, 16));
         
-        setDayTitleBackground(Color.white);
-        setDayTitleBackground2(new Color(0,0,150));
+        setDayTitleBackground(new Color(240, 240, 240));
+        setDayTitleBackground2(new Color(210,210,210));
         
         setGridBorder(BorderFactory.createLineBorder(new Color(240, 240, 240)));
     }
