@@ -10,10 +10,12 @@ import gdcalendar.mvc.view.AbstractViewPanel;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
@@ -26,6 +28,7 @@ import java.util.Date;
 
 import javax.swing.BoxLayout;
 
+import javax.swing.Box;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
@@ -82,9 +85,15 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     private GradientLabel titleLabel;          //Title label, showing the day of the month
     private CalendarController controller;   //The controller, responsible for updating the
     //connected models
-    private ArrayList<JLabel> eventLabels;  //The visual representation of the day events
+    private ArrayList<EventPanel> eventLabels;  //The visual representation of the day events
     private ArrayList<DayEvent> events;     //The events of the day
     private ArrayList<MouseListener> eventMouseListeners = new ArrayList<MouseListener>();
+    
+    
+    //this is a box used for layout of all events
+    //works better than BoxLayout for top-to-bottom alignments
+    Box box;
+    private int cardWidth = 0;
     
     private Color eventForeground = SystemColor.textText;
     
@@ -98,12 +107,14 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
         
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-        simpleView.setBackground(SystemColor.text);
-        detailedView.setBackground(SystemColor.text);
         
-        eventLabels = new ArrayList<JLabel>();
+        box = Box.createVerticalBox();
+        box.add(Box.createHorizontalGlue());
+        eventLabels = new ArrayList<EventPanel>();
         events = new ArrayList<DayEvent>();
         add(titleLabel, BorderLayout.PAGE_START);
+        simpleView.setLayout(new BorderLayout());
+        simpleView.add(box, BorderLayout.PAGE_START);
     }
 
     /**
@@ -119,8 +130,8 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
         
         this.view = view;
 
-        simpleView.setLayout(new BoxLayout(simpleView, BoxLayout.PAGE_AXIS));
-        detailedView.setLayout(new BoxLayout(detailedView, BoxLayout.PAGE_AXIS));
+        
+        detailedView.setLayout(new BoxLayout(detailedView, BoxLayout.Y_AXIS));
         //Make the monthcard show the correct view
         if (view == CardView.SIMPLE) {
             add(simpleView, BorderLayout.CENTER);
@@ -227,6 +238,10 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
      */
     public void setBackground(Color color) {
     	super.setBackground(color);
+    	if (simpleView != null)
+    		simpleView.setBackground(color);
+    	if (detailedView != null)
+    		detailedView.setBackground(color);
     }
     
     /**
@@ -254,8 +269,6 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     public void setMarker(Marker marker) {
     	highlightMarker = marker;
     }
-    
-    
     
     
     private ArrayList<Priority> arrayPrioritiesHighlight = new ArrayList<Priority>();
@@ -338,7 +351,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
      */
     @Override
     protected void paintChildren(Graphics g) {
-
+    	cardWidth = g.getClipBounds().width;
         super.paintChildren(g);
         switch (view) {
             case SIMPLE:
@@ -359,6 +372,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     
     
     private void paintSimple(Graphics g) {
+    	
         //only draw if there are any events for this day card
         if (eventLabels.size() > 0) {
             /*
@@ -410,21 +424,22 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
 
         //Add an event label to the DayCard, invoked in EDT
         if (evtName.equals(CalendarController.ADD_EVENT)|| evtName.equals(CalendarController.REMOVE_EVENT)) {
-            simpleView.removeAll();
+            box.removeAll();
             eventLabels.clear();
             events.clear();
             DayEvent[] filteredEvents = (DayEvent[]) evt.getNewValue();
             for (int i = 0; i < filteredEvents.length; i++) {
                 events.add(filteredEvents[i]);
-                JLabel eventLabel = new JLabel(filteredEvents[i].getEventName());
-                eventLabel.setName(""+filteredEvents[i].getID());
-                eventLabel.setForeground(eventForeground);
+                EventPanel eventPanel = new EventPanel(filteredEvents[i].getEventName());
+                eventPanel.setName(""+filteredEvents[i].getID());
+                eventPanel.setCategoryColor(filteredEvents[i].getCategory().getCategoryColor());
+                eventPanel.setForeground(eventForeground);
                 //add all event mouse listeners to the event label
                 for (int j = 0; j < eventMouseListeners.size(); j++) {
-                	eventLabel.addMouseListener(eventMouseListeners.get(j));
+                	eventPanel.addMouseListener(eventMouseListeners.get(j));
                 }
-                simpleView.add(eventLabel);
-                eventLabels.add(eventLabel);
+                box.add(eventPanel);
+                eventLabels.add(eventPanel);
                 
             }
 
@@ -442,28 +457,29 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
             
         } else if (evtName.equals(CalendarController.FILTERED_EVENTS)) {
 
-            simpleView.removeAll();
+            box.removeAll();
             eventLabels.clear();
             events.clear();
             DayEvent[] filteredEvents = (DayEvent[]) evt.getNewValue();
             for (int i = 0; i < filteredEvents.length; i++) {
                 events.add(filteredEvents[i]);
-                JLabel eventLabel = new JLabel(filteredEvents[i].getEventName());
-                eventLabel.setName(""+filteredEvents[i].getID());
-
-                eventLabel.setForeground(eventForeground);
+                EventPanel eventPanel = new EventPanel(filteredEvents[i].getEventName());
+                eventPanel.setName(""+filteredEvents[i].getID());
+                eventPanel.setCategoryColor(filteredEvents[i].getCategory().getCategoryColor());
+                eventPanel.setForeground(eventForeground);
                 //add all event mouse listeners to the event label
                 for (int j = 0; j < eventMouseListeners.size(); j++) {
-                	eventLabel.addMouseListener(eventMouseListeners.get(j));
+                	eventPanel.addMouseListener(eventMouseListeners.get(j));
                 }
-                simpleView.add(eventLabel);
-                eventLabels.add(eventLabel);
+                
+                box.add(eventPanel);
+                eventLabels.add(eventPanel);
             }
 
         }
+        
         revalidate();
         repaint();
-
 
     }
 
@@ -490,6 +506,98 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     	eventMouseListeners.add(l);
     }
     
+    /**
+     * This is a panel that displays information on a single event.
+     * The interface is similar to a JLabel to be easy to use and
+     * simple to integrate. The information it displays is the text
+     * for the event, and a color for it's category which is displayed
+     * as a circle to the left (this does not respect locale currently).
+     * 
+     * Priority will also be displayed in this.
+     * 
+     * @author Håkan
+     *
+     */
+    class EventPanel extends JPanel {
+    	private Color categoryColor = new Color(0,0,0);
+    	//private String text = null;
+    	private JLabel textLabel = new JLabel();
+    	
+    	private int width = 150;
+    	private int height = 0;
+    	
+    	EventPanel() { 
+    		this.setOpaque(false);
+    	}
+    	
+    	EventPanel(String text) {
+    		textLabel.setText(text);
+    		textLabel.setOpaque(false);
+    		setOpaque(false);
+    		setLayout(new BorderLayout());
+    		Box internalBox = Box.createHorizontalBox();
+    		add(internalBox, BorderLayout.CENTER);
+    		internalBox.add(Box.createRigidArea(new Dimension(17, textLabel.getHeight())));
+    		internalBox.add(textLabel);
+    	}
+    	
+    	/**
+    	 * Set the text to display on this event panel.
+    	 * 
+    	 * @param text
+    	 */
+    	public void setText(String text) {
+    		textLabel.setText(text);
+    	}
+    	
+    	/**
+    	 * Get the text displayed in this event panel.
+    	 * @return	String of the contained text
+    	 */
+    	public String getText() {
+    		return textLabel.getText();
+    	}
+    	
+    	
+    	public void setCategoryColor(Color color) {
+    		categoryColor = color;
+    	}
+    	
+    	@Override
+    	public void paintComponent(Graphics g) {
+    		super.paintComponent(g);
+    		
+    		int x = 5;
+    		int y = getHeight()/2-5;
+    		
+    		Graphics2D g2d = (Graphics2D)g;
+    		
+    		g2d.setColor(categoryColor);
+    		g2d.fillOval(x, y, 10, 10);
+    		
+    		/*if (text != null) {
+	    		g2d.setColor(this.getForeground());
+				g2d.setFont(this.getFont());
+
+				/*
+				 * Draw the actual text of the label, this has to be done manually
+				 * after drawing the background, since calling super.paintComponent()
+				 * draws both background and text, which would overwrite the custom
+				 * drawing.
+				 */
+				/*g2d.drawString(this.getText(), x + 10 + 2, (int)getHeight()/2 + height/2-1);
+			}*/
+    		
+    	}
+    }
+    
+    /**
+     * This is a regular JLabel with a custom background
+     * of a gradient between two specified colors.
+     * 
+     * @author Håkan
+     *
+     */
     class GradientLabel extends JLabel {
     	private Color color1;
     	private Color color2;
@@ -513,7 +621,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     	@Override
     	public void paintComponent(Graphics graphics) {
     		super.paintComponent(graphics);
-    		
+    		    		
     		/*
     		 * if we have two different colors, let's
     		 * produce a nice gradient between them

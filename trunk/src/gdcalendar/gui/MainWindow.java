@@ -9,8 +9,10 @@ import gdcalendar.xml.Configuration;
 import gdcalendar.xml.XMLUtils;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -189,9 +191,25 @@ public class MainWindow extends JFrame {
         popMenu = new DayPopupMenu();
 
         //Make the pop-up show when the user press an event
+        
         calendarContainer.addEventMouseListener(new MouseAdapter() {
             //TODO: add commandmananger as parameter to daypopupmenu
-
+        	private Color oldColor;
+        	
+        	@Override
+        	public void mouseEntered(MouseEvent e) {
+        		oldColor = ((JPanel)e.getSource()).getBackground();
+        		((JPanel)e.getSource()).setOpaque(true);
+        		((JPanel)e.getSource()).setBackground(SystemColor.controlHighlight);
+        		
+        	}
+        	
+        	@Override
+        	public void mouseExited(MouseEvent e) {
+        		((JPanel)e.getSource()).setOpaque(false);
+        		((JPanel)e.getSource()).setBackground(oldColor);
+        	}
+        	
             @Override
             public void mousePressed(MouseEvent e) {
                 maybeShowPopup(e);
@@ -282,7 +300,7 @@ public class MainWindow extends JFrame {
 
 
                 } else if (evtName.equals(DayPopupMenu.DELETE)) {
-                    String ID = ((JLabel) popMenu.getInvoker()).getName();
+                    String ID = ((JPanel) popMenu.getInvoker()).getName();
                     DayEvent event = calendarModel.getDayEvent(UUID.fromString(ID));
                     cm.execute(new RemoveEventCommand(calendarModel, event));
                     actionManager.getAction("doRedo").setEnabled(cm.canRedo());
@@ -291,7 +309,7 @@ public class MainWindow extends JFrame {
 
                 } else if (evtName.equals(DayPopupMenu.EDIT)) {
                     //Create a new addEvent window
-                    String ID = ((JLabel) popMenu.getInvoker()).getName();
+                    String ID = ((JPanel) popMenu.getInvoker()).getName();
                     final DayEvent d = calendarModel.getDayEvent(UUID.fromString(ID));
                     EventWindow editEventWindow = new EventWindow(new Date(), d, DayPopupMenu.EDIT);
 
