@@ -278,19 +278,7 @@ public class MainWindow extends JFrame {
             public void propertyChange(PropertyChangeEvent evt) {
                 String evtName = evt.getPropertyName();
                 if (evtName.equals(DayPopupMenu.ADD)) {
-                    //Create a new addEvent window
-                    Date eventDate = ((MonthDayCard) popMenu.getInvoker()).getFilter();
-                    EventWindow addEventWindow = new EventWindow(eventDate, null, DayPopupMenu.ADD);
-
-                    addEventWindow.addPropertyChangeListener(new PropertyChangeListener() {
-
-                        public void propertyChange(PropertyChangeEvent evt) {
-                            cm.execute(new AddEventCommand(calendarModel, (DayEvent) evt.getNewValue()));
-                            actionManager.getAction("doRedo").setEnabled(cm.canRedo());
-                            actionManager.getAction("doUndo").setEnabled(cm.canUndo());
-                        }
-                    });
-                    addEventWindow.setVisible(true);
+                    showAddEventWindow(((MonthDayCard) popMenu.getInvoker()).getFilter());
 
 
                 } else if (evtName.equals(DayPopupMenu.DELETE)) {
@@ -320,6 +308,22 @@ public class MainWindow extends JFrame {
                 }
             }
         });
+    }
+
+    public void showAddEventWindow(Date eventDate) {
+        //Create a new addEvent window
+        
+        EventWindow addEventWindow = new EventWindow(eventDate, null, DayPopupMenu.ADD);
+
+        addEventWindow.addPropertyChangeListener(new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                cm.execute(new AddEventCommand(calendarModel, (DayEvent) evt.getNewValue()));
+                actionManager.getAction("doRedo").setEnabled(cm.canRedo());
+                actionManager.getAction("doUndo").setEnabled(cm.canUndo());
+            }
+        });
+        addEventWindow.setVisible(true);
     }
 
     /**
@@ -391,10 +395,7 @@ public class MainWindow extends JFrame {
      */
     @Action
     public void addEventHelp() {
-        helpGlassPane = new HelpGlassPane(this.getContentPane(), "addevent");
-        this.setGlassPane(helpGlassPane);
-        helpGlassPane.setVisible(true);
-        System.out.println("Add Event Help");
+        showGlassPane("addevent");
     }
 
     /**
@@ -402,10 +403,22 @@ public class MainWindow extends JFrame {
      */
     @Action
     public void transparencyHelp() {
-        helpGlassPane = new HelpGlassPane(this.getContentPane(), "transparency");
+        showGlassPane("transparency");
+    }
+
+    private void showGlassPane(String helpType) {
+        helpGlassPane = new HelpGlassPane(this, helpType);
         this.setGlassPane(helpGlassPane);
         helpGlassPane.setVisible(true);
-        System.out.println("Transparency Help");
+    }
+
+    public void doAction(String helpType) {
+        if (helpType.equals("addevent")) {
+            showAddEventWindow(new Date());
+        }
+        else if (helpType.equals("transparency")) {
+            new PreferencesWindow(this);
+        }
     }
 
     /**

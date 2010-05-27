@@ -14,7 +14,10 @@ import java.util.ArrayList;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import javax.imageio.ImageIO;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 /**
@@ -32,7 +35,12 @@ public class HelpGlassPane extends JPanel implements IAnimatedComponent {
     JLabel textLabel;
     ResourceBundle resource;
 
-    public HelpGlassPane(Container contentPane, String helpType) {
+    Container contentPane;
+    MainWindow parentFrame;
+
+    public HelpGlassPane(MainWindow frame, String helpType) {
+        contentPane = frame.getContentPane();
+        parentFrame = frame;
         setSize(new Dimension(686, 514));
         setOpaque(true);
         setBackground(Color.black);
@@ -98,10 +106,11 @@ public class HelpGlassPane extends JPanel implements IAnimatedComponent {
     private int step = 0;
     private int inc = 1;
 
+    private boolean finished = false;
+
     @Override
     public boolean animationFinished() {
-        // Check performed in computeAnimation().
-        return false;
+        return finished;
     }
 
     /*
@@ -121,6 +130,24 @@ public class HelpGlassPane extends JPanel implements IAnimatedComponent {
         } else {
             AnimationDriver.getInstance().removeAll("show help image");
             setVisible(false);
+
+            askDoAction();
+
+            finished = true;
+        }
+    }
+
+    private void askDoAction() {
+        int doAction = JOptionPane.showConfirmDialog(
+                parentFrame,
+                resource.getString("help.doaction." + helpType + ".text"),
+                "Complete the Task?",
+                JOptionPane.YES_NO_OPTION);
+        if (doAction == JOptionPane.YES_OPTION) {
+            parentFrame.doAction(helpType);
+        }
+        else {
+            // nothin'
         }
     }
 
@@ -131,8 +158,8 @@ public class HelpGlassPane extends JPanel implements IAnimatedComponent {
 
     @Override
     public double preferredFPS() {
-        return 1.0;   // used for testing purposes
-        //return 0.15;
+        //return 1.0;   // used for testing purposes
+        return 0.15;
     }
 
     @Override
