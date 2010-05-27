@@ -86,7 +86,7 @@ public class HelpGlassPane extends JPanel implements IAnimatedComponent {
 
         try {
             xOffset = (this.getWidth() / 2) - (imageToShow.getWidth() / 2);
-            yOffset = (this.getHeight() / 2) - (imageToShow.getHeight() / 2) + 30;
+            yOffset = ((this.getHeight() / 2) - (imageToShow.getHeight() / 2)) + 18;
         } catch (NullPointerException e) {
             // Do nothing... Doesn't affect anything.
         }
