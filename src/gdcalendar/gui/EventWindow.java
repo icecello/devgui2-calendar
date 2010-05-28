@@ -21,6 +21,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
+import javax.swing.ComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -199,13 +200,14 @@ public class EventWindow extends JDialog {
 
         addCategory = new JLabel("<html><a href='' color=#6666ff>Add</a></html>");
         addCategory.setForeground(Color.BLACK);
-        addCategory.addMouseListener(new MouseLinkListner(addCategory,"Add"));
+        addCategory.addMouseListener(new MouseLinkListner(addCategory, "Add"));
         removeCategory = new JLabel("<html><a href='' color=#6666ff>Remove</a></html>");
-        removeCategory.addMouseListener(new MouseLinkListner(removeCategory,"Remove"));
+        removeCategory.addMouseListener(new MouseLinkListner(removeCategory, "Remove"));
         editCategory = new JLabel("<html><a href='' color=#6666ff>Edit</a></html>");
         editCategory.addMouseListener(new MouseLinkListner(editCategory, "Edit"));
-        
-        c.gridx = 0; c.gridy = 1;
+
+        c.gridx = 0;
+        c.gridy = 1;
         c.insets = new Insets(0, 5, 10, 5);
         categoryPanel.add(addCategory, c);
         c.gridx = 1;
@@ -213,7 +215,9 @@ public class EventWindow extends JDialog {
         c.gridx = 2;
         categoryPanel.add(editCategory, c);
         categoryComboBox = new JComboBox(Main.categories.values().toArray());
-        c.gridx = 0; c.gridy = 0; c.gridwidth = 3;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.gridwidth = 3;
         categoryPanel.add(categoryComboBox, c);
 
         JPanel priorityPanel = new JPanel();
@@ -311,11 +315,28 @@ public class EventWindow extends JDialog {
 
         @Override
         public void mouseClicked(MouseEvent e) {
-            CategoryWindow cWindow = new CategoryWindow(linkText, null);
+            Category cat = null;
+            if (linkText.equals("Edit")) {
+                cat = (Category) categoryComboBox.getSelectedItem();
+            } else if (linkText.equals("Remove")) {
+                Main.categories.remove(((Category) categoryComboBox.getSelectedItem()).getName());
+                categoryComboBox.removeItemAt(categoryComboBox.getSelectedIndex());
+                return;
+            }
+            CategoryWindow cWindow = new CategoryWindow(linkText, cat);
             cWindow.addPropertyChangeListener(new PropertyChangeListener() {
 
                 public void propertyChange(PropertyChangeEvent evt) {
-                    System.out.println(evt.getPropertyName());                }
+                    Category newCategory = (Category) evt.getNewValue();
+                    Category oldCategory = (Category) evt.getOldValue();
+                    Main.categories.put(newCategory.getName(), newCategory);
+                    if (oldCategory != null) {
+                        Main.categories.remove(oldCategory.getName());
+                        categoryComboBox.removeItem(oldCategory);
+                    }
+                    categoryComboBox.addItem(newCategory);
+                    Main.categories.put(newCategory.getName(), newCategory);
+                }
             });
             cWindow.setVisible(true);
         }
@@ -323,13 +344,13 @@ public class EventWindow extends JDialog {
         @Override
         public void mouseEntered(MouseEvent e) {
             linkLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            linkLabel.setText("<html><a href='' color=#6666aa>"+linkText+"</a></html>");
+            linkLabel.setText("<html><a href='' color=#6666aa>" + linkText + "</a></html>");
         }
 
         @Override
         public void mouseExited(MouseEvent e) {
             linkLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            linkLabel.setText("<html><a href='' color=#6666ff>"+linkText+"</a></html>");
+            linkLabel.setText("<html><a href='' color=#6666ff>" + linkText + "</a></html>");
         }
     };
 

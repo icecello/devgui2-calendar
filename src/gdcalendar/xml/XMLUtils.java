@@ -7,6 +7,7 @@ import java.awt.Color;
 import java.io.*;
 import java.text.*;
 import java.util.*;
+import java.util.ArrayList;
 import org.jdom.DocType;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.*;
@@ -149,7 +150,8 @@ public class XMLUtils {
             item.addContent(new org.jdom.Element("description").setText(category.getDescription()));
             if (category.getCategoryColor() != null) {
                 Color color = category.getCategoryColor();
-                org.jdom.Element elem = item.addContent("color");
+                org.jdom.Element elem = item.addContent(new org.jdom.Element("color"));
+                elem = elem.getChild("color");
                 elem.setAttribute("red", "" + color.getRed());
                 elem.setAttribute("green", "" + color.getGreen());
                 elem.setAttribute("blue", "" + color.getBlue());
@@ -231,6 +233,12 @@ public class XMLUtils {
         org.jdom.Element root = new org.jdom.Element("calendar");
         DocType type = new DocType("calendar", "calendar.dtd");
         org.jdom.Document doc = new org.jdom.Document(root, type);
+        ArrayList<Category> categories = new ArrayList<Category>();
+        for (DayEvent event : events) {
+            if (!categories.contains(event.getCategory())) {
+                categories.add(event.getCategory());
+            }
+        }
 
         for (int i = 0; i < events.size(); i++) {
             DayEvent event = events.get(i);
@@ -244,7 +252,7 @@ public class XMLUtils {
             item.addContent(new org.jdom.Element("priority").setText(event.getPriority().name()));
             root.addContent(item);
         }
-
+        saveCategories(categories);
         XMLOutputter outputter = new XMLOutputter();
         outputter.setFormat(org.jdom.output.Format.getPrettyFormat());
         try {
@@ -256,7 +264,9 @@ public class XMLUtils {
     }
 
     public static void main(String[] args) {
-        ArrayList<DayEvent> events = XMLUtils.loadDayEvents(Configuration.getProperty("calendar"));
-        System.out.println(events.get(0));
+        Category cat = new Category("cat", "desc", Color.yellow);
+        ArrayList<Category> categories = new ArrayList<Category>();
+        categories.add(cat);
+        XMLUtils.saveCategories(categories);
     }
 }
