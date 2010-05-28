@@ -21,11 +21,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
-import javax.swing.ComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
-import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
@@ -34,9 +32,6 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerDateModel;
 import javax.swing.SpinnerModel;
 import javax.swing.SwingUtilities;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
-import javax.swing.plaf.basic.BasicComboBoxUI.PropertyChangeHandler;
 
 /**
  *General window for showing and manipulating events.
@@ -161,26 +156,16 @@ public class EventWindow extends JDialog {
         endDateSpinner = new JSpinner(endDateModel);
         endDateSpinner.setEditor(new JSpinner.DateEditor(endDateSpinner, resource.getString("gdcalendar.gui.EventWindow.format.date")));
 
-        //Make the minute text get highlighted, dunno if this is good or not
-        //but the technique could be used in other places
-        final JTextField field = ((JSpinner.DateEditor) endTimeSpinner.getEditor()).getTextField();
-        field.addFocusListener(new FocusAdapter() {
-
-            @Override
-            public void focusGained(FocusEvent e) {
-
-                if (isEnabled()) {
-                    SwingUtilities.invokeLater(new Runnable() {
-
-                        public void run() {
-                            field.setCaretPosition(5);
-                            field.setSelectionEnd(5);
-                            field.setSelectionStart(3);
-                        }
-                    });
-                }
-            }
-        });
+        //Set the caret to an appropriate position, making the spinner
+        //edit the correct field
+        JTextField field = ((JSpinner.DateEditor) endTimeSpinner.getEditor()).getTextField();
+        field.addFocusListener(new FocusSpinnerLister(field, 3, 4));
+        field = ((JSpinner.DateEditor) startTimeSpinner.getEditor()).getTextField();
+        field.addFocusListener(new FocusSpinnerLister(field, 3, 4));
+        field = ((JSpinner.DateEditor) endDateSpinner.getEditor()).getTextField();
+        field.addFocusListener(new FocusSpinnerLister(field, 3, 4));
+        field = ((JSpinner.DateEditor) startDateSpinner.getEditor()).getTextField();
+        field.addFocusListener(new FocusSpinnerLister(field, 3, 4));
 
 
         // END TIME PANEL //
@@ -354,16 +339,6 @@ public class EventWindow extends JDialog {
         }
     };
 
-    public int roundToFive(int value) {
-        if (value > 55) {
-            return 0;
-        }
-        while (value % 5 != 0) {
-            value = value + 1;
-        }
-        return value;
-    }
-
     /**
      * Get all  values from the input fields, create a DayEvent and fire
      * a propertyChangeEvent
@@ -394,6 +369,33 @@ public class EventWindow extends JDialog {
         DayEvent dayEvent = new DayEvent(name, startDate, endDate, category, prio);
         dayEvent.setDescription(desc);
         firePropertyChange(notificationMessage, null, dayEvent);
+    }
+
+    private class FocusSpinnerLister extends FocusAdapter {
+
+        private int selectionStart, selectionEnd;
+        private JTextField field;
+
+        public FocusSpinnerLister(JTextField field, int selectionStart, int selectionEnd) {
+            this.field = field;
+            this.selectionStart = selectionStart;
+            this.selectionEnd = selectionEnd;
+        }
+
+        @Override
+        public void focusGained(FocusEvent e) {
+
+            if (isEnabled()) {
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    public void run() {
+                        field.setSelectionStart(selectionStart);
+                        field.setCaretPosition(selectionEnd);
+                        field.setSelectionEnd(selectionEnd);
+                    }
+                });
+            }
+        }
     }
 
     public static void main(String[] args) {
