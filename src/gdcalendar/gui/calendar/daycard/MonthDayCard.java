@@ -33,7 +33,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-
 /**
  * @author HÃ¥kan
  * @author James
@@ -69,9 +68,11 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
          */
         DETAILED
     }
-    
+
     public static enum Marker {
-    	NONE, TRIANGLE_FADING, SPARKLE /* this one doesn't yet exist */
+
+        NONE, TRIANGLE_FADING, SPARKLE /* this one doesn't yet exist */
+
     }
     /*
      * member variables
@@ -88,33 +89,27 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     private ArrayList<EventPanel> eventLabels;  //The visual representation of the day events
     private ArrayList<DayEvent> events;     //The events of the day
     private ArrayList<MouseListener> eventMouseListeners = new ArrayList<MouseListener>();
-    
-    
-    //this is a box used for layout of all events
+    //this is a eventPanelBox used for layout of all events
     //works better than BoxLayout for top-to-bottom alignments
-    Box box;
+    private JPanel eventPanelBox;
     private int cardWidth = 0;
-    
     private Color eventForeground = SystemColor.textText;
-    
     private Marker highlightMarker = Marker.NONE;
+
     /**
      * internal method to handle basic setup of the daycard
      */
     private void Init() {
         setLayout(new BorderLayout());
         titleLabel = new GradientLabel();
-        
-        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-        
-        box = Box.createVerticalBox();
-        box.add(Box.createHorizontalGlue());
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        eventPanelBox = new JPanel(new GridLayout(0, 1));
         eventLabels = new ArrayList<EventPanel>();
         events = new ArrayList<DayEvent>();
         add(titleLabel, BorderLayout.PAGE_START);
         simpleView.setLayout(new BorderLayout());
-        simpleView.add(box, BorderLayout.PAGE_START);
+        simpleView.add(eventPanelBox, BorderLayout.PAGE_START);
     }
 
     /**
@@ -125,12 +120,12 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
      */
     public MonthDayCard(CardView view, CalendarController controller) {
         //Call Init() to handle basic setup
-    	//just changed name to make more sense
+        //just changed name to make more sense
         Init();
-        
+
         this.view = view;
 
-        
+
         detailedView.setLayout(new BoxLayout(detailedView, BoxLayout.Y_AXIS));
         //Make the monthcard show the correct view
         if (view == CardView.SIMPLE) {
@@ -150,13 +145,13 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
      * @param controller    The controller which is responsible for connecting the
      *                      MonthCardDay to corresponing models
      */
-    private  MonthDayCard(Date filter, CardView view, CalendarController controller) {
+    private MonthDayCard(Date filter, CardView view, CalendarController controller) {
         /*
          * Call MonthDayCard with current date and the given view
          */
-    	this(view, controller);
-    	Init();
-    	
+        this(view, controller);
+        Init();
+
         //Make the necessary adjustments, so that the monthcard reflectes
         //the data in the given day
         this.controller = controller;
@@ -180,36 +175,36 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
      * @param color
      */
     public void setTriangleColor(Color color) {
-    	triangleStartColor = color;
+        triangleStartColor = color;
     }
-    
+
     /** 
      * set the color the triangle fades into
      * during animation
      * @param color
      */
     public void setTriangleFadeColor(Color color) {
-    	triangleEndColor = color;
+        triangleEndColor = color;
     }
-    
+
     /**
      * set the font for the title of this daycard
      * 
      * @param font
      */
     public void setTitleFont(Font font) {
-    	titleLabel.setFont(font);
+        titleLabel.setFont(font);
     }
-    
+
     /**
      * Set the color to be used for the daycards title text
      * 
      * @param color		color to use
      */
     public void setTitleForeground(Color color) {
-    	titleLabel.setForeground(color);
+        titleLabel.setForeground(color);
     }
-    
+
     /**
      * Set the color to use for the background of the daycards
      * title
@@ -217,9 +212,9 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
      * @param color
      */
     public void setTitleBackground(Color color) {
-    	titleLabel.setBackground(color);
+        titleLabel.setBackground(color);
     }
-    
+
     /**
      * Set the second color of the daycard's title background.
      * If this color differs from the first background color
@@ -228,22 +223,24 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
      * @param color
      */
     public void setTitleBackground2(Color color) {
-    	titleLabel.setBackground2(color);
+        titleLabel.setBackground2(color);
     }
-    
+
     /**
      * Set the background color of the daycard
      * 
      * @param color		which color to use for background
      */
     public void setBackground(Color color) {
-    	super.setBackground(color);
-    	if (simpleView != null)
-    		simpleView.setBackground(color);
-    	if (detailedView != null)
-    		detailedView.setBackground(color);
+        super.setBackground(color);
+        if (simpleView != null) {
+            simpleView.setBackground(color);
+        }
+        if (detailedView != null) {
+            detailedView.setBackground(color);
+        }
     }
-    
+
     /**
      * Set the color of text for events that are displayed in 
      * the daycard
@@ -251,13 +248,13 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
      * @param color
      */
     public void setEventForeground(Color color) {
-    	eventForeground = color;
-    	
-    	for (int i = 0; i < eventLabels.size(); i++) {
-    		eventLabels.get(i).setForeground(color);
-    	}
+        eventForeground = color;
+
+        for (int i = 0; i < eventLabels.size(); i++) {
+            eventLabels.get(i).setForeground(color);
+        }
     }
-    
+
     /**
      * Set which marker to use during highlighting of
      * priorities or categories.
@@ -267,12 +264,11 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
      * @param marker	which marker to use
      */
     public void setMarker(Marker marker) {
-    	highlightMarker = marker;
+        highlightMarker = marker;
     }
-    
-    
     private ArrayList<Priority> arrayPrioritiesHighlight = new ArrayList<Priority>();
     private ArrayList<Category> arrayCategoriesHighlight = new ArrayList<Category>();
+
     /**
      * highlight this daycard if contained events match the
      * specified category
@@ -280,10 +276,10 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
      * @param category	name of category to match against
      */
     public void addHighlight(Category category) {
-    	arrayCategoriesHighlight.add(category);
-    	//AnimationDriver.getInstance().run(this, category.getName());
+        arrayCategoriesHighlight.add(category);
+        //AnimationDriver.getInstance().run(this, category.getName());
     }
-    
+
     /**
      * highlight this daycard if contained events match the
      * specified category
@@ -291,18 +287,18 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
      * @param prio    priority to match against
      */
     public void addHighlight(Priority prio) {
-    	arrayPrioritiesHighlight.add(prio);
-    	//AnimationDriver.getInstance().run(this);
+        arrayPrioritiesHighlight.add(prio);
+        //AnimationDriver.getInstance().run(this);
     }
-    
+
     public void removeHighlight(Category category) {
-    	arrayCategoriesHighlight.remove(category);
+        arrayCategoriesHighlight.remove(category);
     }
-    
+
     public void removeHighlight(Priority prio) {
-    	arrayPrioritiesHighlight.remove(prio);
+        arrayPrioritiesHighlight.remove(prio);
     }
-    
+
     /**
      * Get the currenty active view of this day card.
      * This is one of:
@@ -351,7 +347,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
      */
     @Override
     protected void paintChildren(Graphics g) {
-    	cardWidth = g.getClipBounds().width;
+        cardWidth = g.getClipBounds().width;
         super.paintChildren(g);
         switch (view) {
             case SIMPLE:
@@ -368,18 +364,15 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
      * This should never be called from outside the component.
      *
      */
-    
-    
-    
     private void paintSimple(Graphics g) {
-    	
+
         //only draw if there are any events for this day card
         if (eventLabels.size() > 0) {
             /*
              * we may want to move these calculations into a resize event instead of paint
              */
-        	int triangleX[] = { (getWidth() - (titleLabel.getHeight()*2)), getWidth(), getWidth() };
-            int triangleY[] = {2, titleLabel.getHeight(), 2 };
+            int triangleX[] = {(getWidth() - (titleLabel.getHeight() * 2)), getWidth(), getWidth()};
+            int triangleY[] = {2, titleLabel.getHeight(), 2};
 
 
             Polygon triangle = new Polygon(triangleX, triangleY, 3);
@@ -423,24 +416,24 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
         }
 
         //Add an event label to the DayCard, invoked in EDT
-        if (evtName.equals(CalendarController.ADD_EVENT)|| evtName.equals(CalendarController.REMOVE_EVENT)) {
-            box.removeAll();
+        if (evtName.equals(CalendarController.ADD_EVENT) || evtName.equals(CalendarController.REMOVE_EVENT)) {
+            eventPanelBox.removeAll();
             eventLabels.clear();
             events.clear();
             DayEvent[] filteredEvents = (DayEvent[]) evt.getNewValue();
             for (int i = 0; i < filteredEvents.length; i++) {
                 events.add(filteredEvents[i]);
                 EventPanel eventPanel = new EventPanel(filteredEvents[i].getEventName());
-                eventPanel.setName(""+filteredEvents[i].getID());
+                eventPanel.setName("" + filteredEvents[i].getID());
                 eventPanel.setCategoryColor(filteredEvents[i].getCategory().getCategoryColor());
                 eventPanel.setForeground(eventForeground);
                 //add all event mouse listeners to the event label
                 for (int j = 0; j < eventMouseListeners.size(); j++) {
-                	eventPanel.addMouseListener(eventMouseListeners.get(j));
+                    eventPanel.addMouseListener(eventMouseListeners.get(j));
                 }
-                box.add(eventPanel);
+                eventPanelBox.add(eventPanel);
                 eventLabels.add(eventPanel);
-                
+
             }
 
             //Remove an event (the one at the bottom) from the DayCard, invoked in EDT
@@ -454,44 +447,44 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
             calendar.setTime(filter);
             titleLabel.setText("" + calendar.get(Calendar.DAY_OF_MONTH));
             checkAndHighlightHoliday();
-            
+
         } else if (evtName.equals(CalendarController.FILTERED_EVENTS)) {
 
-            box.removeAll();
+            eventPanelBox.removeAll();
             eventLabels.clear();
             events.clear();
             DayEvent[] filteredEvents = (DayEvent[]) evt.getNewValue();
             for (int i = 0; i < filteredEvents.length; i++) {
                 events.add(filteredEvents[i]);
                 EventPanel eventPanel = new EventPanel(filteredEvents[i].getEventName());
-                eventPanel.setName(""+filteredEvents[i].getID());
+                eventPanel.setName("" + filteredEvents[i].getID());
                 eventPanel.setCategoryColor(filteredEvents[i].getCategory().getCategoryColor());
                 eventPanel.setForeground(eventForeground);
                 //add all event mouse listeners to the event label
                 for (int j = 0; j < eventMouseListeners.size(); j++) {
-                	eventPanel.addMouseListener(eventMouseListeners.get(j));
+                    eventPanel.addMouseListener(eventMouseListeners.get(j));
                 }
-                
-                box.add(eventPanel);
+
+                eventPanelBox.add(eventPanel);
                 eventLabels.add(eventPanel);
             }
 
         }
-        
+
         revalidate();
         repaint();
 
     }
 
     private void checkAndHighlightHoliday() {
-    	
-    	if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
-        	titleLabel.setForeground(SystemColor.red);
+
+        if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
+            titleLabel.setForeground(SystemColor.red);
         } else {
-        	titleLabel.setForeground(SystemColor.textText);
+            titleLabel.setForeground(SystemColor.textText);
         }
     }
-    
+
     /**
      * Add a MouseListener that will be fired whenever
      * a mouse event occurs on events.
@@ -499,13 +492,13 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
      * @param l
      */
     public void addEventMouseListener(MouseListener l) {
-    	for (int i = 0; i < eventLabels.size(); i++) {
-    		eventLabels.get(i).addMouseListener(l);
-    	}
-    	
-    	eventMouseListeners.add(l);
+        for (int i = 0; i < eventLabels.size(); i++) {
+            eventLabels.get(i).addMouseListener(l);
+        }
+
+        eventMouseListeners.add(l);
     }
-    
+
     /**
      * This is a panel that displays information on a single event.
      * The interface is similar to a JLabel to be easy to use and
@@ -515,243 +508,222 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
      * 
      * Priority will also be displayed in this.
      * 
-     * @author Håkan
-     *
+     * @author Hï¿½kan
+     * edited by Tomas
      */
     class EventPanel extends JPanel {
-    	private Color categoryColor = new Color(0,0,0);
-    	//private String text = null;
-    	private JLabel textLabel = new JLabel();
-    	
-    	private int width = 150;
-    	private int height = 0;
-    	
-    	EventPanel() { 
-    		this.setOpaque(false);
-    	}
-    	
-    	EventPanel(String text) {
-    		textLabel.setText(text);
-    		textLabel.setOpaque(false);
-    		setOpaque(false);
-    		setLayout(new BorderLayout());
-    		Box internalBox = Box.createHorizontalBox();
-    		add(internalBox, BorderLayout.CENTER);
-    		internalBox.add(Box.createRigidArea(new Dimension(17, textLabel.getHeight())));
-    		internalBox.add(textLabel);
-    	}
-    	
-    	/**
-    	 * Set the text to display on this event panel.
-    	 * 
-    	 * @param text
-    	 */
-    	public void setText(String text) {
-    		textLabel.setText(text);
-    	}
-    	
-    	/**
-    	 * Get the text displayed in this event panel.
-    	 * @return	String of the contained text
-    	 */
-    	public String getText() {
-    		return textLabel.getText();
-    	}
-    	
-    	
-    	public void setCategoryColor(Color color) {
-    		categoryColor = color;
-    	}
-    	
-    	@Override
-    	public void paintComponent(Graphics g) {
-    		super.paintComponent(g);
-    		
-    		int x = 5;
-    		int y = getHeight()/2-5;
-    		
-    		Graphics2D g2d = (Graphics2D)g;
-    		
-    		g2d.setColor(categoryColor);
-    		g2d.fillOval(x, y, 10, 10);
-    		
-    		/*if (text != null) {
-	    		g2d.setColor(this.getForeground());
-				g2d.setFont(this.getFont());
 
-				/*
-				 * Draw the actual text of the label, this has to be done manually
-				 * after drawing the background, since calling super.paintComponent()
-				 * draws both background and text, which would overwrite the custom
-				 * drawing.
-				 */
-				/*g2d.drawString(this.getText(), x + 10 + 2, (int)getHeight()/2 + height/2-1);
-			}*/
-    		
-    	}
+        private Color categoryColor = new Color(0, 0, 0);
+        //private String text = null;
+        private JLabel textLabel = new JLabel();
+
+        EventPanel() {
+            this.setOpaque(false);
+        }
+
+        EventPanel(String text) {
+            setLayout(new BorderLayout());
+            textLabel.setText(text);
+            add(textLabel, BorderLayout.CENTER);
+            add(Box.createRigidArea(new Dimension(20, textLabel.getHeight() + 20)), BorderLayout.LINE_START);
+        }
+
+        /**
+         * Set the text to display on this event panel.
+         *
+         * @param text
+         */
+        public void setText(String text) {
+            textLabel.setText(text);
+        }
+
+        /**
+         * Get the text displayed in this event panel.
+         * @return	String of the contained text
+         */
+        public String getText() {
+            return textLabel.getText();
+        }
+
+        public void setCategoryColor(Color color) {
+            categoryColor = color;
+        }
+
+        @Override
+        public void paintComponent(Graphics g) {
+            super.paintComponent(g);
+
+            int x = 5;
+            int y = getHeight() / 2 - 5;
+
+            Graphics2D g2d = (Graphics2D) g;
+
+            g2d.setColor(categoryColor);
+            g2d.fillOval(x, y, 10, 10);
+        }
     }
-    
+
     /**
      * This is a regular JLabel with a custom background
      * of a gradient between two specified colors.
      * 
-     * @author Håkan
+     * @author Hï¿½kan
      *
      */
     class GradientLabel extends JLabel {
-    	private Color color1;
-    	private Color color2;
-    	GradientLabel() {
-    		color1 = SystemColor.textText;
-    		color2 = SystemColor.textText;
-    	}
-    	
-    	@Override
-    	public void setBackground(Color color) {
-    		color1 = color;
-    		this.repaint();
-    		super.setBackground(color);
-    	}
-    	
-    	public void setBackground2(Color color) {
-    		color2 = color;
-    		this.repaint();
-    	}
-    	
-    	@Override
-    	public void paintComponent(Graphics graphics) {
-    		super.paintComponent(graphics);
-    		    		
-    		/*
-    		 * if we have two different colors, let's
-    		 * produce a nice gradient between them
-    		 */
-    		if (!color1.equals(color2)) {
-    			Graphics2D g2d = (Graphics2D)graphics;
-    			Rectangle r = getBounds();
-    			Point pt1 = new Point(1,1);
-    			Point pt2 = new Point((int)r.getWidth(), (int)r.getHeight());
-    			GradientPaint gp = new GradientPaint(pt1, color1, pt2, color2);
 
-    			g2d.setPaint(gp);
-    			g2d.fillRect(pt1.x, pt1.y, pt2.x, pt2.y);
-    			g2d.setColor(this.getForeground());
-    			g2d.setFont(this.getFont());
-    			//get font metrics to properly place the label text
-    			int height = this.getFontMetrics(this.getFont()).getHeight();
-    			int width = 0;
-    			int widths[] = getFontMetrics(getFont()).getWidths();
-    			for (int i = 0; i < getText().length(); i++) {
-    				width += widths[getText().charAt(i)];
-    			}
-    			/*
-    			 * Draw the actual text of the label, this has to be done manually
-    			 * after drawing the background, since calling super.paintComponent()
-    			 * draws both background and text, which would overwrite the custom
-    			 * drawing.
-    			 */
-    			g2d.drawString(this.getText(), (int)r.getWidth()/2 - width/2, (int)r.getHeight()/2 + height/2-1);
+        private Color color1;
+        private Color color2;
 
-    		}
-    		
-    		
-    	}
+        GradientLabel() {
+            color1 = SystemColor.textText;
+            color2 = SystemColor.textText;
+        }
+
+        @Override
+        public void setBackground(Color color) {
+            color1 = color;
+            this.repaint();
+            super.setBackground(color);
+        }
+
+        public void setBackground2(Color color) {
+            color2 = color;
+            this.repaint();
+        }
+
+        @Override
+        public void paintComponent(Graphics graphics) {
+            super.paintComponent(graphics);
+
+            /*
+             * if we have two different colors, let's
+             * produce a nice gradient between them
+             */
+            if (!color1.equals(color2)) {
+                Graphics2D g2d = (Graphics2D) graphics;
+                Rectangle r = getBounds();
+                Point pt1 = new Point(1, 1);
+                Point pt2 = new Point((int) r.getWidth(), (int) r.getHeight());
+                GradientPaint gp = new GradientPaint(pt1, color1, pt2, color2);
+
+                g2d.setPaint(gp);
+                g2d.fillRect(pt1.x, pt1.y, pt2.x, pt2.y);
+                g2d.setColor(this.getForeground());
+                g2d.setFont(this.getFont());
+                //get font metrics to properly place the label text
+                int height = this.getFontMetrics(this.getFont()).getHeight();
+                int width = 0;
+                int widths[] = getFontMetrics(getFont()).getWidths();
+                for (int i = 0; i < getText().length(); i++) {
+                    width += widths[getText().charAt(i)];
+                }
+                /*
+                 * Draw the actual text of the label, this has to be done manually
+                 * after drawing the background, since calling super.paintComponent()
+                 * draws both background and text, which would overwrite the custom
+                 * drawing.
+                 */
+                g2d.drawString(this.getText(), (int) r.getWidth() / 2 - width / 2, (int) r.getHeight() / 2 + height / 2 - 1);
+
+            }
+
+
+        }
     }
-    
-    
     /*
      * these variables are placed down here for the sole reason that it's much
      * easier to keep them close to the actual code that uses them, it makes sense
      * to have them nearby
      */
-    private Color triangleStartColor = new Color(0,100,0);
-    private Color triangleEndColor = new Color(0,210,0);
+    private Color triangleStartColor = new Color(0, 100, 0);
+    private Color triangleEndColor = new Color(0, 210, 0);
     private Color triangleColor = triangleStartColor;
     private float colorStep = 0.0f;
     private boolean hasMarker = true;
     private float colorInc = 0.2f;
     private boolean shouldAnimate = false;
     private boolean cleanupDone = false;
-    
-	@Override
-	public boolean animationFinished() {
-		return false;
-	}
 
-	/*
-	 * Reset the state of the animation to it's starting state.
-	 */
-	@Override
-	public void cleanup() {
-		if (!cleanupDone) {
-			triangleColor = triangleStartColor;
-			colorStep = 0.2f;
-			this.repaint();
-			cleanupDone = true;
-		}
-	}
-	
-	/*
-	 * perform a simple animation that smoothly changes between two colors
-	 * in the triangle, any other animation is not yet supported
-	 */
-	@Override
-	public void computeAnimatation() {
-		shouldAnimate = false;
-		/*
-		 * Do nothing if we have no specified marker for the daycard
-		 * if we have a marker:
-		 * Look through the list of priorities and categories to highlight
-		 * and see if this daycard has events matching these. Animation
-		 * will only happen if we find a match.
-		 */
-		if (hasMarker) {
-			for (int j = 0; j < events.size(); j++) {
-				for (int i = 0; i < arrayPrioritiesHighlight.size(); i++) {
-					if (arrayPrioritiesHighlight.get(i).toString().equals(events.get(j).getPriority().toString())) {
-						shouldAnimate = true;
-					}
-				}
-				
-				for (int i = 0; i < arrayCategoriesHighlight.size(); i++) {
-					if (arrayCategoriesHighlight.get(i).getName().equals(events.get(j).getCategory().getName())) {
-						shouldAnimate = true;
-					}
-				}
-			}
-		}
-		
-		if (shouldAnimate) {
-			cleanupDone = false;
-			switch (highlightMarker) {
-			
-			
-			case TRIANGLE_FADING:
-				int r = (int) ((1 - colorStep) * triangleStartColor.getRed() + colorStep * triangleEndColor.getRed());
-				int g = (int) ((1 - colorStep) * triangleStartColor.getGreen() + colorStep * triangleEndColor.getGreen());
-				int b = (int) ((1 - colorStep) * triangleStartColor.getBlue() + colorStep * triangleEndColor.getBlue());
-				colorStep += colorInc;
-				if (colorStep >= 1) {
-					colorInc = -0.2f;
-				} else if (colorStep <= 0.1f) {
-					colorInc = 0.2f;
-				}
-				triangleColor = new Color(r, g, b);
-			}
-		} else {
-			cleanup();
-		}
-	}
+    @Override
+    public boolean animationFinished() {
+        return false;
+    }
 
-	@Override
-	public void displayAnimatation() {
-		if (shouldAnimate) {
-			this.repaint();
-		} 
-	}
+    /*
+     * Reset the state of the animation to it's starting state.
+     */
+    @Override
+    public void cleanup() {
+        if (!cleanupDone) {
+            triangleColor = triangleStartColor;
+            colorStep = 0.2f;
+            this.repaint();
+            cleanupDone = true;
+        }
+    }
 
-	@Override
-	public double preferredFPS() {
-		return 5;
-	}
+    /*
+     * perform a simple animation that smoothly changes between two colors
+     * in the triangle, any other animation is not yet supported
+     */
+    @Override
+    public void computeAnimatation() {
+        shouldAnimate = false;
+        /*
+         * Do nothing if we have no specified marker for the daycard
+         * if we have a marker:
+         * Look through the list of priorities and categories to highlight
+         * and see if this daycard has events matching these. Animation
+         * will only happen if we find a match.
+         */
+        if (hasMarker) {
+            for (int j = 0; j < events.size(); j++) {
+                for (int i = 0; i < arrayPrioritiesHighlight.size(); i++) {
+                    if (arrayPrioritiesHighlight.get(i).toString().equals(events.get(j).getPriority().toString())) {
+                        shouldAnimate = true;
+                    }
+                }
+
+                for (int i = 0; i < arrayCategoriesHighlight.size(); i++) {
+                    if (arrayCategoriesHighlight.get(i).getName().equals(events.get(j).getCategory().getName())) {
+                        shouldAnimate = true;
+                    }
+                }
+            }
+        }
+
+        if (shouldAnimate) {
+            cleanupDone = false;
+            switch (highlightMarker) {
+
+
+                case TRIANGLE_FADING:
+                    int r = (int) ((1 - colorStep) * triangleStartColor.getRed() + colorStep * triangleEndColor.getRed());
+                    int g = (int) ((1 - colorStep) * triangleStartColor.getGreen() + colorStep * triangleEndColor.getGreen());
+                    int b = (int) ((1 - colorStep) * triangleStartColor.getBlue() + colorStep * triangleEndColor.getBlue());
+                    colorStep += colorInc;
+                    if (colorStep >= 1) {
+                        colorInc = -0.2f;
+                    } else if (colorStep <= 0.1f) {
+                        colorInc = 0.2f;
+                    }
+                    triangleColor = new Color(r, g, b);
+            }
+        } else {
+            cleanup();
+        }
+    }
+
+    @Override
+    public void displayAnimatation() {
+        if (shouldAnimate) {
+            this.repaint();
+        }
+    }
+
+    @Override
+    public double preferredFPS() {
+        return 5;
+    }
 }
