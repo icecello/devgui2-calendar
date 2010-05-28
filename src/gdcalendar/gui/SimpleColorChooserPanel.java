@@ -26,9 +26,9 @@ public class SimpleColorChooserPanel extends AbstractColorChooserPanel
     }
 
     protected void buildChooser() {
-        for (int r = 165; r < 256; r += 30) {
-            for (int g = 165; g < 256; g += 30) {
-                for (int b = 165; b < 256; b += 30) {
+        for (int r = 75; r < 256; r += 60) {
+            for (int g = 75; g < 256; g += 60) {
+                for (int b = 75; b < 256; b += 60) {
                     JToggleButton button = new JToggleButton();
                     Color color = new Color(r, g, b);
                     button.setBackground(color);
