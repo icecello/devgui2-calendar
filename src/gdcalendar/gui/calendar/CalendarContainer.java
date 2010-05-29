@@ -137,8 +137,15 @@ public class CalendarContainer extends JPanel {
         setDayTitleBackground2(new Color(210,210,210));
         
         setGridBorder(BorderFactory.createLineBorder(new Color(240, 240, 240)));
+        
     }
 
+    /**
+     * Set the border type to use between days in
+     * the grid.
+     * 
+     * @param gridborder
+     */
     public void setGridBorder(Border gridborder) {
     	for (int i = 0; i < views.size(); i++) {
     		views.get(i).setBorder(gridborder);
@@ -184,6 +191,19 @@ public class CalendarContainer extends JPanel {
                 views.get(i).setBackground(color);
             }
         }
+    }
+    
+    /**
+     * Get the background color of the days of the calendar container.
+     * 
+     * @return		background color of the days, or their parent's
+     * 				background color if none is specified.
+     */
+    public Color getBackground() {
+    	if (views != null && views.size() > 0)
+    		return views.get(0).getBackground();
+    	else
+    		return super.getBackground();
     }
 
     /**

@@ -14,6 +14,8 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
+import java.awt.event.ContainerEvent;
+import java.awt.event.ContainerListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -52,6 +54,10 @@ import java.beans.PropertyChangeListener;
 import java.util.Date;
 import java.util.UUID;
 import javax.swing.JLabel;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 
 /**
  * MainWindow for a Calendar application. Events are loaded from XML at initialization
@@ -66,6 +72,7 @@ import javax.swing.JLabel;
 public class MainWindow extends JFrame {
 
     static private HelpGlassPane helpGlassPane;
+
     private ResourceBundle resource;
     private JMenuItem quitItem;
     private JMenuItem undoItem;
@@ -96,7 +103,7 @@ public class MainWindow extends JFrame {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setMinimumSize(new Dimension(700, 500));
         setPreferredSize(new Dimension(700, 530));
-
+        
         resource = ResourceBundle.getBundle("gdcalendar.resource_en_US");
         actionManager = new ActionManager(this, resource);
 
@@ -124,7 +131,7 @@ public class MainWindow extends JFrame {
 
         pack();
 
-
+        
         AnimationDriver.getInstance().runThread("calendarcontainer");
     }
 
@@ -190,28 +197,35 @@ public class MainWindow extends JFrame {
         popMenu = new DayPopupMenu();
 
         //Make the pop-up show when the user press an event
-
+        
         calendarContainer.addEventMouseListener(new MouseAdapter() {
             //TODO: add commandmananger as parameter to daypopupmenu
-
-            private Color oldColor;
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                oldColor = ((JPanel) e.getSource()).getBackground();
-                ((JPanel) e.getSource()).setOpaque(true);
-                ((JPanel) e.getSource()).setBackground(SystemColor.controlHighlight);
-
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                ((JPanel) e.getSource()).setOpaque(false);
-                ((JPanel) e.getSource()).setBackground(oldColor);
-            }
-
+        	private Color oldColor = SystemColor.white;
+        	private JPanel panel = null;
+        	private boolean mouseDown = false;
+        	
+        	@Override
+        	public void mouseEntered(MouseEvent e) {
+        		panel = (JPanel) e.getSource(); 
+        		doHoverColor();
+        	}
+        	
+        	@Override
+        	public void mouseExited(MouseEvent e) {
+        		/*
+        		 * only return original background color
+        		 * if the popupmenu is no longer visible
+        		 */
+        		if (!mouseDown || !popMenu.isVisible()) {
+        			mouseDown = false;
+        			panel = (JPanel) e.getSource();
+        			doReturnColor();
+        		}
+        	}
+        	
             @Override
             public void mousePressed(MouseEvent e) {
+            	mouseDown = true;
                 maybeShowPopup(e);
             }
 
@@ -220,8 +234,43 @@ public class MainWindow extends JFrame {
                 maybeShowPopup(e);
             }
 
+            private void doHoverColor() {
+            	oldColor = calendarContainer.getBackground();
+            	
+        		panel.setOpaque(true);
+        		panel.setBackground(SystemColor.controlHighlight);
+            }
+            
+            private void doReturnColor() {
+            	panel.setOpaque(false);
+            	panel.setBackground(oldColor);
+            }
+            
             private void maybeShowPopup(MouseEvent e) {
                 if (e.isPopupTrigger()) {
+                	/*
+                	 * add a listener to detect popup menu events, which
+                	 * will affect the background color of the currently
+                	 * selected calendar event
+                	 */
+                	popMenu.addPopupMenuListener(new PopupMenuListener() {
+						
+						@Override
+						public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+							doHoverColor();
+						}
+						
+						@Override
+						public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+							doReturnColor();
+						}
+						
+						@Override
+						public void popupMenuCanceled(PopupMenuEvent e) {
+							doReturnColor();
+						}
+					});
+                	
                     popMenu.setEditEnabled(true);
                     popMenu.setDeleteEnabled(true);
                     popMenu.show(e.getComponent(),
@@ -344,7 +393,7 @@ public class MainWindow extends JFrame {
 
     public void showAddEventWindow(Date eventDate) {
         //Create a new addEvent window
-
+        
         EventWindow addEventWindow = new EventWindow(eventDate, null, DayPopupMenu.ADD);
 
         addEventWindow.addPropertyChangeListener(new PropertyChangeListener() {
@@ -497,14 +546,14 @@ public class MainWindow extends JFrame {
 
             menu.add(item);
         }
-
+        
         Rectangle rect = toolButtonCategory.getBounds();
         Point bounds = new Point(rect.x, rect.y + rect.height);
         Point toolButtonLocation = toolButtonCategory.getLocation();
         Point toolBarLocation = toolBar.getLocationOnScreen();
         Point windowDisplacement = this.getLocationOnScreen();
-        menu.show(this, toolBarLocation.x + toolButtonLocation.x - windowDisplacement.x,
-                toolBarLocation.y + toolButtonLocation.y + bounds.y - windowDisplacement.y);
+        menu.show(this, toolBarLocation.x + toolButtonLocation.x - windowDisplacement.x, 
+        		toolBarLocation.y + toolButtonLocation.y + bounds.y - windowDisplacement.y);
 
 
     }
@@ -547,7 +596,7 @@ public class MainWindow extends JFrame {
         Point toolButtonLocation = toolButtonPriority.getLocation();
         Point toolBarLocation = toolBar.getLocationOnScreen();
         Point windowDisplacement = this.getLocationOnScreen();
-        menu.show(this, toolBarLocation.x + toolButtonLocation.x - windowDisplacement.x,
-                toolBarLocation.y + toolButtonLocation.y + bounds.y - windowDisplacement.y);
+        menu.show(this, toolBarLocation.x + toolButtonLocation.x - windowDisplacement.x, 
+        		toolBarLocation.y + toolButtonLocation.y + bounds.y - windowDisplacement.y);
     }
 }
