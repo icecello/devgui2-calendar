@@ -314,13 +314,16 @@ public class EventWindow extends JDialog {
                 public void propertyChange(PropertyChangeEvent evt) {
                     Category newCategory = (Category) evt.getNewValue();
                     Category oldCategory = (Category) evt.getOldValue();
-                    Main.categories.put(newCategory.getName(), newCategory);
                     if (oldCategory != null) {
                         Main.categories.remove(oldCategory.getName());
                         categoryComboBox.removeItem(oldCategory);
                     }
                     categoryComboBox.addItem(newCategory);
                     Main.categories.put(newCategory.getName(), newCategory);
+                    categoryComboBox.setSelectedItem(newCategory);
+                    if(linkText.equals("Edit")){
+                        EventWindow.this.firePropertyChange("categoryEdited", oldCategory, newCategory);
+                    }
                 }
             });
             cWindow.setVisible(true);

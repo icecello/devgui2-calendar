@@ -66,7 +66,6 @@ import javax.swing.JLabel;
 public class MainWindow extends JFrame {
 
     static private HelpGlassPane helpGlassPane;
-
     private ResourceBundle resource;
     private JMenuItem quitItem;
     private JMenuItem undoItem;
@@ -97,7 +96,7 @@ public class MainWindow extends JFrame {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setMinimumSize(new Dimension(700, 500));
         setPreferredSize(new Dimension(700, 530));
-        
+
         resource = ResourceBundle.getBundle("gdcalendar.resource_en_US");
         actionManager = new ActionManager(this, resource);
 
@@ -125,7 +124,7 @@ public class MainWindow extends JFrame {
 
         pack();
 
-        
+
         AnimationDriver.getInstance().runThread("calendarcontainer");
     }
 
@@ -191,25 +190,26 @@ public class MainWindow extends JFrame {
         popMenu = new DayPopupMenu();
 
         //Make the pop-up show when the user press an event
-        
+
         calendarContainer.addEventMouseListener(new MouseAdapter() {
             //TODO: add commandmananger as parameter to daypopupmenu
-        	private Color oldColor;
-        	
-        	@Override
-        	public void mouseEntered(MouseEvent e) {
-        		oldColor = ((JPanel)e.getSource()).getBackground();
-        		((JPanel)e.getSource()).setOpaque(true);
-        		((JPanel)e.getSource()).setBackground(SystemColor.controlHighlight);
-        		
-        	}
-        	
-        	@Override
-        	public void mouseExited(MouseEvent e) {
-        		((JPanel)e.getSource()).setOpaque(false);
-        		((JPanel)e.getSource()).setBackground(oldColor);
-        	}
-        	
+
+            private Color oldColor;
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                oldColor = ((JPanel) e.getSource()).getBackground();
+                ((JPanel) e.getSource()).setOpaque(true);
+                ((JPanel) e.getSource()).setBackground(SystemColor.controlHighlight);
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                ((JPanel) e.getSource()).setOpaque(false);
+                ((JPanel) e.getSource()).setBackground(oldColor);
+            }
+
             @Override
             public void mousePressed(MouseEvent e) {
                 maybeShowPopup(e);
@@ -316,8 +316,22 @@ public class MainWindow extends JFrame {
                     editEventWindow.addPropertyChangeListener(new PropertyChangeListener() {
 
                         public void propertyChange(PropertyChangeEvent evt) {
-                            DayEvent tempEvent = (DayEvent) evt.getNewValue();
-                            calendarModel.replaceDayEvent(d.getID(), tempEvent);
+                            if (evt.getPropertyName().equals("categoryEdited")) {
+                                Category oldCategory = (Category)evt.getOldValue();
+                                Category newCategory = (Category)evt.getNewValue();
+                                DayEvent[] events = calendarModel.getEvents();
+                                for(int i =0; i <events.length; i++){
+                                    if(events[i].getCategory().getName().equals(oldCategory.getName())){
+                                        DayEvent d = events[i];
+                                        d.setCategory(newCategory);
+                                        calendarModel.replaceDayEvent(events[i].getID(),d);
+                                    }
+                                }
+                            } else {
+                                DayEvent tempEvent = (DayEvent) evt.getNewValue();
+                                calendarModel.replaceDayEvent(d.getID(), tempEvent);
+
+                            }
                         }
                     });
                     editEventWindow.setVisible(true);
@@ -330,7 +344,7 @@ public class MainWindow extends JFrame {
 
     public void showAddEventWindow(Date eventDate) {
         //Create a new addEvent window
-        
+
         EventWindow addEventWindow = new EventWindow(eventDate, null, DayPopupMenu.ADD);
 
         addEventWindow.addPropertyChangeListener(new PropertyChangeListener() {
@@ -433,8 +447,7 @@ public class MainWindow extends JFrame {
     public void doAction(String helpType) {
         if (helpType.equals("addevent")) {
             showAddEventWindow(new Date());
-        }
-        else if (helpType.equals("transparency")) {
+        } else if (helpType.equals("transparency")) {
             new PreferencesWindow(this);
         }
     }
@@ -484,14 +497,14 @@ public class MainWindow extends JFrame {
 
             menu.add(item);
         }
-        
+
         Rectangle rect = toolButtonCategory.getBounds();
         Point bounds = new Point(rect.x, rect.y + rect.height);
         Point toolButtonLocation = toolButtonCategory.getLocation();
         Point toolBarLocation = toolBar.getLocationOnScreen();
         Point windowDisplacement = this.getLocationOnScreen();
-        menu.show(this, toolBarLocation.x + toolButtonLocation.x - windowDisplacement.x, 
-        		toolBarLocation.y + toolButtonLocation.y + bounds.y - windowDisplacement.y);
+        menu.show(this, toolBarLocation.x + toolButtonLocation.x - windowDisplacement.x,
+                toolBarLocation.y + toolButtonLocation.y + bounds.y - windowDisplacement.y);
 
 
     }
@@ -534,7 +547,7 @@ public class MainWindow extends JFrame {
         Point toolButtonLocation = toolButtonPriority.getLocation();
         Point toolBarLocation = toolBar.getLocationOnScreen();
         Point windowDisplacement = this.getLocationOnScreen();
-        menu.show(this, toolBarLocation.x + toolButtonLocation.x - windowDisplacement.x, 
-        		toolBarLocation.y + toolButtonLocation.y + bounds.y - windowDisplacement.y);
+        menu.show(this, toolBarLocation.x + toolButtonLocation.x - windowDisplacement.x,
+                toolBarLocation.y + toolButtonLocation.y + bounds.y - windowDisplacement.y);
     }
 }
