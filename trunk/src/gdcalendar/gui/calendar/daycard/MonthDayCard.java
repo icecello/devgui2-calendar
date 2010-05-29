@@ -82,7 +82,6 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     private CardView view = CardView.SIMPLE;
     private JPanel simpleView = new JPanel();   //The simple visual representation of the day
     private JPanel detailedView = new JPanel(); //The advanced visual representation of the day
-    private String newEventName;        //temporary storage for a new event name
     private GradientLabel titleLabel;          //Title label, showing the day of the month
     private CalendarController controller;   //The controller, responsible for updating the
     //connected models
@@ -92,7 +91,6 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     //this is a eventPanelBox used for layout of all events
     //works better than BoxLayout for top-to-bottom alignments
     private JPanel eventPanelBox;
-    private int cardWidth = 0;
     private Color eventForeground = SystemColor.textText;
     private Marker highlightMarker = Marker.NONE;
 
@@ -110,6 +108,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
         add(titleLabel, BorderLayout.PAGE_START);
         simpleView.setLayout(new BorderLayout());
         simpleView.add(eventPanelBox, BorderLayout.PAGE_START);
+        
     }
 
     /**
@@ -233,13 +232,34 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
      */
     public void setBackground(Color color) {
         super.setBackground(color);
-        if (simpleView != null) {
-            eventPanelBox.setBackground(color);
+        if (eventPanelBox != null)
+        	eventPanelBox.setBackground(color);
+        if (simpleView != null)
             simpleView.setBackground(color);
-        }
-        if (detailedView != null) {
+        if (detailedView != null)
             detailedView.setBackground(color);
+        
+        //also make sure the event labels have updated backgrounds
+        //this cold be a problem otherwise, where they retain the Swing
+        //default background during construction
+        if (eventLabels != null) {
+        	for (int i = 0; i < eventLabels.size(); i++)
+        		eventLabels.get(i).setBackground(color);
         }
+    }
+    
+    /**
+     * Get the background color of this daycard.
+     * 
+     * @return	the background color of this daycard, or if that
+     * 			is not specified, it's parent's background color.
+     */
+    @Override
+    public Color getBackground() {
+    	if (simpleView != null)
+    		return simpleView.getBackground();
+    	else
+    		return super.getBackground();
     }
 
     /**
@@ -348,7 +368,6 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
      */
     @Override
     protected void paintChildren(Graphics g) {
-        cardWidth = g.getClipBounds().width;
         super.paintChildren(g);
         switch (view) {
             case SIMPLE:
@@ -367,6 +386,8 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
      */
     private void paintSimple(Graphics g) {
 
+    	
+    	
         //only draw if there are any events for this day card
         if (eventLabels.size() > 0) {
             /*
@@ -412,9 +433,6 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     @Override
     public void modelPropertyChange(final PropertyChangeEvent evt) {
         String evtName = evt.getPropertyName();
-        if (evt.getNewValue() != null) {
-            newEventName = evt.getNewValue().toString();
-        }
 
         //Add an event label to the DayCard, invoked in EDT
         if (evtName.equals(CalendarController.ADD_EVENT) || evtName.equals(CalendarController.REMOVE_EVENT)) {
@@ -436,7 +454,6 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
                 eventLabels.add(eventPanel);
 
             }
-
             //Remove an event (the one at the bottom) from the DayCard, invoked in EDT
         } else if (evtName.equals(CalendarController.REMOVE_EVENT)) {
             simpleView.remove(eventLabels.get(eventLabels.size() - 1));
@@ -512,7 +529,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
      * @author H�kan
      * edited by Tomas
      */
-    class EventPanel extends JPanel {
+    public class EventPanel extends JPanel {
 
         private Color categoryColor = new Color(0, 0, 0);
         //private String text = null;
