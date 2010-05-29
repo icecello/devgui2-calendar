@@ -3,16 +3,37 @@
 
 <calendar>
   <dayEvent>
-    <name>test2</name>
-    <startDate>2010-05-13 20:29</startDate>
-    <endDate>2010-05-13 21:29</endDate>
-    <category>catEdit</category>
+    <name>sdsd</name>
+    <startDate>2010-05-06 21:29</startDate>
+    <endDate>2010-05-06 22:29</endDate>
+    <category>cat</category>
+    <priority>MEDIUM</priority>
+  </dayEvent>
+  <dayEvent>
+    <name>fsfsdf</name>
+    <startDate>2010-05-13 23:44</startDate>
+    <endDate>2010-05-13 23:53</endDate>
+    <category>new Cat</category>
     <priority>MEDIUM</priority>
   </dayEvent>
   <dayEvent>
     <name>test</name>
     <startDate>2010-05-12 20:29</startDate>
     <endDate>2010-05-12 21:29</endDate>
+    <category>cat</category>
+    <priority>MEDIUM</priority>
+  </dayEvent>
+  <dayEvent>
+    <name>test2</name>
+    <startDate>2010-05-13 20:29</startDate>
+    <endDate>2010-05-13 21:29</endDate>
+    <category>cat</category>
+    <priority>MEDIUM</priority>
+  </dayEvent>
+  <dayEvent>
+    <name>zxczxczxc</name>
+    <startDate>2010-05-10 21:29</startDate>
+    <endDate>2010-05-10 22:29</endDate>
     <category>cat</category>
     <priority>MEDIUM</priority>
   </dayEvent>

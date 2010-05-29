@@ -234,6 +234,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     public void setBackground(Color color) {
         super.setBackground(color);
         if (simpleView != null) {
+            eventPanelBox.setBackground(color);
             simpleView.setBackground(color);
         }
         if (detailedView != null) {
@@ -524,8 +525,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
         EventPanel(String text) {
             setLayout(new BorderLayout());
             textLabel.setText(text);
-            textLabel.setOpaque(false);
-
+            this.setOpaque(false);
             add(textLabel, BorderLayout.CENTER);
             add(Box.createRigidArea(new Dimension(20, textLabel.getHeight() + 20)), BorderLayout.LINE_START);
         }

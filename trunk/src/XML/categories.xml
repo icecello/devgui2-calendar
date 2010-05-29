@@ -3,14 +3,14 @@
 
 <categories>
   <category>
-    <name>catEdit</name>
-    <description>desc</description>
-    <color red="195" green="165" blue="165" />
-  </category>
-  <category>
     <name>cat</name>
     <description>desc</description>
-    <color red="255" green="255" blue="0" />
+    <color red="255" green="75" blue="75" />
+  </category>
+  <category>
+    <name>new Cat</name>
+    <description />
+    <color red="75" green="255" blue="75" />
   </category>
 </categories>
 
