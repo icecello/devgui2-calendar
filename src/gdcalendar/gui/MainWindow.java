@@ -44,6 +44,7 @@ import actionmanager.ActionManager;
 
 import commandmanager.CommandManager;
 import gdcalendar.gui.calendar.daycard.DayPopupMenu;
+import gdcalendar.gui.calendar.daycard.DayView;
 import gdcalendar.gui.calendar.daycard.MonthDayCard;
 import gdcalendar.gui.calendar.daycard.MonthDayCard.Marker;
 import gdcalendar.gui.calendar.undoredo.AddEventCommand;
@@ -385,7 +386,16 @@ public class MainWindow extends JFrame {
                     });
                     editEventWindow.setVisible(true);
                 } else if (evtName.equals(DayPopupMenu.VIEW)) {
-                    System.out.println("View");
+                    System.out.println("Viewing day...");
+                    Date day = ((MonthDayCard) popMenu.getInvoker()).getFilter();
+
+                    JFrame frame = new JFrame();
+                    DayView d = new DayView(calendarModel.getEvents());
+
+                    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                    frame.add(d);
+                    frame.pack();
+                    frame.setVisible(true);
                 }
             }
         });

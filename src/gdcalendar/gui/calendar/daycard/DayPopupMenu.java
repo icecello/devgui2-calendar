@@ -53,7 +53,7 @@ public class DayPopupMenu extends JPopupMenu {
     }
 
     /**
-     * Sends a notification that view action should be called
+     * Sends a notification that view day action should be called
      * in the classes listening
      */
     @Action

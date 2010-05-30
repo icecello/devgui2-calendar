@@ -21,13 +21,21 @@ public class CalendarController extends AbstractController
 
     //  Properties this controller expects to be stored in one or more registered models
     
-    
+    public static final String VIEW_DAY = "viewDayEvent";
     public static final String ADD_EVENT = "addDayEvent";
     public static final String REMOVE_EVENT = "removeDayEvent";
     public static final String FILTERED_EVENTS = "getFilteredEvents";
     public static final String FILTER= "setDayFilter";
     
     
+    /**
+     * View a particular day
+     * @param day The Date of the day to view
+     */
+    public void viewDayEvent(Date day) {
+        setModelProperty(VIEW_DAY, day);
+    }
+
     /**
      * Add a DayEvent to all models connected to the controller
      * @param event The DayEvent to add
