@@ -187,7 +187,9 @@ public class DayEvent extends AbstractModel{
         this.description = description;
     }
 
-
+    public int getTimeSpan() {
+        return (int) (getEndTime().getTime() - getStartTime().getTime()) / 60000;
+    }
 
     @Override
     public String toString() {
