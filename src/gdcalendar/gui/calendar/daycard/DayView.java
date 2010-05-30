@@ -63,7 +63,7 @@ public class DayView extends JPanel {
         scroll.setMinimumSize(new Dimension(100, 500));
         initTimeLabels();
 
-        for (int i=0; i > events.size(); i++) {
+        for (int i=0; i < events.size(); i++) {
             addEvent(events.get(i));
         }
 
@@ -77,7 +77,7 @@ public class DayView extends JPanel {
         initTimeLabels();
 
         System.out.println("length: " + events.length);
-        for (int i=0; i > events.length; i++) {
+        for (int i=0; i < events.length; i++) {
             addEvent(events[i]);
         }
 
