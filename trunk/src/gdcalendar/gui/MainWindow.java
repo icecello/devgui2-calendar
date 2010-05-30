@@ -388,9 +388,11 @@ public class MainWindow extends JFrame {
                 } else if (evtName.equals(DayPopupMenu.VIEW)) {
                     System.out.println("Viewing day...");
                     Date day = ((MonthDayCard) popMenu.getInvoker()).getFilter();
-
+                    DayFilteredCalendarModel model = new DayFilteredCalendarModel();
+                    model.setRealCalendarModel(calendarModel);
+                    model.setDayFilter(day);
                     JFrame frame = new JFrame();
-                    DayView d = new DayView(calendarModel.getEvents());
+                    DayView d = new DayView(model.getFilteredEvents());
 
                     frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                     frame.add(d);
