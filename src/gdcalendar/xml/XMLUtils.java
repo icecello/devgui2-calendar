@@ -107,7 +107,7 @@ public class XMLUtils {
             Node color, icon;
             String iconSrc = "";
             int red = 0, green = 0, blue = 0;
-            // Loop through each todo-item in XML-file and extract properties
+            // Loop through each category in XML-file and extract properties
             for (int i = 0; i < XMLUtils.getSize(doc, "category"); i++) {
                 Element element = XMLUtils.getElement(doc, "category", i);
                 String name = XMLUtils.getValue(element, "name");

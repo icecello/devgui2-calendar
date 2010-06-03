@@ -1,6 +1,7 @@
 package gdcalendar.mvc.model;
 
 import gdcalendar.mvc.controller.CalendarController;
+import gdcalendar.mvc.controller.DayFilteredCalendarController;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -32,48 +33,6 @@ public class DayFilteredCalendarModel extends AbstractModel {
     }
 
     /**
-     * Add a new DayEvent to the model. The backbone model
-     * will also be updated
-     *
-     * @param event	The event to be added
-     */
-    public void addDayEvent(DayEvent event) {
-        //Notify all controllers connected to the model that a DayEvent has been added
-//        firePropertyChange(CalendarController.ADD_EVENT, null, event);
-        realModel.addDayEvent(event);
-    }
-
-    /**
-     * Remove specified event from a certain day. The backbone model will
-     * also be updated
-     *
-     * @param eventID	The ID that uniquely determines a DayEvent
-     * @return 		The DayEvent corresponding to the given eventID
-     */
-    public DayEvent removeDayEvent(UUID eventID) {
-        //Notify all controllers connected to the model that a DayEvent has been added
-//        firePropertyChange(CalendarController.REMOVE_EVENT, realModel.getDayEvent(eventID), null);
-        DayEvent toReturn = realModel.removeDayEvent(eventID);
-        return toReturn;
-    }
-
-    /**
-     * Get the DayEvent connected to the given eventID. If no DayEvent
-     * matches the eventID, null is returned
-     * @param eventID	The ID that uniquely determines a DayEvent
-     * @return		The DayEvent corresponding to the given eventID
-     */
-    public DayEvent getDayEvent(UUID eventID) {
-        DayEvent[] events = getFilteredEvents();
-        for (int i = 0; i < events.length; i++) {
-            if (events[i].getID().equals(eventID)) {
-                return events[i];
-            }
-        }
-        return null;
-    }
-
-    /**
      * Attach a new filter to the model. Only DayEvents fullfilling the
      * filters' preferences will be shown
      * @param filter the day filter. Only DayEvents taking place this day will be shown
@@ -83,7 +42,7 @@ public class DayFilteredCalendarModel extends AbstractModel {
         this.filter = filter;
         //Notify the connected controllers that the filter has been updated, and
         //also send the events matching the new filter
-        firePropertyChange(CalendarController.FILTER, oldVaule, filter);
+        firePropertyChange(DayFilteredCalendarController.FILTER, oldVaule, filter);
         firePropertyChange(CalendarController.FILTERED_EVENTS, null, getFilteredEvents());
 
     }
@@ -98,7 +57,7 @@ public class DayFilteredCalendarModel extends AbstractModel {
 
     /**
      * Attach a backbone model to the filteredCalendarModel. Changes to the filtered Model
-     * and vice versa will be reflected to the corresponing models
+     * and vice versa will be reflected to the corresponing controllers
      * @param realModel the backbone model
      */
     public void setRealCalendarModel(final CalendarModel realModel) {
@@ -166,7 +125,7 @@ public class DayFilteredCalendarModel extends AbstractModel {
             return data;
         }
 
-        //Filter the DayEvents that fullfills the filter
+        //Get the DayEvents that fullfills the filter
         int filteredSize = 0;
         for (int i = 0; i < data.length; i++) {
             if (data[i].isActiveDuringDay(filter)) {

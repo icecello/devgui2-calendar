@@ -1,8 +1,8 @@
 package gdcalendar.gui.calendar.undoredo;
 
 import commandmanager.ICommand;
+import gdcalendar.mvc.controller.CalendarController;
 
-import gdcalendar.mvc.model.CalendarModel;
 import gdcalendar.mvc.model.DayEvent;
 
 /**
@@ -14,37 +14,37 @@ import gdcalendar.mvc.model.DayEvent;
  * @author Tomas
  */
 public class AddEventCommand implements ICommand {
-	
-	private CalendarModel model;
-	private DayEvent event;
-	
-	/**
-	 * 
-	 * @param controller
-	 * @param event
-	 */
-	public AddEventCommand(CalendarModel cModel, DayEvent event) {
-		this.model = cModel;
-		this.event = event;
-	}
-	
-	@Override
-	public void execute() {
-		// add this command
-        model.addDayEvent(event);
-	}
 
-	@Override
-	public void undo() {
-		// remove this command again, but keep it's state
-		// so we can redo it
-		model.removeDayEvent(event.getID());
+    private CalendarController controller;
+    private DayEvent event;
 
-	}
-	
-	@Override
-	public void redo() {
-		execute();
-	}
+    /**
+     * Create a command that adds a DayEvent
+     * @param controller the controller attached which should take care of
+     * adding the DayEvent
+     * @param event the event to be added
+    **/
+    public AddEventCommand(CalendarController cConttroller, DayEvent event) {
+        this.controller = cConttroller;
+        this.event = event;
+    }
 
+    @Override
+    public void execute() {
+        // add this command
+        controller.addDayEvent(event);
+    }
+
+    @Override
+    public void undo() {
+        // remove this command again, but keep it's state
+        // so we can redo it
+        controller.removeDayEvent(event.getID());
+
+    }
+
+    @Override
+    public void redo() {
+        execute();
+    }
 }

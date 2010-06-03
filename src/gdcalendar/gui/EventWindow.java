@@ -322,7 +322,7 @@ public class EventWindow extends JDialog {
                     Main.categories.put(newCategory.getName(), newCategory);
                     categoryComboBox.setSelectedItem(newCategory);
                     if(linkText.equals("Edit")){
-                        EventWindow.this.firePropertyChange("categoryEdited", oldCategory, newCategory);
+                        EventWindow.this.firePropertyChange(CategoryWindow.CATEGORY_EDITED, oldCategory, newCategory);
                     }
                 }
             });

@@ -31,7 +31,7 @@ import javax.swing.event.ChangeListener;
  * @author Tomas
  */
 public class CategoryWindow extends JDialog {
-
+    public static String CATEGORY_EDITED = "categoryEdited";
     private JTextField titleField;
     private JTextArea descTextArea;
     private JColorChooser colorChooser;

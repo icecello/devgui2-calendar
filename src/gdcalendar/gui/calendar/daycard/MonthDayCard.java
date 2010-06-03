@@ -2,6 +2,7 @@ package gdcalendar.gui.calendar.daycard;
 
 import gdcalendar.logic.IAnimatedComponent;
 import gdcalendar.mvc.controller.CalendarController;
+import gdcalendar.mvc.controller.DayFilteredCalendarController;
 import gdcalendar.mvc.model.Category;
 import gdcalendar.mvc.model.DayEvent;
 import gdcalendar.mvc.model.DayEvent.Priority;
@@ -83,7 +84,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
     private JPanel simpleView = new JPanel();   //The simple visual representation of the day
     private JPanel detailedView = new JPanel(); //The advanced visual representation of the day
     private GradientLabel titleLabel;          //Title label, showing the day of the month
-    private CalendarController controller;   //The controller, responsible for updating the
+    private DayFilteredCalendarController controller;   //The controller, responsible for updating the
     //connected models
     private ArrayList<EventPanel> eventLabels;  //The visual representation of the day events
     private ArrayList<DayEvent> events;     //The events of the day
@@ -117,7 +118,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
      *
      * @param view	which layout to use for the drawing of the component
      */
-    public MonthDayCard(CardView view, CalendarController controller) {
+    public MonthDayCard(CardView view, DayFilteredCalendarController controller) {
         //Call Init() to handle basic setup
         //just changed name to make more sense
         Init();
@@ -144,7 +145,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
      * @param controller    The controller which is responsible for connecting the
      *                      MonthCardDay to corresponing models
      */
-    private MonthDayCard(Date filter, CardView view, CalendarController controller) {
+    private MonthDayCard(Date filter, CardView view, DayFilteredCalendarController controller) {
         /*
          * Call MonthDayCard with current date and the given view
          */
@@ -460,7 +461,7 @@ public class MonthDayCard extends AbstractViewPanel implements IDayCard, IAnimat
             eventLabels.remove(eventLabels.size() - 1);
             events.remove(events.get(events.size() - 1));
 
-        } else if (evtName.equals(CalendarController.FILTER)) {
+        } else if (evtName.equals(DayFilteredCalendarController.FILTER)) {
             filter = (Date) evt.getNewValue();
             calendar.setTime(filter);
             titleLabel.setText("" + calendar.get(Calendar.DAY_OF_MONTH));
