@@ -2,7 +2,7 @@ package gdcalendar.gui.calendar;
 
 import gdcalendar.gui.calendar.daycard.MonthDayCard;
 import gdcalendar.logic.AnimationDriver;
-import gdcalendar.mvc.controller.CalendarController;
+import gdcalendar.mvc.controller.DayFilteredCalendarController;
 import gdcalendar.mvc.model.*;
 import gdcalendar.mvc.model.DayEvent.Priority;
 import java.awt.*;
@@ -70,7 +70,7 @@ public class CalendarContainer extends JPanel {
     //|_#_|_#_|_#_|_#_|_#_|_#_|_#_|
     private Calendar cal;
     private CardView dayViews = CardView.SIMPLE;
-    private ArrayList<CalendarController> controllers = new ArrayList<CalendarController>();
+    private ArrayList<DayFilteredCalendarController> controllers = new ArrayList<DayFilteredCalendarController>();
     private ArrayList<MonthDayCard> views = new ArrayList<MonthDayCard>();
     private ArrayList<CalendarDataChangedListener> dataChangedListeners = new ArrayList<CalendarDataChangedListener>();
     private CalendarModel calendarModel = new CalendarModel();
@@ -393,7 +393,7 @@ public class CalendarContainer extends JPanel {
     private void initMVC() {
         //Fill the whole grid with MonthDayCards
         for (int i = 1; i <= 42; i++) {
-            final CalendarController controller = new CalendarController();
+            final DayFilteredCalendarController controller = new DayFilteredCalendarController();
             final MonthDayCard daycard = new MonthDayCard(dayViews, controller);
             //add each daycard into the animation driver under the thread "calendarcontainer"
             AnimationDriver.getInstance().add(daycard, "calendarcontainer");

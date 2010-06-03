@@ -108,4 +108,12 @@ public class DayPopupMenu extends JPopupMenu {
     public void setDeleteEnabled(boolean value){
         actionManager.getAction("deleteEvent").setEnabled(value);
     }
+
+    /**
+     * Set if the add item should be enabled or not
+     * @param value true if the item should be enables, and false otherwise
+     */
+    public void setAddEnabled(boolean value){
+        actionManager.getAction("addEvent").setEnabled(value);
+    }
 }

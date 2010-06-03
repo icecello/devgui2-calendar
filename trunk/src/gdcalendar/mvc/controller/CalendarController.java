@@ -25,7 +25,6 @@ public class CalendarController extends AbstractController
     public static final String ADD_EVENT = "addDayEvent";
     public static final String REMOVE_EVENT = "removeDayEvent";
     public static final String FILTERED_EVENTS = "getFilteredEvents";
-    public static final String FILTER= "setDayFilter";
     
     
     /**
@@ -38,7 +37,7 @@ public class CalendarController extends AbstractController
 
     /**
      * Add a DayEvent to all models connected to the controller
-     * @param event The DayEvent to add
+     * @param event The DayEvent to add<
      */
     public void addDayEvent(DayEvent event) {
         setModelProperty(ADD_EVENT, event);
@@ -49,17 +48,7 @@ public class CalendarController extends AbstractController
      * connected models
      * @param eventID The ID that uniquely determines a DayEvent
      */
-    public void removeEvent(UUID eventID) {
+    public void removeDayEvent(UUID eventID) {
         setModelProperty(REMOVE_EVENT, eventID);
     }
-
-    /**
-     * Set a filter for all the connected models
-     * @param filter The new filter
-     */
-    public void setFilter(Date filter){
-        setModelProperty(FILTER, filter);
-    }
-
-    
 }

@@ -14,8 +14,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
-import java.awt.event.ContainerEvent;
-import java.awt.event.ContainerListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -49,14 +47,12 @@ import gdcalendar.gui.calendar.daycard.MonthDayCard;
 import gdcalendar.gui.calendar.daycard.MonthDayCard.Marker;
 import gdcalendar.gui.calendar.undoredo.AddEventCommand;
 import gdcalendar.gui.calendar.undoredo.RemoveEventCommand;
+import gdcalendar.mvc.controller.CalendarController;
 import gdcalendar.mvc.model.DayEvent.Priority;
 import java.awt.Dimension;
 import java.beans.PropertyChangeListener;
 import java.util.Date;
 import java.util.UUID;
-import javax.swing.JLabel;
-import javax.swing.event.AncestorEvent;
-import javax.swing.event.AncestorListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
@@ -73,7 +69,6 @@ import javax.swing.event.PopupMenuListener;
 public class MainWindow extends JFrame {
 
     static private HelpGlassPane helpGlassPane;
-
     private ResourceBundle resource;
     private JMenuItem quitItem;
     private JMenuItem undoItem;
@@ -91,6 +86,7 @@ public class MainWindow extends JFrame {
     private ActionManager actionManager;
     private CalendarContainer calendarContainer;
     private CalendarModel calendarModel;
+    private CalendarController calendarController;
     private DayPopupMenu popMenu;
     private JToolBar toolBar;
     private CollapsiblePanel collapsiblePanel;
@@ -104,7 +100,7 @@ public class MainWindow extends JFrame {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setMinimumSize(new Dimension(700, 500));
         setPreferredSize(new Dimension(700, 530));
-        
+
         resource = ResourceBundle.getBundle("gdcalendar.resource_en_US");
         actionManager = new ActionManager(this, resource);
 
@@ -117,6 +113,9 @@ public class MainWindow extends JFrame {
             System.err.println("In MainWindow: Error loading events from file");
         }
         calendarModel = new CalendarModel(events);
+        calendarController = new CalendarController();
+        calendarController.addModel(calendarModel);
+
         calendarContainer = new CalendarContainer(calendarModel);
 
         initMenuBar();
@@ -132,7 +131,7 @@ public class MainWindow extends JFrame {
 
         pack();
 
-        
+
         AnimationDriver.getInstance().runThread("calendarcontainer");
     }
 
@@ -198,35 +197,36 @@ public class MainWindow extends JFrame {
         popMenu = new DayPopupMenu();
 
         //Make the pop-up show when the user press an event
-        
+
         calendarContainer.addEventMouseListener(new MouseAdapter() {
             //TODO: add commandmananger as parameter to daypopupmenu
-        	private Color oldColor = SystemColor.white;
-        	private JPanel panel = null;
-        	private boolean mouseDown = false;
-        	
-        	@Override
-        	public void mouseEntered(MouseEvent e) {
-        		panel = (JPanel) e.getSource(); 
-        		doHoverColor();
-        	}
-        	
-        	@Override
-        	public void mouseExited(MouseEvent e) {
-        		/*
-        		 * only return original background color
-        		 * if the popupmenu is no longer visible
-        		 */
-        		if (!mouseDown || !popMenu.isVisible()) {
-        			mouseDown = false;
-        			panel = (JPanel) e.getSource();
-        			doReturnColor();
-        		}
-        	}
-        	
+
+            private Color oldColor = SystemColor.white;
+            private JPanel panel = null;
+            private boolean mouseDown = false;
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                panel = (JPanel) e.getSource();
+                doHoverColor();
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                /*
+                 * only return original background color
+                 * if the popupmenu is no longer visible
+                 */
+                if (!mouseDown || !popMenu.isVisible()) {
+                    mouseDown = false;
+                    panel = (JPanel) e.getSource();
+                    doReturnColor();
+                }
+            }
+
             @Override
             public void mousePressed(MouseEvent e) {
-            	mouseDown = true;
+                mouseDown = true;
                 maybeShowPopup(e);
             }
 
@@ -236,44 +236,45 @@ public class MainWindow extends JFrame {
             }
 
             private void doHoverColor() {
-            	oldColor = calendarContainer.getBackground();
-            	
-        		panel.setOpaque(true);
-        		panel.setBackground(SystemColor.controlHighlight);
+                oldColor = calendarContainer.getBackground();
+
+                panel.setOpaque(true);
+                panel.setBackground(SystemColor.controlHighlight);
             }
-            
+
             private void doReturnColor() {
-            	panel.setOpaque(false);
-            	panel.setBackground(oldColor);
+                panel.setOpaque(false);
+                panel.setBackground(oldColor);
             }
-            
+
             private void maybeShowPopup(MouseEvent e) {
                 if (e.isPopupTrigger()) {
-                	/*
-                	 * add a listener to detect popup menu events, which
-                	 * will affect the background color of the currently
-                	 * selected calendar event
-                	 */
-                	popMenu.addPopupMenuListener(new PopupMenuListener() {
-						
-						@Override
-						public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-							doHoverColor();
-						}
-						
-						@Override
-						public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-							doReturnColor();
-						}
-						
-						@Override
-						public void popupMenuCanceled(PopupMenuEvent e) {
-							doReturnColor();
-						}
-					});
-                	
+                    /*
+                     * add a listener to detect popup menu events, which
+                     * will affect the background color of the currently
+                     * selected calendar event
+                     */
+                    popMenu.addPopupMenuListener(new PopupMenuListener() {
+
+                        @Override
+                        public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                            doHoverColor();
+                        }
+
+                        @Override
+                        public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+                            doReturnColor();
+                        }
+
+                        @Override
+                        public void popupMenuCanceled(PopupMenuEvent e) {
+                            doReturnColor();
+                        }
+                    });
+
                     popMenu.setEditEnabled(true);
                     popMenu.setDeleteEnabled(true);
+                    popMenu.setAddEnabled(false);
                     popMenu.show(e.getComponent(),
                             e.getX(), e.getY());
                 }
@@ -297,6 +298,7 @@ public class MainWindow extends JFrame {
                     //Gray out edit and delete functionality
                     popMenu.setEditEnabled(false);
                     popMenu.setDeleteEnabled(false);
+                    popMenu.setAddEnabled(true);
                     popMenu.show(e.getComponent(),
                             e.getX(), e.getY());
                 }
@@ -352,39 +354,15 @@ public class MainWindow extends JFrame {
                 } else if (evtName.equals(DayPopupMenu.DELETE)) {
                     String ID = ((JPanel) popMenu.getInvoker()).getName();
                     DayEvent event = calendarModel.getDayEvent(UUID.fromString(ID));
-                    cm.execute(new RemoveEventCommand(calendarModel, event));
+                    cm.execute(new RemoveEventCommand(calendarController, event));
                     actionManager.getAction("doRedo").setEnabled(cm.canRedo());
                     actionManager.getAction("doUndo").setEnabled(cm.canUndo());
-
 
                 } else if (evtName.equals(DayPopupMenu.EDIT)) {
                     //Create a new addEvent window
                     String ID = ((JPanel) popMenu.getInvoker()).getName();
                     final DayEvent d = calendarModel.getDayEvent(UUID.fromString(ID));
-                    EventWindow editEventWindow = new EventWindow(new Date(), d, DayPopupMenu.EDIT);
-
-                    editEventWindow.addPropertyChangeListener(new PropertyChangeListener() {
-
-                        public void propertyChange(PropertyChangeEvent evt) {
-                            if (evt.getPropertyName().equals("categoryEdited")) {
-                                Category oldCategory = (Category)evt.getOldValue();
-                                Category newCategory = (Category)evt.getNewValue();
-                                DayEvent[] events = calendarModel.getEvents();
-                                for(int i =0; i <events.length; i++){
-                                    if(events[i].getCategory().getName().equals(oldCategory.getName())){
-                                        DayEvent d = events[i];
-                                        d.setCategory(newCategory);
-                                        calendarModel.replaceDayEvent(events[i].getID(),d);
-                                    }
-                                }
-                            } else {
-                                DayEvent tempEvent = (DayEvent) evt.getNewValue();
-                                calendarModel.replaceDayEvent(d.getID(), tempEvent);
-
-                            }
-                        }
-                    });
-                    editEventWindow.setVisible(true);
+                    showEditEventWindow(d);
                 } else if (evtName.equals(DayPopupMenu.VIEW)) {
                     System.out.println("Viewing day...");
                     Date day = ((MonthDayCard) popMenu.getInvoker()).getFilter();
@@ -405,18 +383,61 @@ public class MainWindow extends JFrame {
 
     public void showAddEventWindow(Date eventDate) {
         //Create a new addEvent window
-        
+
         EventWindow addEventWindow = new EventWindow(eventDate, null, DayPopupMenu.ADD);
 
         addEventWindow.addPropertyChangeListener(new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
-                cm.execute(new AddEventCommand(calendarModel, (DayEvent) evt.getNewValue()));
-                actionManager.getAction("doRedo").setEnabled(cm.canRedo());
-                actionManager.getAction("doUndo").setEnabled(cm.canUndo());
+                if (evt.getPropertyName().equals(CategoryWindow.CATEGORY_EDITED)) {
+                    Category oldCategory = (Category) evt.getOldValue();
+                    Category newCategory = (Category) evt.getNewValue();
+                    updateDisplayedCategories(oldCategory, newCategory);
+                } else {
+                    cm.execute(new AddEventCommand(calendarController, (DayEvent) evt.getNewValue()));
+                    actionManager.getAction("doRedo").setEnabled(cm.canRedo());
+                    actionManager.getAction("doUndo").setEnabled(cm.canUndo());
+                }
             }
         });
         addEventWindow.setVisible(true);
+    }
+
+    public void showEditEventWindow(final DayEvent event) {
+        //Create a new addEvent window
+        EventWindow editEventWindow = new EventWindow(new Date(), event, DayPopupMenu.EDIT);
+
+        editEventWindow.addPropertyChangeListener(new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (evt.getPropertyName().equals(CategoryWindow.CATEGORY_EDITED)) {
+                    Category oldCategory = (Category) evt.getOldValue();
+                    Category newCategory = (Category) evt.getNewValue();
+                    updateDisplayedCategories(oldCategory, newCategory);
+                } else {
+                    DayEvent tempEvent = (DayEvent) evt.getNewValue();
+                    //TODO: This should be done via the controller. 
+                    //however, the current implementation of the controller doesn't
+                    //support methods with more than one argument
+                    calendarModel.replaceDayEvent(event.getID(), tempEvent);
+                }
+            }
+        });
+        editEventWindow.setVisible(true);
+    }
+
+    public void updateDisplayedCategories(Category oldCategory, Category newCategory) {
+        DayEvent[] events = calendarModel.getEvents();
+        for (int i = 0; i < events.length; i++) {
+            if (events[i].getCategory().getName().equals(oldCategory.getName())) {
+                DayEvent d = events[i];
+                d.setCategory(newCategory);
+                //TODO: This should be done via the controller.
+                //however, the current implementation of the controller doesn't
+                //support methods with more than one argument
+                calendarModel.replaceDayEvent(events[i].getID(), d);
+            }
+        }
     }
 
     /**
@@ -558,14 +579,14 @@ public class MainWindow extends JFrame {
 
             menu.add(item);
         }
-        
+
         Rectangle rect = toolButtonCategory.getBounds();
         Point bounds = new Point(rect.x, rect.y + rect.height);
         Point toolButtonLocation = toolButtonCategory.getLocation();
         Point toolBarLocation = toolBar.getLocationOnScreen();
         Point windowDisplacement = this.getLocationOnScreen();
-        menu.show(this, toolBarLocation.x + toolButtonLocation.x - windowDisplacement.x, 
-        		toolBarLocation.y + toolButtonLocation.y + bounds.y - windowDisplacement.y);
+        menu.show(this, toolBarLocation.x + toolButtonLocation.x - windowDisplacement.x,
+                toolBarLocation.y + toolButtonLocation.y + bounds.y - windowDisplacement.y);
 
 
     }
@@ -608,7 +629,7 @@ public class MainWindow extends JFrame {
         Point toolButtonLocation = toolButtonPriority.getLocation();
         Point toolBarLocation = toolBar.getLocationOnScreen();
         Point windowDisplacement = this.getLocationOnScreen();
-        menu.show(this, toolBarLocation.x + toolButtonLocation.x - windowDisplacement.x, 
-        		toolBarLocation.y + toolButtonLocation.y + bounds.y - windowDisplacement.y);
+        menu.show(this, toolBarLocation.x + toolButtonLocation.x - windowDisplacement.x,
+                toolBarLocation.y + toolButtonLocation.y + bounds.y - windowDisplacement.y);
     }
 }
