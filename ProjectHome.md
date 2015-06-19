@@ -1,0 +1,1 @@
+Graphical calendar, developed during the course "Graphical user interface II" VT 2010.
